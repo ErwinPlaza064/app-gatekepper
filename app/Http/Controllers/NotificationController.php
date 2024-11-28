@@ -8,7 +8,12 @@ class NotificationController extends Controller
 {
     public function index()
     {
-        // Puedes usar el método notifications() o unreadNotifications() para solo traer las no leídas
-        return response()->json(auth()->user()->notifications);
+        $user = auth()->user();
+        if (!$user) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+    
+        return response()->json($user->notifications);
     }
+    
 }

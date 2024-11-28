@@ -2,6 +2,8 @@
 
 return [
 
+
+    
     /*
     |--------------------------------------------------------------------------
     | Authentication Defaults
@@ -36,11 +38,16 @@ return [
     */
 
     'guards' => [
-        'web' => [
-            'driver' => 'session',
-            'provider' => 'users',
-        ],
+    'web' => [
+        'driver' => 'session',
+        'provider' => 'users',
     ],
+
+    'api' => [
+        'driver' => 'sanctum', // Cambiar según tu método de autenticación (ver sección siguiente)
+        'provider' => 'users',
+    ],
+],
 
     /*
     |--------------------------------------------------------------------------

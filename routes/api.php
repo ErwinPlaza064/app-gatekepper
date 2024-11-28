@@ -15,10 +15,8 @@ use App\Http\Controllers\NotificationController;
 |
 */
 
-Route::middleware('auth:sanctum')->group(function () {
-    // Obtener notificaciones
-    Route::get('/notifications', [NotificationController::class, 'index']);
-});
+Route::middleware('auth:sanctum')->get('/notifications', [NotificationController::class, 'index']);
+
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();

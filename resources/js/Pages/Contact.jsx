@@ -37,8 +37,8 @@ export default function Contact({ auth }) {
             <div className="flex flex-col justify-start items-start py-10 px-4 lg:px-64">
                 <Typography
                     className="m-auto"
-                    as={"h4"}
-                    variant={"h4"}
+                    as={"h2"}
+                    variant={"h2"}
                     color={"primary"}
                 >
                     CONTACTANOS
@@ -89,8 +89,8 @@ export default function Contact({ auth }) {
                         </picture>
 
                         <Typography
-                            as={"h5"}
-                            variant={"h5"}
+                            as={"h3"}
+                            variant={"h3"}
                             color={"primary"}
                             className="mt-4"
                         >

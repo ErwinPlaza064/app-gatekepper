@@ -8,7 +8,9 @@ export default function Dashboard({ auth }) {
     // Obtener las notificaciones del usuario autenticado cuando se monta el componente
     useEffect(() => {
         axios
-            .get("/api/notifications")
+            .get("/api/notifications", {
+                withCredentials: true, // Esto asegura que las cookies de sesión se envíen
+            })
             .then((response) => {
                 setNotifications(response.data);
             })

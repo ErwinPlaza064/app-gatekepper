@@ -6,8 +6,7 @@ export default function Ask_Acount() {
     return (
         <>
             <Head title="¿Residente?" />
-            <div className="flex flex-col-reverse lg:flex-row justify-center px-4 bg-gradient-to-r from-blue-300 bg-cyan-200 lg:px-64 py-32 gap-6">
-                <div className="p-4 bg-white"></div>
+            <div className="flex flex-col-reverse lg:flex-row justify-center px-4 bg-gradient-to-r from-blue-300 bg-cyan-200 lg:px-64 py-40 gap-6">
                 <div className="flex-1 flex justify-center">
                     <picture className="w-80 lg:w-96">
                         <img
@@ -45,7 +44,6 @@ export default function Ask_Acount() {
                         </Link>
                     </div>
                 </div>
-                <div className="p-4 bg-white"></div>
             </div>
         </>
     );

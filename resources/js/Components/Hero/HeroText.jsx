@@ -44,7 +44,10 @@ export default function HeroText() {
                         />
                     </Link>
 
-                    <Link className="border px-6 py-2 items-center rounded-xl border-black hover:bg-primary hover:text-white text-center">
+                    <Link
+                        href={"contacto"}
+                        className="border px-6 py-2 items-center rounded-xl border-black hover:bg-primary hover:text-white text-center"
+                    >
                         Contáctanos
                     </Link>
                 </div>

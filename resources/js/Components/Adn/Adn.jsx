@@ -147,20 +147,6 @@ export default function Adn() {
                         adaptadas a las residencias modernas.
                     </Typography>
                 </div>
-                <div className="flex mt-3 relative px-4 text-center">
-                    <Typography
-                        className="text-pretty"
-                        as={"p"}
-                        variant={"p"}
-                        color={"dark"}
-                    >
-                        <span className="absolute left-1 top-1">
-                            <img src="/Assets/Vector.png" alt="" />
-                        </span>
-                        Confianza-Brindar un ambiente seguro y confiable para
-                        todos.
-                    </Typography>
-                </div>
             </div>
         </div>
     );

@@ -1,4 +1,4 @@
-import Typography from "../Ui/Typography";
+import Typography from "../UI/Typography";
 import { Link } from "@inertiajs/react";
 
 export default function Ask_Count() {

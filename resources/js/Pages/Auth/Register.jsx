@@ -1,9 +1,9 @@
 import { useEffect } from "react";
 import GuestLayout from "@/Layouts/GuestLayout";
-import InputError from "@/Components/Ui/InputError";
-import InputLabel from "@/Components/Ui/InputLabel";
-import PrimaryButton from "@/Components/Ui/PrimaryButton";
-import TextInput from "@/Components/Ui/TextInput";
+import InputError from "@/Components/UI/InputError";
+import InputLabel from "@/Components/UI/InputLabel";
+import PrimaryButton from "@/Components/UI/PrimaryButton";
+import TextInput from "@/Components/UI/TextInput";
 import { Head, Link, useForm } from "@inertiajs/react";
 
 export default function Register() {
@@ -122,19 +122,7 @@ export default function Register() {
                         Registrar
                     </PrimaryButton>
                 </div>
-                <div className="mt-6">
-                    <a
-                        href={route("google.login")}
-                        className="flex items-center justify-center px-4 py-2 border border-black text-black rounded hover:bg-primary hover:text-white"
-                    >
-                        <img
-                            className="w-5 mr-3"
-                            src="/Assets/Logo-Google.png"
-                            alt=""
-                        />
-                        Continua con Google
-                    </a>
-                </div>
+                
             </form>
         </GuestLayout>
     );

@@ -1,10 +1,10 @@
 import { useEffect } from "react";
-import Checkbox from "@/Components/Ui/Checkbox";
+import Checkbox from "@/Components/UI/Checkbox";
 import GuestLayout from "@/Layouts/GuestLayout";
-import InputError from "@/Components/Ui/InputError";
-import InputLabel from "@/Components/Ui/InputLabel";
-import PrimaryButton from "@/Components/Ui/PrimaryButton";
-import TextInput from "@/Components/Ui/TextInput";
+import InputError from "@/Components/UI/InputError";
+import InputLabel from "@/Components/UI/InputLabel";
+import PrimaryButton from "@/Components/UI/PrimaryButton";
+import TextInput from "@/Components/UI/TextInput";
 import { Head, Link, useForm } from "@inertiajs/react";
 
 export default function Login({ status, canResetPassword }) {
@@ -90,26 +90,9 @@ export default function Login({ status, canResetPassword }) {
                             </span>
                         </label>
                     </div>
-                    <div className="relative flex items-center justify-center mt-10">
-                        <span className="absolute bg-white px-2 text-black">
-                            O continúa con
-                        </span>
-                        <hr className="w-full border-t border-black" />
-                    </div>
+                  
 
-                    <div className="mt-6">
-                        <a
-                            href={route("google.login")}
-                            className="flex items-center justify-center px-4 py-2 border border-black text-black rounded hover:bg-primary hover:text-white"
-                        >
-                            <img
-                                className="w-5 mr-3"
-                                src="/Assets/Logo-Google.png"
-                                alt=""
-                            />
-                            Continuar con Google
-                        </a>
-                    </div>
+                  
 
                     <div className="flex items-center justify-end mt-4">
                         {canResetPassword && (

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useKeenSlider } from "keen-slider/react";
 import "keen-slider/keen-slider.min.css";
 import { Link } from "@inertiajs/react";
-import Typography from "../Ui/Typography";
+import Typography from "../UI/Typography";
 
 export default function Benefits() {
     const covers = [

@@ -1,6 +1,5 @@
 import { useState } from "react";
 import DesktopNav from "@/Components/Common/DesktopNav";
-import MobileNav from "@/Components/Common/MobileNav";
 
 export default function Authenticated({ user, children }) {
     const [showingNavigationDropdown, setShowingNavigationDropdown] =
@@ -25,10 +24,7 @@ export default function Authenticated({ user, children }) {
                         />
                     </nav>
                 </div>
-                <MobileNav
-                    userSession={userSession}
-                    showingNavigationDropdown={showingNavigationDropdown}
-                />
+               
                 <main className="min-h-screen">{children}</main>
             </div>
         </div>

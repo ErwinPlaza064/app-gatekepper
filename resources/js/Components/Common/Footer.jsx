@@ -1,5 +1,5 @@
 import React from "react";
-import Typography from "../Ui/Typography";
+import Typography from "../UI/Typography";
 import Social_Icons from "./Social_Icons";
 
 export default function Footer() {

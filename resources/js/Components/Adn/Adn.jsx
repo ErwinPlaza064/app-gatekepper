@@ -1,5 +1,5 @@
 import React from "react";
-import Typography from "../Ui/Typography";
+import Typography from "../UI/Typography";
 
 export default function Adn() {
     return (

@@ -1,4 +1,4 @@
-import Typography from "@/Components/Ui/Typography";
+import Typography from "@/Components/UI/Typography";
 import { Link } from "@inertiajs/react";
 import { Head } from "@inertiajs/react";
 

@@ -1,7 +1,7 @@
 import Banner from "@/Components/Common/Banner";
 import Footer from "@/Components/Common/Footer";
 import Social_Icons from "@/Components/Common/Social_Icons";
-import Typography from "@/Components/Ui/Typography";
+import Typography from "@/Components/UI/Typography";
 import Authenticated from "@/Layouts/AuthenticatedLayout";
 import { Head, useForm } from "@inertiajs/react";
 import InputError from "@/Components/UI/InputError";

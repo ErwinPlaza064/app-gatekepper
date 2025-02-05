@@ -31,7 +31,7 @@ export default function Ask_Acount() {
                         color={"dark"}
                     >
                         <Typography as={"h3"} variant={"h3"} color={"whites"}>
-                            ¿Eres residente?
+                            ¿Eres residente? Regístrate y accede a tu cuenta
                         </Typography>
                     </Typography>
 

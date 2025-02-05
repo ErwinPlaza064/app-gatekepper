@@ -41,7 +41,7 @@ export default function Contact({ auth }) {
                     variant={"h2"}
                     color={"primary"}
                 >
-                    CONTACTANOS
+                    CONTACTANOS A TRAVÉS DE NUESTRO FORMULARIO
                 </Typography>
                 <div className="flex flex-col lg:flex-row justify-start items-center py-8 gap-10">
                     <form onSubmit={handleSubmit} className="w-full lg:w-1/2">

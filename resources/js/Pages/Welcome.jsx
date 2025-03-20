@@ -14,8 +14,6 @@ export default function Welcome({ auth }) {
                 <Head title="Inicio" />
                 <HeroText />
                 <Benefits />
-                <Adn />
-                <Ask_Count />
                 <Footer />
             </Authenticated>
         </>

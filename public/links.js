@@ -5,10 +5,10 @@ export const links = [
     },
     {
         name: "Registro de Visitas",
-        href: "/beneficios",
+        href: "/registrovisit",
     },
     {
         name: "Notificaciones",
-        href: "/contacto",
+        href: "/notificaciones",
     },
 ];

@@ -101,7 +101,7 @@ export default function Benefits() {
     return (
         <div
             ref={sliderRef}
-            className="keen-slider flex justify-center px-4 md:px-64 mt-10 relative z-0"
+            className="keen-slider flex justify-center px-4 md:px-64 relative z-0"
         >
             {covers.map(({ src, srcMobile, alt, href, text }, idx) => (
                 <div className="relative keen-slider__slide">

@@ -46,13 +46,17 @@ Route::get('/welcome',function(){
     return Inertia::render('Welcome');
 })->name('welcome');
 
+Route::get('/registrovisit',function(){
+    return Inertia::render('RegistroVisit');
+})->name('registrovisit');
+
+Route::get('/notificaciones',function(){
+    return Inertia::render('Notificaciones');
+})->name('notificaciones');
+
 Route::get('contacto', function(){
     return Inertia::render('Contact');
 })->name('contact');
-
-Route::get('acercade', function () {
-    return Inertia::render('AcercaDe');
-})->name('acercade');
 
 Route::get('/ask_register', function () {
     return Inertia::render('Ask_Register');

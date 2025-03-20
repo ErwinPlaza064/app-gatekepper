@@ -51,14 +51,11 @@ export default function Footer() {
                 </div>
             </div>
 
-            <div className="flex justify-center items-center p-3 h-auto bg-primary">
-                <picture>
-                    <img
-                        src="/Assets/Copy.png"
-                        alt="Logo"
-                        className="h-6 md:h-8"
-                    />
-                </picture>
+            <div className="flex justify-center items-center p-5 h-auto bg-black">
+                <span className="text-white">
+                    ©Todos los derechos reservados para: Registrador de
+                    visitantes
+                </span>
             </div>
         </footer>
     );

@@ -12,28 +12,26 @@ export default function DesktopNav({
     return (
         <div className="px-5">
             <div className="flex h-16 justify-between">
-                <div className="flex">
+                <div className="flex gap-8">
                     <div className="flex shrink-0 items-center">
-                        <Link href="/">
-                            <ApplicationLogo />
-                        </Link>
+                        <Link href="/">Registrador</Link>
                     </div>
-                </div>
 
-                <ul className="hidden gap-8 md:flex">
-                    {links.map((link, index) => (
-                        <li key={index + link}>
-                            <AnimatedLink
-                                href={link.href}
-                                variant={"black"}
-                                color={"black"}
-                                className={"h-full"}
-                            >
-                                {link.name}
-                            </AnimatedLink>
-                        </li>
-                    ))}
-                </ul>
+                    <ul className="hidden gap-7 md:flex">
+                        {links.map((link, index) => (
+                            <li key={index + link}>
+                                <AnimatedLink
+                                    href={link.href}
+                                    variant={"black"}
+                                    color={"black"}
+                                    className={"h-full"}
+                                >
+                                    {link.name}
+                                </AnimatedLink>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
 
                 <div className="hidden md:flex md:ms-6 md:items-center">
                     <div className="relative ms-3">
@@ -79,16 +77,10 @@ export default function DesktopNav({
                         ) : (
                             <>
                                 <Link
-                                    className="p-2 hover:text-primary "
+                                    className="p-2 bg-black text-white rounded-xl hover:p-3 "
                                     href={"/ask_login"}
                                 >
-                                    Ingresa
-                                </Link>
-                                <Link
-                                    className="mx-auto rounded-full bg-primary px-3 py-2 text-sm font-semibold text-white hover:bg-cyan-800"
-                                    href={"/ask_register"}
-                                >
-                                    Registrate
+                                    Inicia Sesión
                                 </Link>
                             </>
                         )}

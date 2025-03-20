@@ -4,15 +4,11 @@ export const links = [
         href: "/welcome",
     },
     {
-        name: "Beneficios",
+        name: "Registro de Visitas",
         href: "/beneficios",
     },
     {
-        name: "Contacto",
+        name: "Notificaciones",
         href: "/contacto",
-    },
-    {
-        name: "Acerca De",
-        href: "/acercade",
     },
 ];

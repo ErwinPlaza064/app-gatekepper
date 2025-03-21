@@ -24,7 +24,7 @@ export default function Authenticated({ user, children }) {
                         />
                     </nav>
                 </div>
-               
+
                 <main className="min-h-screen">{children}</main>
             </div>
         </div>

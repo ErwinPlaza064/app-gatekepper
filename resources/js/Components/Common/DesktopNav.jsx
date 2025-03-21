@@ -1,5 +1,4 @@
 import { Link } from "@inertiajs/react";
-import ApplicationLogo from "../UI/ApplicationLogo";
 import Dropdown from "../UI/Dropdown";
 import AnimatedLink from "../UI/AnimatedLink";
 import { links } from "../../../../public/links";
@@ -62,13 +61,11 @@ export default function DesktopNav({
                                 </Dropdown.Trigger>
 
                                 <Dropdown.Content>
-                                    <Dropdown.Link href={route("profile.edit")}>
-                                        Profile
-                                    </Dropdown.Link>
                                     <Dropdown.Link
                                         href={route("logout")}
                                         method="post"
                                         as="button"
+                                        className="bg-black text-white hover:bg-gray-400"
                                     >
                                         Log Out
                                     </Dropdown.Link>

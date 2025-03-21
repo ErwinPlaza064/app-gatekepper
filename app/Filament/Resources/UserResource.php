@@ -22,7 +22,8 @@ class UserResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->where('role', 'resident');
+        // Se ha eliminado la referencia al rol
+        return parent::getEloquentQuery();
     }
 
     public static function form(Form $form): Form

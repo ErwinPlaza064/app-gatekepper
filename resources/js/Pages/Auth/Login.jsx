@@ -29,7 +29,7 @@ export default function Login({ status, canResetPassword }) {
     return (
         <>
             <GuestLayout>
-                <Head title="Log in" />
+                <Head title="Inicia Sesión" />
 
                 {status && (
                     <div className="mb-4 font-medium text-sm text-green-600">
@@ -90,10 +90,6 @@ export default function Login({ status, canResetPassword }) {
                             </span>
                         </label>
                     </div>
-                  
-
-                  
-
                     <div className="flex items-center justify-end mt-4">
                         {canResetPassword && (
                             <Link
@@ -105,7 +101,7 @@ export default function Login({ status, canResetPassword }) {
                         )}
 
                         <PrimaryButton
-                            className="ms-4 bg-primary"
+                            className="ms-4 bg-black text-white"
                             disabled={processing}
                         >
                             Iniciar sesión
@@ -121,7 +117,7 @@ export default function Login({ status, canResetPassword }) {
                 <div className="mt-3">
                     <Link
                         href={route("register")}
-                        className="flex items-center justify-center px-4 py-2 border border-black text-black rounded hover:bg-primary hover:text-white"
+                        className="flex items-center justify-center px-4 py-2 border border-black text-black rounded hover:bg-black hover:text-white"
                     >
                         Registrate
                     </Link>

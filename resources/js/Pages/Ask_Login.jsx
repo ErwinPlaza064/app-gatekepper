@@ -6,7 +6,7 @@ export default function Ask_Acount() {
     return (
         <>
             <Head title="¿Residente?" />
-            <div className="flex flex-col-reverse lg:flex-row justify-center px-4 bg-gradient-to-r from-blue-300 bg-cyan-200 lg:px-64 py-40 gap-6">
+            <div className="flex flex-col-reverse lg:flex-row justify-center px-4  lg:px-64 py-40 gap-6">
                 <div className="flex-1 flex justify-center">
                     <picture className="w-80 lg:w-96">
                         <img
@@ -18,11 +18,11 @@ export default function Ask_Acount() {
                 <div className="flex-1 p-12">
                     <Typography
                         className="text-center"
-                        as={"h1"}
-                        variant={"h1"}
+                        as={"h2"}
+                        variant={"h2"}
                         color={"primary"}
                     >
-                        GATEKEPPER
+                        REGISTRADOR DE VISITANTES
                     </Typography>
                     <Typography
                         className="text-center mt-3"
@@ -31,7 +31,8 @@ export default function Ask_Acount() {
                         color={"dark"}
                     >
                         <Typography as={"h3"} variant={"h3"} color={"whites"}>
-                            ¿Eres residente? Regístrate y accede a tu cuenta
+                            <strong>¿Eres residente?</strong> Ingresa y accede a
+                            tu cuenta
                         </Typography>
                     </Typography>
 

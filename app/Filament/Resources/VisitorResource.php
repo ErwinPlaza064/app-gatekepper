@@ -9,6 +9,9 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Notification;
+use App\Notifications\NewVisitorNotification;
+use Illuminate\Support\Facades\Log;
 
 class VisitorResource extends Resource
 {
@@ -31,7 +34,7 @@ class VisitorResource extends Resource
                     ->label('Residente')
                     ->relationship('user', 'name')
                     ->searchable()
-                    ->required(),
+                    ->required(),  // Este campo es obligatorio
                 Forms\Components\TextInput::make('vehicle_plate')
                     ->label('Placa del Vehículo'),
                 Forms\Components\DateTimePicker::make('entry_time')
@@ -74,5 +77,24 @@ class VisitorResource extends Resource
             'create' => Pages\CreateVisitor::route('/create'),
             'edit' => Pages\EditVisitor::route('/{record}/edit'),
         ];
+    }
+
+    /**
+     * Enviar notificación al residente después de guardar el visitante.
+     *
+     * @param \App\Models\Visitor $record
+     */
+    public static function afterSave($record)
+    {
+        $user = $record->user;
+    
+        if ($user) {
+            // Enviar la notificación al residente
+            $user->notify(new NewVisitorNotification($record));
+    
+            Log::info('Notificación enviada a ' . $user->name . ' sobre el visitante ' . $record->name);
+        } else {
+            Log::warning('No se asignó un residente para el visitante ' . $record->name);
+        }
     }
 }

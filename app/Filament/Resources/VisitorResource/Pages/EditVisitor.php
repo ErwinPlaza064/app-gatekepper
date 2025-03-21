@@ -3,10 +3,7 @@
 namespace App\Filament\Resources\VisitorResource\Pages;
 
 use App\Filament\Resources\VisitorResource;
-use App\Notifications\NewVisitorNotification;
 use Filament\Resources\Pages\EditRecord;
-use Illuminate\Support\Facades\Notification;
-use Illuminate\Support\Facades\Log;
 use Filament\Actions;
 
 class EditVisitor extends EditRecord
@@ -29,15 +26,8 @@ class EditVisitor extends EditRecord
         // Obtener el residente (user) asignado
         $user = $visitor->user;
 
-        Log::info('Tipo de $user: ', [$user]);
-
-        // Verificar el tipo de $visitor
-        Log::info('Tipo de $visitor: ', [$visitor]);
-
+        // Log para verificar la información del residente
         if ($user instanceof \App\Models\User) {
-            // Enviar la notificación
-            Notification::send($user, new NewVisitorNotification($visitor));
-            Log::info('Notificación enviada a ' . $user->name . ' sobre el visitante ' . $visitor->name);
         } else {
             Log::warning('No se asignó un residente para el visitante ' . $visitor->name);
         }

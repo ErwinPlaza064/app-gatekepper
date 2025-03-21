@@ -11,7 +11,6 @@ class CreateVisitor extends CreateRecord
     protected function handleRecordCreation(array $data): \App\Models\Visitor
     {
         $visitor = parent::handleRecordCreation($data);
-
         return $visitor;
     }
 }

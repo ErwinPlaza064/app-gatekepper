@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Notifications\Notifiable; // Importa el trait Notifiable
+use App\Notifications\NewVisitorNotification; // Asegúrate de importar la notificación
 
 class Visitor extends Model
 {
-    use HasFactory;
+    use HasFactory, Notifiable; // Usa el trait Notifiable para poder enviar notificaciones
 
     protected $fillable = [
         'name',
@@ -23,8 +25,18 @@ class Visitor extends Model
         'exit_time' => 'datetime',
     ];
 
+    // Relación con el modelo User
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    // Evento que se ejecuta al crear un nuevo visitante
+    protected static function booted()
+    {
+        static::created(function ($visitor) {
+            // Enviar la notificación cuando se cree un nuevo visitante
+            $visitor->user->notify(new NewVisitorNotification($visitor));
+        });
     }
 }

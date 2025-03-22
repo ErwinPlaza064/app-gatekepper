@@ -6,14 +6,13 @@ use Illuminate\Http\Request;
 
 class NotificationController extends Controller
 {
-    public function index()
+    /**
+     * Marcar todas las notificaciones como leídas.
+     */
+    public function markAsRead(Request $request)
     {
-        $user = auth()->user();
-        if (!$user) {
-            return response()->json(['error' => 'Unauthorized'], 401);
-        }
-    
-        return response()->json($user->notifications);
+        $request->user()->unreadNotifications->markAsRead();
+
+        return response()->json(['success' => true]);
     }
-    
 }

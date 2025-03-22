@@ -7,8 +7,8 @@ export default function Guest({ children }) {
         <div className="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100">
             <div>
                 <Link href="/">
-                    <Typography as={"h1"} variant={"h1"} color={"black"}>
-                        Registrador De Visitantes
+                    <Typography as={"h2"} variant={"h2"} color={"black"}>
+                        REGISTRADOR
                     </Typography>
                 </Link>
             </div>

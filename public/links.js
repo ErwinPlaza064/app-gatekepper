@@ -9,14 +9,10 @@ export const links = [
     },
     {
         name: "Soporte",
-        href: "/notificaciones",
+        href: "/contacto",
     },
     {
         name: "Reglamento",
-        href: "/notificaciones",
-    },
-    {
-        name: "Mi informacion",
-        href: "/notificaciones",
+        href: "/reglamento",
     },
 ];

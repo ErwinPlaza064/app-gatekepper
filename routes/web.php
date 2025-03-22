@@ -30,7 +30,7 @@ Route::get('/', function () {
 });
 
 Route::get('/ask_login', function () {
-    return Inertia::render('Ask_Login');
+    return Inertia::render('Ask/Ask_Login');
 })->name('ask_login');
 
 Route::get('/welcome',function(){
@@ -38,20 +38,20 @@ Route::get('/welcome',function(){
 })->name('welcome');
 
 Route::get('/registrovisit',function(){
-    return Inertia::render('RegistroVisit');
+    return Inertia::render('Links/RegistroVisit');
 })->name('registrovisit');
 
-Route::get('/notificaciones',function(){
-    return Inertia::render('Notificaciones');
-})->name('notificaciones');
+Route::get('/soporte',function(){
+    return Inertia::render('Links/Soporte');
+})->name('soporte');
 
-Route::get('contacto', function(){
-    return Inertia::render('Contact');
+Route::get('/reglamento',function(){
+    return Inertia::render('Links/Reglamento');
+})->name('reglamento');
+
+Route::get('/contacto', function(){
+    return Inertia::render('Links/Contact');
 })->name('contact');
-
-Route::get('/ask_register', function () {
-    return Inertia::render('Ask_Register');
-})->name('ask_register');
 
 Route::get('/success', function () {
     return Inertia::render('Email/ResponseEmail');

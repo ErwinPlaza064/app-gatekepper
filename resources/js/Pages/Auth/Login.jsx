@@ -108,20 +108,6 @@ export default function Login({ status, canResetPassword }) {
                         </PrimaryButton>
                     </div>
                 </form>
-                <div className="relative flex items-center justify-center mt-8">
-                    <span className="absolute bg-white px-2 text-black">
-                        ¿Eres nuevo aqui?
-                    </span>
-                    <hr className="w-full border-t border-black" />
-                </div>
-                <div className="mt-3">
-                    <Link
-                        href={route("register")}
-                        className="flex items-center justify-center px-4 py-2 border border-black text-black rounded hover:bg-black hover:text-white"
-                    >
-                        Registrate
-                    </Link>
-                </div>
             </GuestLayout>
         </>
     );

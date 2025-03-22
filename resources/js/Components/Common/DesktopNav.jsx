@@ -13,7 +13,9 @@ export default function DesktopNav({
             <div className="flex h-16 justify-between">
                 <div className="flex gap-8">
                     <div className="flex shrink-0 items-center">
-                        <Link href="/">Registrador</Link>
+                        <Link href="/">
+                            <strong>Registrador</strong>
+                        </Link>
                     </div>
 
                     <ul className="hidden gap-7 md:flex">
@@ -74,7 +76,7 @@ export default function DesktopNav({
                         ) : (
                             <>
                                 <Link
-                                    className="p-2 bg-black text-white rounded-xl hover:p-3 "
+                                    className="px-7 py-2 bg-black text-white rounded-xl hover:bg-gray-700"
                                     href={"/ask_login"}
                                 >
                                     Inicia Sesión

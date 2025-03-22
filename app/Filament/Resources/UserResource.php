@@ -22,7 +22,6 @@ class UserResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        // Se ha eliminado la referencia al rol
         return parent::getEloquentQuery();
     }
 

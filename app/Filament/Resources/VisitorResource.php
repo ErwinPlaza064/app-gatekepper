@@ -34,7 +34,7 @@ class VisitorResource extends Resource
                     ->label('Residente')
                     ->relationship('user', 'name')
                     ->searchable()
-                    ->required(),  // Este campo es obligatorio
+                    ->required(), 
                 Forms\Components\TextInput::make('vehicle_plate')
                     ->label('Placa del Vehículo'),
                 Forms\Components\DateTimePicker::make('entry_time')
@@ -89,7 +89,6 @@ class VisitorResource extends Resource
         $user = $record->user;
     
         if ($user) {
-            // Enviar la notificación al residente
             $user->notify(new NewVisitorNotification($record));
     
             Log::info('Notificación enviada a ' . $user->name . ' sobre el visitante ' . $record->name);

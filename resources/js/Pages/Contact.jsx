@@ -35,15 +35,7 @@ export default function Contact({ auth }) {
             <Head title="Contacto" />
             <Banner title="CONOCE NUESTRAS FORMAS DE CONTACTO" />
             <div className="flex flex-col justify-start items-start py-10 px-4 lg:px-64">
-                <Typography
-                    className="m-auto"
-                    as={"h2"}
-                    variant={"h2"}
-                    color={"primary"}
-                >
-                    CONTACTANOS A TRAVÉS DE NUESTRO FORMULARIO
-                </Typography>
-                <div className="flex flex-col lg:flex-row justify-start items-center py-8 gap-10">
+                <div className="flex flex-col lg:flex-row justify-start items-center gap-10">
                     <form onSubmit={handleSubmit} className="w-full lg:w-1/2">
                         <label htmlFor="email">CORREO ELECTRONICO</label>
                         <input
@@ -75,7 +67,7 @@ export default function Contact({ auth }) {
                             onChange={handleChange}
                         />
                         <InputError message={errors.message} />
-                        <button className="bg-primary text-white px-5 w-full lg:w-auto hover:bg-teal-900 m-0 rounded-xl mt-5">
+                        <button className="bg-black text-white px-5 w-full lg:w-auto hover:bg-teal-900 m-0 rounded-xl mt-5">
                             Enviar
                         </button>
                     </form>
@@ -91,7 +83,7 @@ export default function Contact({ auth }) {
                         <Typography
                             as={"h3"}
                             variant={"h3"}
-                            color={"primary"}
+                            color={"black"}
                             className="mt-4"
                         >
                             OTRAS FORMAS DE CONTACTO
@@ -100,7 +92,7 @@ export default function Contact({ auth }) {
                             className="text-center mt-2"
                             as={"p"}
                             variant={"p"}
-                            color={"primary"}
+                            color={"black"}
                         >
                             Si prefieres, puedes contactarnos a través de
                             nuestras redes sociales o directamente a nuestro

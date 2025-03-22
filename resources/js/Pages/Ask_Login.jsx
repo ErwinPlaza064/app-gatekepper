@@ -10,7 +10,7 @@ export default function Ask_Acount() {
                 <div className="flex-1 flex justify-center">
                     <picture className="w-80 lg:w-96">
                         <img
-                            src="/Assets/Hero_Img.png"
+                            src="/Assets/computer.svg"
                             alt="Ilustración de registro"
                         />
                     </picture>
@@ -20,7 +20,7 @@ export default function Ask_Acount() {
                         className="text-center"
                         as={"h2"}
                         variant={"h2"}
-                        color={"primary"}
+                        color={"black"}
                     >
                         REGISTRADOR DE VISITANTES
                     </Typography>
@@ -39,7 +39,7 @@ export default function Ask_Acount() {
                     <div className="flex flex-col sm:flex-row gap-5 justify-center items-center mt-8">
                         <Link
                             href={"/login"}
-                            className="border px-6 py-2 items-center rounded-xl border-black hover:bg-primary hover:text-white text-center"
+                            className="border px-6 py-2 items-center rounded-xl border-black hover:bg-black hover:text-white text-center"
                         >
                             Ingresa
                         </Link>

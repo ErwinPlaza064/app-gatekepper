@@ -10,23 +10,10 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\SendEmailController;
 
 
-
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
-*/
 Route::get('/auth/google', [GoogleController::class, 'redirectToGoogle'])->name('google.login');
 Route::get('/auth/google/callback', [GoogleController::class, 'handleGoogleCallback']);
 
 Route::middleware(['auth'])->get('/notifications', [NotificationController::class, 'index']);
-
-Route::post('/send-email', [SendEmailController::class, 'send']);
 
 
 Route::post('/notifications/mark-as-read', [DashboardController::class, 'markNotificationsAsRead'])

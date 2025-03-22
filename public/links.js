@@ -1,14 +1,22 @@
 export const links = [
     {
         name: "Inicio",
-        href: "/welcome",
+        href: "/dashboard",
     },
     {
-        name: "Registro de Visitas",
+        name: "Mis visitas",
         href: "/registrovisit",
     },
     {
-        name: "Notificaciones",
+        name: "Soporte",
+        href: "/notificaciones",
+    },
+    {
+        name: "Reglamento",
+        href: "/notificaciones",
+    },
+    {
+        name: "Mi informacion",
         href: "/notificaciones",
     },
 ];

@@ -30,19 +30,6 @@ export default function Footer() {
 
                 <div className="p-4 md:p-10 text-center">
                     <Typography as={"h4"} variant={"h4"} color={"black"}>
-                        Beneficios
-                    </Typography>
-                    <Typography as={"p"} variant={"p"} color={"black"}>
-                        <ul className="p-0 m-0">
-                            <li>Registro rápido de visitantes.</li>
-                            <li>Mejora el control de acceso.</li>
-                            <li>Seguridad más eficiente. Fácil de usar.</li>
-                        </ul>
-                    </Typography>
-                </div>
-
-                <div className="p-4 md:p-10 text-center">
-                    <Typography as={"h4"} variant={"h4"} color={"black"}>
                         Contacto
                     </Typography>
                     <Typography as={"p"} variant={"p"} color={"black"}>

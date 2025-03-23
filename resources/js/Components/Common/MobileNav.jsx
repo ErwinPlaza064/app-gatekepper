@@ -39,9 +39,9 @@ export default function MobileNav({ showingNavigationDropdown, userSession }) {
                                 method="post"
                                 href={route("logout")}
                                 as="button"
-                                className="block rounded-md px-4 py-2 hover:bg-gray-100"
+                                className="block rounded-md px-4 py-2 bg-black text-white hover:bg-gray-400"
                             >
-                                Log Out
+                                Cerrar sesión
                             </ResponsiveNavLink>
                         </div>
                     </>

@@ -69,7 +69,7 @@ export default function DesktopNav({
                                         as="button"
                                         className="bg-black text-white hover:bg-gray-400"
                                     >
-                                        Log Out
+                                        Cerrar Sesión
                                     </Dropdown.Link>
                                 </Dropdown.Content>
                             </Dropdown>

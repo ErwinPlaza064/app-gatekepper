@@ -35,7 +35,7 @@ export default function Dashboard({ auth, visits }) {
                     Bienvenido, {auth.user.name}!
                 </Typography>
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                    <div className="bg-white shadow-md rounded-lg p-5">
+                    <div className="bg-white flex flex-col ju shadow-md rounded-lg p-5">
                         <Typography
                             as={"h2"}
                             variant={"h2"}
@@ -47,23 +47,27 @@ export default function Dashboard({ auth, visits }) {
                         {notifications.length > 0 ? (
                             <>
                                 <ul className="space-y-3">
-                                    {notifications.map((notification) => (
-                                        <li
-                                            key={notification.id}
-                                            className="text-gray-700 border-b pb-2"
-                                        >
-                                            {notification.data.message} <br />
-                                            <span className="text-gray-500 text-sm">
-                                                {new Date(
-                                                    notification.created_at
-                                                ).toLocaleString()}
-                                            </span>
-                                        </li>
-                                    ))}
+                                    {notifications
+                                        .slice(0, 2)
+                                        .map((notification) => (
+                                            <li
+                                                key={notification.id}
+                                                className="text-gray-700 border-b pb-2"
+                                            >
+                                                {notification.data.message}{" "}
+                                                <br />
+                                                <span className="text-gray-500 text-sm">
+                                                    {new Date(
+                                                        notification.created_at
+                                                    ).toLocaleString()}
+                                                </span>
+                                            </li>
+                                        ))}
                                 </ul>
+
                                 <button
                                     onClick={markAsRead}
-                                    className="mt-3 text-sm bg-black text-white px-3 py-1 rounded hover:bg-blue-700"
+                                    className="mt-24 text-sm bg-black text-white px-3 py-1 rounded hover:bg-blue-700"
                                 >
                                     Marcar todas como leídas
                                 </button>
@@ -149,13 +153,14 @@ export default function Dashboard({ auth, visits }) {
                             No dudes en contactarnos para cualquier sugerencia o
                             duda.
                         </Typography>
-
-                        <Link
-                            href={"contacto"}
-                            className="text-center text-sm bg-black text-white py-1 w-56 rounded hover:bg-blue-700"
-                        >
-                            <strong>Contactanos</strong>
-                        </Link>
+                        <div className="flex mt-32">
+                            <Link
+                                href={"contacto"}
+                                className="text-center  text-sm bg-black text-white py-1 w-56 rounded hover:bg-blue-700"
+                            >
+                                <strong>Contactanos</strong>
+                            </Link>
+                        </div>
                     </div>
                 </div>
             </div>

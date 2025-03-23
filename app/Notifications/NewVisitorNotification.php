@@ -3,6 +3,8 @@ namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Messages\MailMessage;
 
 class NewVisitorNotification extends Notification
 {
@@ -17,7 +19,7 @@ class NewVisitorNotification extends Notification
 
     public function via($notifiable)
     {
-        return ['database'];  // Solo guardará la notificación en la base de datos
+        return ['mail', 'database'];
     }
 
     public function toDatabase($notifiable)
@@ -28,5 +30,14 @@ class NewVisitorNotification extends Notification
             'visitor_time' => now(),
             'message' => "{$this->visitor->name} va a tu domicilio.",
         ];
+    }
+
+    public function toMail($notifiable)
+    {
+        return (new MailMessage)
+            ->subject('Nuevo visitante registrado')
+            ->greeting("Hola {$notifiable->name},")
+            ->line("{$this->visitor->name} está llendo para tu dirección.")
+            ->line('Gracias por usar nuestra aplicación!');
     }
 }

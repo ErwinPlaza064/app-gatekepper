@@ -76,10 +76,10 @@ export default function DesktopNav({
                         ) : (
                             <>
                                 <Link
-                                    className="px-7 py-2 bg-black text-white rounded-xl hover:bg-gray-700"
+                                    className="px-6 py-2 bg-black text-white rounded-xl hover:bg-gray-700"
                                     href={"/ask_login"}
                                 >
-                                    Inicia Sesión
+                                    Ingresa
                                 </Link>
                             </>
                         )}

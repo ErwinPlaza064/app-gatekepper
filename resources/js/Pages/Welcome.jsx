@@ -11,7 +11,6 @@ export default function Welcome({ auth }) {
             <Authenticated user={user}>
                 <Head title="Inicio" />
                 <HeroText />
-                <Benefits />
                 <Footer />
             </Authenticated>
         </>

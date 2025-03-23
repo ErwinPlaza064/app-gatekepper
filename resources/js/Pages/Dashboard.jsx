@@ -128,8 +128,6 @@ export default function Dashboard({ auth, visits }) {
                         <Typography as={"p"} variant={"p"} color={"black"}>
                             Nombre: {auth.user.name}
                             <br />
-                            Email: {auth.user.email}
-                            <br />
                             Dirección: {auth.user.address ?? "No disponible"}
                         </Typography>
                     </div>

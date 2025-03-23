@@ -1,5 +1,6 @@
 import { useState } from "react";
 import DesktopNav from "@/Components/Common/DesktopNav";
+import MobileNav from "@/Components/Common/MobileNav";
 
 export default function Authenticated({ user, children }) {
     const [showingNavigationDropdown, setShowingNavigationDropdown] =
@@ -18,6 +19,13 @@ export default function Authenticated({ user, children }) {
                         <DesktopNav
                             userSession={userSession}
                             handleOnClick={handleOnClick}
+                            showingNavigationDropdown={
+                                showingNavigationDropdown
+                            }
+                        />
+
+                        <MobileNav
+                            userSession={userSession}
                             showingNavigationDropdown={
                                 showingNavigationDropdown
                             }

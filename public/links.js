@@ -5,7 +5,7 @@ export const links = [
     },
     {
         name: "Mis visitas",
-        href: "/registrovisit",
+        href: "/mis-visitas",
     },
     {
         name: "Soporte",

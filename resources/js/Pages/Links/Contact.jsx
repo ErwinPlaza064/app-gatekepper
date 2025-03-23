@@ -33,8 +33,7 @@ export default function Contact({ auth }) {
     return (
         <Authenticated user={user}>
             <Head title="Contacto" />
-            <Banner title="CONOCE NUESTRAS FORMAS DE CONTACTO" />
-            <div className="flex flex-col justify-start items-start py-10 px-4 lg:px-64">
+            <div className="flex flex-col justify-start items-start py-28 px-4 lg:px-64">
                 <div className="flex flex-col lg:flex-row justify-start items-center gap-10">
                     <form onSubmit={handleSubmit} className="w-full lg:w-1/2">
                         <label htmlFor="email">CORREO ELECTRONICO</label>

@@ -94,7 +94,7 @@ export default function Dashboard({ auth, visits }) {
                         </Typography>
                         {visits.length > 0 ? (
                             <ul className="space-y-3">
-                                {visits.map((visit, index) => (
+                                {visits.slice(0, 2).map((visit, index) => (
                                     <li
                                         key={index}
                                         className="flex justify-between"

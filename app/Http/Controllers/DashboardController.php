@@ -24,6 +24,20 @@ class DashboardController extends Controller
         ]);
     }
 
+    public function misVisitas(Request $request)
+    {
+        $user = $request->user();
+
+        return Inertia::render('Links/MisVisitas', [
+            'auth' => [
+                'user' => $user,
+            ],
+            'visits' => Visitor::where('user_id', $user->id)
+                ->orderBy('entry_time', 'desc')
+                ->get(['name', 'entry_time']),
+        ]);
+    }
+
     public function markNotificationsAsRead(Request $request)
     {
         $request->user()->unreadNotifications->markAsRead();

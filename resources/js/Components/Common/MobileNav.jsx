@@ -36,12 +36,6 @@ export default function MobileNav({ showingNavigationDropdown, userSession }) {
 
                         <div className="mt-4 space-y-2 border-t pt-4">
                             <ResponsiveNavLink
-                                href={route("profile.edit")}
-                                className="block rounded-md px-4 py-2 hover:bg-gray-100"
-                            >
-                                Profile
-                            </ResponsiveNavLink>
-                            <ResponsiveNavLink
                                 method="post"
                                 href={route("logout")}
                                 as="button"

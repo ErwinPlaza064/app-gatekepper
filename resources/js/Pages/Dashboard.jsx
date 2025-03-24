@@ -150,17 +150,12 @@ export default function Dashboard({ auth, visits }) {
                             variant={"p"}
                             color={"black"}
                         >
-                            No dudes en contactarnos para cualquier sugerencia o
-                            duda.
-                        </Typography>
-                        <div className="flex mt-32">
-                            <Link
-                                href={"contacto"}
-                                className="text-center  text-sm bg-black text-white py-1 w-56 rounded hover:bg-blue-700"
-                            >
-                                <strong>Contactanos</strong>
+                            <Link href={"contacto"} className="text-blue-500">
+                                Contactanos
                             </Link>
-                        </div>
+                            <br />
+                            para cualquier sugerencia o duda.
+                        </Typography>
                     </div>
                 </div>
             </div>

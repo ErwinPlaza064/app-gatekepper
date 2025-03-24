@@ -12,9 +12,22 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+
 
 class UserResource extends Resource
 {
+
+    public static function getModelLabel(): string
+    {
+        return 'Residente';
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return 'Residentes';
+    }
     protected static ?string $model = User::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-users';
@@ -32,13 +45,25 @@ class UserResource extends Resource
             Forms\Components\TextInput::make('name')
                 ->label('Nombre')
                 ->required(),
+
             Forms\Components\TextInput::make('email')
                 ->label('Correo Electrónico')
                 ->email()
                 ->required(),
+
             Forms\Components\TextInput::make('address')
                 ->label('Dirección')
                 ->required(),
+
+            Forms\Components\TextInput::make('password')
+                ->label('Contraseña')
+                ->password()
+                ->required()
+                ->dehydrateStateUsing(fn ($state) => Hash::make($state)) 
+                ->dehydrated(fn ($state) => filled($state)), 
+
+                Forms\Components\Hidden::make('remember_token')
+                ->default(fn () => Str::random(60)), 
         ]);
     }
 
@@ -51,10 +76,7 @@ class UserResource extends Resource
                 Tables\Columns\TextColumn::make('email')
                     ->label('Correo Electrónico'),
                 Tables\Columns\TextColumn::make('address')
-                    ->label('Dirección'),
-                Tables\Columns\TextColumn::make('last_logged_in_at')
-                    ->label('Último Inicio de Sesión')
-                    ->dateTime(),
+                    ->label('Dirección')
             ])
             ->filters([])
             ->actions([

@@ -116,13 +116,12 @@ export default function Register() {
                     </Link>
 
                     <PrimaryButton
-                        className="ms-4 bg-primary"
+                        className="ms-4 bg-black"
                         disabled={processing}
                     >
                         Registrar
                     </PrimaryButton>
                 </div>
-                
             </form>
         </GuestLayout>
     );

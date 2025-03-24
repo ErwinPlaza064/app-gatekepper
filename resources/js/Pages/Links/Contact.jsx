@@ -73,7 +73,7 @@ export default function Contact({ auth }) {
                     <div className="flex flex-col justify-center items-center w-full lg:w-1/2">
                         <picture>
                             <img
-                                src="/Assets/Contact_img.png"
+                                src="/Assets/contact.svg"
                                 alt="Imagen de contacto"
                                 className="w-full max-w-md"
                             />

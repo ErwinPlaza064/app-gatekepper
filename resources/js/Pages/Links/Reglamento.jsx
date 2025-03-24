@@ -2,9 +2,9 @@ import Authenticated from "@/Layouts/AuthenticatedLayout";
 import { Head } from "@inertiajs/react";
 import Typography from "@/Components/UI/Typography";
 
-export default function Reglamento() {
+export default function Reglamento({ auth }) {
     return (
-        <Authenticated>
+        <Authenticated user={auth.user}>
             <Head title="Reglamento" />
             <div className="max-w-4xl mx-auto px-6 py-20">
                 <Typography
@@ -16,7 +16,6 @@ export default function Reglamento() {
                     Reglamento de Visitas
                 </Typography>
 
-                {/* Contenedor del Reglamento */}
                 <div className="bg-gray-100 shadow-md rounded-lg p-8 space-y-6">
                     <div>
                         <Typography

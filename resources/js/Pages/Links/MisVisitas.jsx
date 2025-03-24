@@ -15,7 +15,7 @@ export default function MisVisitas({ auth }) {
                     color="black"
                     className="text-4xl font-extrabold text-center mb-8"
                 >
-                    🏡 Mis Visitas
+                    Mis Visitas
                 </Typography>
 
                 <div className="bg-gradient-to-r from-gray-50 to-gray-200 shadow-lg rounded-xl p-8">
@@ -53,7 +53,7 @@ export default function MisVisitas({ auth }) {
                                 color="black"
                                 className="text-gray-600 text-lg"
                             >
-                                No tienes visitas registradas. 🚪
+                                No tienes visitas registradas.
                             </Typography>
                         </div>
                     )}

@@ -6,11 +6,6 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\DashboardController;
 
-
-Route::post('/notifications/mark-as-read', [DashboardController::class, 'markNotificationsAsRead'])
-    ->middleware('auth')
-    ->name('notifications.markAsRead');
-
 Route::get('/', function () {
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
@@ -26,17 +21,12 @@ Route::get('/welcome',function(){
 
 Route::middleware(['auth', 'verified'])->get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-Route::get('/mis-visitas',function(){
-    return Inertia::render('Links/MisVisitas');
-})->name('mis-visitas');
+Route::post('/notifications/mark-as-read', [DashboardController::class, 'markNotificationsAsRead'])
+    ->middleware('auth')
+    ->name('notifications.markAsRead');
 
-Route::get('/contacto',function(){
-    return Inertia::render('Links/Contact');
-})->name('contacto');
 
-Route::get('/reglamento',function(){
-    return Inertia::render('Links/Reglamento');
-})->name('reglamento');
+Route::get('/mis-visitas', [DashboardController::class, 'misVisitas'])->middleware(['auth', 'verified'])->name('mis-visitas');
 
 
 //Ruta para el envio de correos

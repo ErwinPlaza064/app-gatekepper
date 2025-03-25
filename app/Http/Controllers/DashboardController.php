@@ -16,18 +16,30 @@ class DashboardController extends Controller
         return Inertia::render('Dashboard', [
             'auth' => [
                 'user' => $user,
-                'notifications' => $user->notifications, // 🔥 Notificaciones
+                'notifications' => $user->notifications,
             ],
             'visits' => Visitor::where('user_id', $user->id)
-                ->orderBy('entry_time', 'desc') // 🔥 Ordenar por fecha de entrada
-                ->limit(5) // 🔥 Solo las 5 visitas más recientes
-                ->get(['name', 'entry_time']), // 🔥 Solo obtener estos campos
+                ->orderBy('entry_time', 'desc')
+                ->get(['name', 'entry_time']),
+        ]);
+    }
+
+
+    public function misVisitas(Request $request){
+        $user = $request->user();
+        return Inertia::render('Links/MisVisitas',[
+            'auth' => [
+                'user' => $user,
+            ],
+            'visits' => Visitor::where('user_id', $user->id)
+                ->orderBy('entry_time', 'desc')
+                ->get(['name', 'entry_time']),
         ]);
     }
 
     public function markNotificationsAsRead(Request $request)
     {
-        $request->user()->unreadNotifications->markAsRead(); // 🔥 Marcar todas como leídas
-        return response()->json(['success' => true]); // ✅ Responder con JSON
+        $request->user()->unreadNotifications->markAsRead();
+        return response()->json(['success' => true]);
     }
 }

@@ -40,12 +40,13 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'address', 
+        'address',
+        'rol',
         'remember_token',
     ];
 
     public function visitors()
-    {   
+    {
         return $this->hasMany(Visitor::class);
     }
 

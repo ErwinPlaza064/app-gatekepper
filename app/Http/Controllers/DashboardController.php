@@ -38,6 +38,28 @@ class DashboardController extends Controller
         ]);
     }
 
+    public function reglamento(Request $request)
+    {
+        $user = $request->user();
+
+        return Inertia::render('Links/Reglamento', [
+            'auth' => [
+                'user' => $user,
+            ],
+        ]);
+    }
+
+    public function contacto(Request $request)
+    {
+        $user = $request->user();
+
+        return Inertia::render('Links/Contact', [
+            'auth' => [
+                'user' => $user,
+            ],
+        ]);
+    }
+
     public function markNotificationsAsRead(Request $request)
     {
         $request->user()->unreadNotifications->markAsRead();

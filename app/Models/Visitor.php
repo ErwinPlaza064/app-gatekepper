@@ -31,11 +31,9 @@ class Visitor extends Model
         return $this->belongsTo(User::class);
     }
 
-    // Evento que se ejecuta al crear un nuevo visitante
     protected static function booted()
     {
         static::created(function ($visitor) {
-            // Enviar la notificación cuando se cree un nuevo visitante
             $visitor->user->notify(new NewVisitorNotification($visitor));
         });
     }

@@ -1,13 +1,11 @@
 <?php
 
-use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\NotificationController;
-use App\Http\Controllers\SendEmailController;
 
 
 // Notificaciones
@@ -38,7 +36,7 @@ Route::get('/reglamento', [DashboardController::class, 'reglamento'])
     ->middleware(['auth'])
     ->name('reglamento');
 
-    Route::get('/contacto', [DashboardController::class, 'contacto'])
+Route::get('/contacto', [DashboardController::class, 'contacto'])
     ->middleware(['auth'])
     ->name('contacto');
 

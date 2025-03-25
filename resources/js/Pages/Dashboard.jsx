@@ -25,22 +25,22 @@ export default function Dashboard({ auth, visits }) {
     return (
         <Authenticated user={auth.user}>
             <Head title="Inicio" />
-            <div className="max-w-7xl mx-aut px-10 py-20">
+            <div className="px-10 py-20 max-w-7xl mx-aut">
                 <Typography
                     as={"h1"}
                     variant={"h1"}
                     color={"black"}
-                    className="text-2xl font-bold mb-5"
+                    className="mb-5 text-2xl font-bold"
                 >
                     Bienvenido, {auth.user.name}!
                 </Typography>
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                    <div className="bg-white flex flex-col ju shadow-md rounded-lg p-5">
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
+                    <div className="flex flex-col p-5 bg-white rounded-lg shadow-md ju">
                         <Typography
                             as={"h2"}
                             variant={"h2"}
                             color={"black"}
-                            className="text-xl font-semibold mb-3"
+                            className="mb-3 text-xl font-semibold"
                         >
                             Notificaciones
                         </Typography>
@@ -52,11 +52,11 @@ export default function Dashboard({ auth, visits }) {
                                         .map((notification) => (
                                             <li
                                                 key={notification.id}
-                                                className="text-gray-700 border-b pb-2"
+                                                className="pb-2 text-gray-700 border-b"
                                             >
                                                 {notification.data.message}{" "}
                                                 <br />
-                                                <span className="text-gray-500 text-sm">
+                                                <span className="text-sm text-gray-500">
                                                     {new Date(
                                                         notification.created_at
                                                     ).toLocaleString()}
@@ -67,7 +67,7 @@ export default function Dashboard({ auth, visits }) {
 
                                 <button
                                     onClick={markAsRead}
-                                    className="mt-24 text-sm bg-black text-white px-3 py-1 rounded hover:bg-blue-700"
+                                    className="px-3 py-1 mt-24 text-sm text-white bg-black rounded hover:bg-blue-700"
                                 >
                                     Marcar todas como leídas
                                 </button>
@@ -83,12 +83,12 @@ export default function Dashboard({ auth, visits }) {
                             </Typography>
                         )}
                     </div>
-                    <div className="bg-white shadow-md rounded-lg p-5">
+                    <div className="p-5 bg-white rounded-lg shadow-md">
                         <Typography
                             as={"h2"}
                             variant={"h2"}
                             color={"black"}
-                            className="text-xl font-semibold mb-3"
+                            className="mb-3 text-xl font-semibold"
                         >
                             Visitas Recientes
                         </Typography>
@@ -100,7 +100,7 @@ export default function Dashboard({ auth, visits }) {
                                         className="flex justify-between"
                                     >
                                         <span>{visit.name}</span>
-                                        <span className="text-gray-600 text-sm">
+                                        <span className="text-sm text-gray-600">
                                             {new Date(
                                                 visit.entry_time
                                             ).toLocaleString()}
@@ -120,12 +120,12 @@ export default function Dashboard({ auth, visits }) {
                         )}
                     </div>
 
-                    <div className="bg-white shadow-md rounded-lg p-5">
+                    <div className="p-5 bg-white rounded-lg shadow-md">
                         <Typography
                             as={"h2"}
                             variant={"h2"}
                             color={"black"}
-                            className="text-xl font-semibold mb-3"
+                            className="mb-3 text-xl font-semibold"
                         >
                             Tu Perfil
                         </Typography>
@@ -135,17 +135,17 @@ export default function Dashboard({ auth, visits }) {
                             Dirección: {auth.user.address ?? "No disponible"}
                         </Typography>
                     </div>
-                    <div className="p-5 flex flex-col items-center gap-5 bg-white shadow-md rounden-lg">
+                    <div className="flex flex-col items-center gap-5 p-5 bg-white shadow-md rounden-lg">
                         <Typography
                             as={"h2"}
                             variant={"h2"}
                             color={"black"}
-                            className="text-xl font-semibold mb-3"
+                            className="mb-3 text-xl font-semibold"
                         >
                             Contactanos
                         </Typography>
                         <Typography
-                            className="text-center px-10"
+                            className="px-10 text-center"
                             as={"p"}
                             variant={"p"}
                             color={"black"}

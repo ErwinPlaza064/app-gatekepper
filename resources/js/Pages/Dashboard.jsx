@@ -149,10 +149,11 @@ export default function Dashboard({ auth, visits }) {
                             variant={"p"}
                             color={"black"}
                         >
-                            No dudes en
+                            No dudes en{" "}
                             <Link href={"/contacto"} className="text-blue-700">
                                 contactarnos
                             </Link>
+                            <br />
                             para cualquier sugerencia o duda.
                         </Typography>
                     </div>

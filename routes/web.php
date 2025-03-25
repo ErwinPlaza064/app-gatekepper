@@ -10,16 +10,13 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\SendEmailController;
 
 
-Route::get('/auth/google', [GoogleController::class, 'redirectToGoogle'])->name('google.login');
-Route::get('/auth/google/callback', [GoogleController::class, 'handleGoogleCallback']);
-
+// Notificaciones
 Route::middleware(['auth'])->get('/notifications', [NotificationController::class, 'index']);
-
-
 Route::post('/notifications/mark-as-read', [DashboardController::class, 'markNotificationsAsRead'])
     ->middleware('auth')
     ->name('notifications.markAsRead');
 
+// Páginas estáticas y otras rutas
 Route::get('/', function () {
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
@@ -28,10 +25,6 @@ Route::get('/', function () {
         'phpVersion' => PHP_VERSION,
     ]);
 });
-
-Route::get('/ask_login', function () {
-    return Inertia::render('Ask/Ask_Login');
-})->name('ask_login');
 
 Route::get('/welcome',function(){
     return Inertia::render('Welcome');
@@ -61,6 +54,12 @@ Route::get('/success', function () {
     return Inertia::render('Email/ResponseEmail');
 })->name('success');
 
+Route::get('/error', function () {
+    return Inertia::render('Auth/Error');
+})->name('error');
+
+
+// Dashboard y perfil
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
@@ -71,7 +70,5 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-Route::middleware(['auth', 'verified'])->get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-
-
+// Autenticación
 require __DIR__.'/auth.php';

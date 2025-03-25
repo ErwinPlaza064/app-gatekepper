@@ -77,7 +77,7 @@ export default function DesktopNav({
                             <>
                                 <Link
                                     className="px-6 py-2 bg-black text-white rounded-xl hover:bg-gray-700"
-                                    href={"/ask_login"}
+                                    href={"/login"}
                                 >
                                     Ingresa
                                 </Link>

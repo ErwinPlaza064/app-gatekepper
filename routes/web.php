@@ -5,14 +5,12 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\NotificationController;
 
 
 Route::post('/notifications/mark-as-read', [DashboardController::class, 'markNotificationsAsRead'])
     ->middleware('auth')
     ->name('notifications.markAsRead');
 
-// Páginas estáticas y otras rutas
 Route::get('/', function () {
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
@@ -26,16 +24,32 @@ Route::get('/welcome',function(){
     return Inertia::render('Welcome');
 })->name('welcome');
 
+Route::middleware(['auth', 'verified'])->get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
+Route::get('/mis-visitas',function(){
+    return Inertia::render('Links/MisVisitas');
+})->name('mis-visitas');
+
+Route::get('/contacto',function(){
+    return Inertia::render('Links/Contact');
+})->name('contacto');
+
+Route::get('/reglamento',function(){
+    return Inertia::render('Links/Reglamento');
+})->name('reglamento');
+
+
+//Ruta para el envio de correos
 Route::get('/success', function () {
     return Inertia::render('Email/ResponseEmail');
 })->name('success');
 
+
+//Ruta para Permisos de Usuario
 Route::get('/error', function () {
     return Inertia::render('Auth/Error');
 })->name('error');
 
-Route::middleware(['auth', 'verified'])->get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
 
 Route::middleware('auth')->group(function () {
@@ -44,5 +58,4 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-// Autenticación
 require __DIR__.'/auth.php';

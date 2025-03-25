@@ -30,25 +30,17 @@ Route::get('/welcome',function(){
     return Inertia::render('Welcome');
 })->name('welcome');
 
-Route::get('/registrovisit',function(){
-    return Inertia::render('Links/RegistroVisit');
-})->name('registrovisit');
-
 Route::get('/mis-visitas', [DashboardController::class, 'misVisitas'])
     ->middleware(['auth'])
     ->name('mis-visitas');
 
-Route::get('/soporte',function(){
-    return Inertia::render('Links/Soporte');
-})->name('soporte');
+Route::get('/reglamento', [DashboardController::class, 'reglamento'])
+    ->middleware(['auth'])
+    ->name('reglamento');
 
-Route::get('/reglamento',function(){
-    return Inertia::render('Links/Reglamento');
-})->name('reglamento');
-
-Route::get('/contacto', function(){
-    return Inertia::render('Links/Contact');
-})->name('contact');
+    Route::get('/contacto', [DashboardController::class, 'contacto'])
+    ->middleware(['auth'])
+    ->name('contacto');
 
 Route::get('/success', function () {
     return Inertia::render('Email/ResponseEmail');

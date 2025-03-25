@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\Visitor;
 
+
 class DashboardController extends Controller
 {
     public function index(Request $request)
@@ -15,54 +16,18 @@ class DashboardController extends Controller
         return Inertia::render('Dashboard', [
             'auth' => [
                 'user' => $user,
-                'notifications' => $user->notifications,
+                'notifications' => $user->notifications, // 🔥 Notificaciones
             ],
             'visits' => Visitor::where('user_id', $user->id)
-                ->orderBy('entry_time', 'desc')
-                ->limit(5)
-                ->get(['name', 'entry_time']),
-        ]);
-    }
-
-    public function misVisitas(Request $request)
-    {
-        $user = $request->user();
-
-        return Inertia::render('Links/MisVisitas', [
-            'auth' => [
-                'user' => $user,
-            ],
-            'visits' => Visitor::where('user_id', $user->id)
-                ->orderBy('entry_time', 'desc')
-                ->get(['name', 'entry_time']),
-        ]);
-    }
-
-    public function reglamento(Request $request)
-    {
-        $user = $request->user();
-
-        return Inertia::render('Links/Reglamento', [
-            'auth' => [
-                'user' => $user,
-            ],
-        ]);
-    }
-
-    public function contacto(Request $request)
-    {
-        $user = $request->user();
-
-        return Inertia::render('Links/Contact', [
-            'auth' => [
-                'user' => $user,
-            ],
+                ->orderBy('entry_time', 'desc') // 🔥 Ordenar por fecha de entrada
+                ->limit(5) // 🔥 Solo las 5 visitas más recientes
+                ->get(['name', 'entry_time']), // 🔥 Solo obtener estos campos
         ]);
     }
 
     public function markNotificationsAsRead(Request $request)
     {
-        $request->user()->unreadNotifications->markAsRead();
-        return response()->json(['success' => true]);
+        $request->user()->unreadNotifications->markAsRead(); // 🔥 Marcar todas como leídas
+        return response()->json(['success' => true]); // ✅ Responder con JSON
     }
 }

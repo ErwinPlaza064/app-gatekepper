@@ -35,7 +35,7 @@ export default function Dashboard({ auth, visits }) {
                     Bienvenido, {auth.user.name}!
                 </Typography>
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
-                    <div className="flex flex-col p-5 bg-white rounded-lg shadow-md ju">
+                    <div className="p-5 bg-white rounded-lg shadow-md">
                         <Typography
                             as={"h2"}
                             variant={"h2"}
@@ -64,10 +64,9 @@ export default function Dashboard({ auth, visits }) {
                                             </li>
                                         ))}
                                 </ul>
-
                                 <button
                                     onClick={markAsRead}
-                                    className="px-3 py-1 mt-24 text-sm text-white bg-black rounded hover:bg-blue-700"
+                                    className="px-3 py-1 mt-3 text-sm text-white bg-black rounded hover:bg-blue-700"
                                 >
                                     Marcar todas como leídas
                                 </button>
@@ -150,10 +149,10 @@ export default function Dashboard({ auth, visits }) {
                             variant={"p"}
                             color={"black"}
                         >
-                            <Link href={"contacto"} className="text-blue-500">
-                                Contactanos
+                            No dudes en
+                            <Link href={"/contacto"} className="text-blue-700">
+                                contactarnos
                             </Link>
-                            <br />
                             para cualquier sugerencia o duda.
                         </Typography>
                     </div>

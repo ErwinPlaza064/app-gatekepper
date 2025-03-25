@@ -8,23 +8,23 @@ export default function MisVisitas({ auth }) {
     return (
         <Authenticated user={auth.user}>
             <Head title="Mis Visitas" />
-            <div className="max-w-7xl mx-auto px-6 py-20">
+            <div className="px-6 py-20 mx-auto max-w-7xl">
                 <Typography
                     as="h1"
                     variant="h1"
                     color="black"
-                    className="text-4xl font-extrabold text-center mb-8"
+                    className="mb-8 text-4xl font-extrabold text-center"
                 >
                     Mis Visitas
                 </Typography>
 
-                <div className="bg-gradient-to-r from-gray-50 to-gray-200 shadow-lg rounded-xl p-8">
+                <div className="p-8 shadow-lg bg-gradient-to-r from-gray-50 to-gray-200 rounded-xl">
                     {visits.length > 0 ? (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
                             {visits.map((visit, index) => (
                                 <div
                                     key={index}
-                                    className="bg-white p-5 rounded-lg shadow-md transition duration-300 transform hover:scale-105 hover:shadow-lg"
+                                    className="p-5 transition duration-300 transform bg-white rounded-lg shadow-md hover:scale-105 hover:shadow-lg"
                                 >
                                     <Typography
                                         as="h2"
@@ -34,10 +34,10 @@ export default function MisVisitas({ auth }) {
                                     >
                                         {visit.name}
                                     </Typography>
-                                    <p className="text-gray-600 mt-2">
+                                    <p className="mt-2 text-gray-600">
                                         <span className="font-semibold">
                                             Fecha y Hora:
-                                        </span>{" "}
+                                        </span>
                                         {new Date(
                                             visit.entry_time
                                         ).toLocaleString()}
@@ -46,12 +46,12 @@ export default function MisVisitas({ auth }) {
                             ))}
                         </div>
                     ) : (
-                        <div className="text-center py-12">
+                        <div className="py-12 text-center">
                             <Typography
                                 as="p"
                                 variant="p"
                                 color="black"
-                                className="text-gray-600 text-lg"
+                                className="text-lg text-gray-600"
                             >
                                 No tienes visitas registradas.
                             </Typography>

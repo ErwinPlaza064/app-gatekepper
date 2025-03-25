@@ -12,7 +12,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('rol')->default('residente'); // 🔹 Por defecto, los usuarios serán residentes
+            $table->string('rol')->default('residente');
         });
     }
 

@@ -8,8 +8,6 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\NotificationController;
 
 
-// Notificaciones
-Route::middleware(['auth'])->get('/notifications', [NotificationController::class, 'index']);
 Route::post('/notifications/mark-as-read', [DashboardController::class, 'markNotificationsAsRead'])
     ->middleware('auth')
     ->name('notifications.markAsRead');
@@ -28,17 +26,6 @@ Route::get('/welcome',function(){
     return Inertia::render('Welcome');
 })->name('welcome');
 
-Route::get('/mis-visitas', [DashboardController::class, 'misVisitas'])
-    ->middleware(['auth'])
-    ->name('mis-visitas');
-
-Route::get('/reglamento', [DashboardController::class, 'reglamento'])
-    ->middleware(['auth'])
-    ->name('reglamento');
-
-Route::get('/contacto', [DashboardController::class, 'contacto'])
-    ->middleware(['auth'])
-    ->name('contacto');
 
 Route::get('/success', function () {
     return Inertia::render('Email/ResponseEmail');
@@ -48,11 +35,8 @@ Route::get('/error', function () {
     return Inertia::render('Auth/Error');
 })->name('error');
 
+Route::middleware(['auth', 'verified'])->get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-// Dashboard y perfil
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

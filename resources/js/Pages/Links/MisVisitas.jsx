@@ -13,7 +13,7 @@ export default function MisVisitas({ auth }) {
                     as="h1"
                     variant="h1"
                     color="black"
-                    className="mb-8 text-4xl font-extrabold text-center"
+                    className="p-2 text-center"
                 >
                     Mis Visitas
                 </Typography>

@@ -6,17 +6,17 @@ export default function Reglamento({ auth }) {
     return (
         <Authenticated user={auth.user}>
             <Head title="Reglamento" />
-            <div className="max-w-4xl mx-auto px-6 py-20">
+            <div className="max-w-4xl px-6 py-20 mx-auto">
                 <Typography
                     as="h1"
                     variant="h1"
                     color="black"
-                    className="text-3xl font-bold text-center mb-8"
+                    className="p-2 text-center"
                 >
                     Reglamento de Visitas
                 </Typography>
 
-                <div className="bg-gray-100 shadow-md rounded-lg p-8 space-y-6">
+                <div className="p-8 space-y-6 bg-gray-100 rounded-lg shadow-md">
                     <div>
                         <Typography
                             as="h2"
@@ -30,7 +30,7 @@ export default function Reglamento({ auth }) {
                             as="p"
                             variant="p"
                             color="black"
-                            className="text-gray-700 mt-2"
+                            className="mt-2 text-gray-700"
                         >
                             Todos los visitantes deben presentar una
                             identificación oficial al ingresar al recinto. Sin
@@ -51,7 +51,7 @@ export default function Reglamento({ auth }) {
                             as="p"
                             variant="p"
                             color="black"
-                            className="text-gray-700 mt-2"
+                            className="mt-2 text-gray-700"
                         >
                             Se espera que todos los visitantes respeten las
                             normas del recinto. Cualquier alteración del orden
@@ -72,7 +72,7 @@ export default function Reglamento({ auth }) {
                             as="p"
                             variant="p"
                             color="black"
-                            className="text-gray-700 mt-2"
+                            className="mt-2 text-gray-700"
                         >
                             Todos los ingresos deben ser registrados en el
                             sistema. El residente será responsable de sus

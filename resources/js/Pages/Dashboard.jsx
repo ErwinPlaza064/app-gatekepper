@@ -24,15 +24,15 @@ export default function Dashboard({ auth, visits }) {
 
     return (
         <Authenticated user={auth.user}>
-            <Head title="Inicio" />
+            <Head title="Dashboard" />
             <div className="px-10 py-20 max-w-7xl mx-aut">
                 <Typography
+                    className="p-2"
                     as={"h1"}
                     variant={"h1"}
                     color={"black"}
-                    className="mb-5 text-2xl font-bold"
                 >
-                    Bienvenido, {auth.user.name}!
+                    Bienvenido, !{auth.user.name}!
                 </Typography>
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
                     <div className="p-5 bg-white rounded-lg shadow-md">

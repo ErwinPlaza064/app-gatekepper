@@ -28,6 +28,13 @@ Route::post('/notifications/mark-as-read', [DashboardController::class, 'markNot
 
 Route::get('/mis-visitas', [DashboardController::class, 'misVisitas'])->middleware(['auth', 'verified'])->name('mis-visitas');
 
+Route::get("/contacto", function(){
+    return Inertia::render('Links/Contact');
+})->name('contacto');
+
+Route::get("/reglamento", function(){
+    return Inertia::render('Links/Reglamento');
+})->name('reglamento');
 
 //Ruta para el envio de correos
 Route::get('/success', function () {

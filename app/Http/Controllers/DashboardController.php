@@ -24,7 +24,6 @@ class DashboardController extends Controller
         ]);
     }
 
-
     public function misVisitas(Request $request){
         $user = $request->user();
         return Inertia::render('Links/MisVisitas',[

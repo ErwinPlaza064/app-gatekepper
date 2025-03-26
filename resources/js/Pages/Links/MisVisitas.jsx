@@ -1,9 +1,25 @@
 import Authenticated from "@/Layouts/AuthenticatedLayout";
-import { Head, usePage } from "@inertiajs/react";
+import { Head, usePage, router } from "@inertiajs/react";
 import Typography from "@/Components/UI/Typography";
+import { useState, useEffect } from "react";
+import { debounce } from "lodash";
 
 export default function MisVisitas({ auth }) {
-    const { visits = [] } = usePage().props;
+    const { visits = [], searchQuery = "" } = usePage().props;
+    const [search, setSearch] = useState(searchQuery);
+
+    useEffect(() => {
+        const delaySearch = debounce(() => {
+            router.get(
+                route("mis-visitas"),
+                { search },
+                { preserveState: true, replace: true }
+            );
+        }, 500);
+
+        delaySearch();
+        return () => delaySearch.cancel();
+    }, [search]);
 
     return (
         <Authenticated user={auth.user}>
@@ -17,6 +33,13 @@ export default function MisVisitas({ auth }) {
                 >
                     Mis Visitas
                 </Typography>
+                <input
+                    type="text"
+                    placeholder="Buscar por nombre..."
+                    className="w-full p-2 mb-5 bg-gray-200 border-none rounded"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                />
 
                 <div className="p-8 shadow-lg bg-gradient-to-r from-gray-50 to-gray-200 rounded-xl">
                     {visits.length > 0 ? (
@@ -37,7 +60,7 @@ export default function MisVisitas({ auth }) {
                                     <p className="mt-2 text-gray-600">
                                         <span className="font-semibold">
                                             Fecha y Hora:
-                                        </span>
+                                        </span>{" "}
                                         {new Date(
                                             visit.entry_time
                                         ).toLocaleString()}

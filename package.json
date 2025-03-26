@@ -21,6 +21,7 @@
         "vite": "^4.0.0"
     },
     "dependencies": {
-        "keen-slider": "^6.8.6"
+        "keen-slider": "^6.8.6",
+        "lodash": "^4.17.21"
     }
 }

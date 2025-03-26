@@ -9,14 +9,14 @@ export default function MobileNav({ showingNavigationDropdown, userSession }) {
                 (showingNavigationDropdown ? "block" : "hidden") + " sm:hidden"
             }
         >
-            <div className="rounded-lg border-t border-gray-200 bg-white px-4 pb-1 pt-4 shadow-lg">
+            <div className="px-4 pt-4 pb-1 bg-white border-t border-gray-200 rounded-lg shadow-lg">
                 {userSession != null ? (
                     <>
                         <div className="mb-4">
-                            <div className="text-base font-medium text-gray-800">
+                            <div className="text-base font-medium text-center text-gray-800">
                                 {userSession.name}
                             </div>
-                            <div className="text-sm font-medium text-gray-500">
+                            <div className="text-sm font-medium text-center text-gray-500">
                                 {userSession.email}
                             </div>
                         </div>
@@ -26,7 +26,7 @@ export default function MobileNav({ showingNavigationDropdown, userSession }) {
                                 <li key={index + link}>
                                     <ResponsiveNavLink
                                         href={link.href}
-                                        className="block rounded-md px-4 py-2 hover:bg-gray-100"
+                                        className="block px-4 py-2 rounded-md hover:bg-gray-100"
                                     >
                                         {link.name}
                                     </ResponsiveNavLink>
@@ -34,12 +34,12 @@ export default function MobileNav({ showingNavigationDropdown, userSession }) {
                             ))}
                         </ul>
 
-                        <div className="mt-4 space-y-2 border-t pt-4">
+                        <div className="pt-4 mt-4 space-y-2 border-t">
                             <ResponsiveNavLink
                                 method="post"
                                 href={route("logout")}
                                 as="button"
-                                className="block rounded-md px-4 py-2 bg-black text-white hover:bg-gray-400"
+                                className="block px-4 py-2 text-white bg-black rounded-md hover:bg-gray-400"
                             >
                                 Cerrar sesión
                             </ResponsiveNavLink>
@@ -51,14 +51,14 @@ export default function MobileNav({ showingNavigationDropdown, userSession }) {
                             <li key={index + link}>
                                 <ResponsiveNavLink
                                     href={link.href}
-                                    className="block rounded-md px-4 py-2 hover:bg-gray-100"
+                                    className="block px-4 py-2 rounded-md hover:bg-gray-100"
                                 >
                                     {link.name}
                                 </ResponsiveNavLink>
                             </li>
                         ))}
                         <Link
-                            className="block rounded-md px-4 py-2 hover:bg-gray-100"
+                            className="block px-4 py-2 rounded-md hover:bg-gray-100"
                             href={route("login")}
                         >
                             Ingresa

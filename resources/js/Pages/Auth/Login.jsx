@@ -7,7 +7,7 @@ import PrimaryButton from "@/Components/UI/PrimaryButton";
 import TextInput from "@/Components/UI/TextInput";
 import { Head, Link, useForm } from "@inertiajs/react";
 
-export default function Login({ status, canResetPassword }) {
+export default function Login({ status }) {
     const { data, setData, post, processing, errors, reset } = useForm({
         email: "",
         password: "",
@@ -32,7 +32,7 @@ export default function Login({ status, canResetPassword }) {
                 <Head title="Inicia Sesión" />
 
                 {status && (
-                    <div className="mb-4 font-medium text-sm text-green-600">
+                    <div className="mb-4 text-sm font-medium text-green-600">
                         {status}
                     </div>
                 )}
@@ -42,14 +42,14 @@ export default function Login({ status, canResetPassword }) {
                         <InputLabel
                             htmlFor="email"
                             value="Correo"
-                            className="text-gray-700 font-semibold"
+                            className="font-semibold text-gray-700"
                         />
                         <TextInput
                             id="email"
                             type="email"
                             name="email"
                             value={data.email}
-                            className="mt-2 block w-full border-gray-300 focus:border-gray-700 focus:ring focus:ring-gray-400 rounded-md shadow-sm"
+                            className="block w-full mt-2 border-gray-300 rounded-md shadow-sm focus:border-gray-700 focus:ring focus:ring-gray-400"
                             autoComplete="username"
                             isFocused={true}
                             onChange={(e) => setData("email", e.target.value)}
@@ -64,14 +64,14 @@ export default function Login({ status, canResetPassword }) {
                         <InputLabel
                             htmlFor="password"
                             value="Contraseña"
-                            className="text-gray-700 font-semibold"
+                            className="font-semibold text-gray-700"
                         />
                         <TextInput
                             id="password"
                             type="password"
                             name="password"
                             value={data.password}
-                            className="mt-2 block w-full border-gray-300 focus:border-gray-700 focus:ring focus:ring-gray-400 rounded-md shadow-sm"
+                            className="block w-full mt-2 border-gray-300 rounded-md shadow-sm focus:border-gray-700 focus:ring focus:ring-gray-400"
                             autoComplete="current-password"
                             onChange={(e) =>
                                 setData("password", e.target.value)
@@ -98,9 +98,9 @@ export default function Login({ status, canResetPassword }) {
                         </label>
                     </div>
 
-                    <div className="flex flex-col md:flex-row items-center justify-end mt-4">
+                    <div className="flex flex-col items-center justify-end mt-4 md:flex-row">
                         <PrimaryButton
-                            className="ms-4 bg-black"
+                            className="bg-black ms-4"
                             disabled={processing}
                         >
                             Iniciar sesión

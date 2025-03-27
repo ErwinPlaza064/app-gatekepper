@@ -43,7 +43,6 @@ class AdminPanelProvider extends PanelProvider
                 Widgets\AccountWidget::class,
             ])
             ->middleware([
-                // Middleware original de Filament y Laravel
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
                 StartSession::class,

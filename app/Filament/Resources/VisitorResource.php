@@ -34,7 +34,7 @@ class VisitorResource extends Resource
                     ->label('Residente')
                     ->relationship('user', 'name')
                     ->searchable()
-                    ->required(), 
+                    ->required(),
                 Forms\Components\TextInput::make('vehicle_plate')
                     ->label('Placa del Vehículo'),
                 Forms\Components\DateTimePicker::make('entry_time')
@@ -49,12 +49,23 @@ class VisitorResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')->label('Nombre'),
-                Tables\Columns\TextColumn::make('id_document')->label('Documento'),
-                Tables\Columns\TextColumn::make('user.name')->label('Residente'),
-                Tables\Columns\TextColumn::make('vehicle_plate')->label('Placa'),
-                Tables\Columns\TextColumn::make('entry_time')->label('Entrada')->dateTime(),
-                Tables\Columns\TextColumn::make('exit_time')->label('Salida')->dateTime(),
+                Tables\Columns\TextColumn::make('name')
+                    ->label('Nombre')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('id_document')
+                    ->label('Documento')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('user.name')
+                    ->label('Residente')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('vehicle_plate')
+                    ->label('Placa'),
+                Tables\Columns\TextColumn::make('entry_time')
+                    ->label('Entrada')
+                    ->dateTime(),
+                Tables\Columns\TextColumn::make('exit_time')
+                    ->label('Salida')
+                    ->dateTime(),
             ])
             ->filters([])
             ->actions([
@@ -62,8 +73,11 @@ class VisitorResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
-            ]);
+            ])
+            ->defaultSort('entry_time', 'desc')
+            ->searchable();
     }
+
 
     public static function getRelations(): array
     {
@@ -87,10 +101,10 @@ class VisitorResource extends Resource
     public static function afterSave($record)
     {
         $user = $record->user;
-    
+
         if ($user) {
             $user->notify(new NewVisitorNotification($record));
-    
+
             Log::info('Notificación enviada a ' . $user->name . ' sobre el visitante ' . $record->name);
         } else {
             Log::warning('No se asignó un residente para el visitante ' . $record->name);

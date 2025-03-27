@@ -10,9 +10,9 @@ export default function DesktopNav({
 }) {
     return (
         <div className="px-5">
-            <div className="flex h-16 justify-between">
+            <div className="flex justify-between h-16">
                 <div className="flex gap-8">
-                    <div className="flex shrink-0 items-center">
+                    <div className="flex items-center shrink-0">
                         <Link href="/">
                             <strong>Registrador</strong>
                         </Link>
@@ -42,7 +42,7 @@ export default function DesktopNav({
                                     <span className="inline-flex rounded-md">
                                         <button
                                             type="button"
-                                            className="inline-flex items-center rounded-md border border-transparent bg-white px-3 py-2 text-sm font-medium leading-4 text-gray-500 transition duration-150 ease-in-out hover:text-gray-700 focus:outline-none"
+                                            className="inline-flex items-center px-3 py-2 text-sm font-medium leading-4 text-gray-500 transition duration-150 ease-in-out bg-white border border-transparent rounded-md hover:text-gray-700 focus:outline-none"
                                         >
                                             {userSession.name}
 
@@ -67,7 +67,7 @@ export default function DesktopNav({
                                         href={route("logout")}
                                         method="post"
                                         as="button"
-                                        className="bg-black text-white hover:bg-gray-400"
+                                        className="text-white bg-black hover:bg-gray-400"
                                     >
                                         Cerrar Sesión
                                     </Dropdown.Link>
@@ -76,7 +76,7 @@ export default function DesktopNav({
                         ) : (
                             <>
                                 <Link
-                                    className="px-6 py-2 bg-black text-white rounded-xl hover:bg-gray-700"
+                                    className="px-6 py-2 text-white transition-all duration-300 ease-in-out bg-black rounded-xl hover:bg-gray-700"
                                     href={"/login"}
                                 >
                                     Ingresa
@@ -86,13 +86,13 @@ export default function DesktopNav({
                     </div>
                 </div>
 
-                <div className="-me-2 flex items-center sm:hidden">
+                <div className="flex items-center -me-2 sm:hidden">
                     <button
                         onClick={handleOnClick}
-                        className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 transition duration-150 ease-in-out hover:bg-gray-100 hover:text-gray-500 focus:bg-gray-100 focus:text-gray-500 focus:outline-none"
+                        className="inline-flex items-center justify-center p-2 text-gray-400 transition duration-150 ease-in-out rounded-md hover:bg-gray-100 hover:text-gray-500 focus:bg-gray-100 focus:text-gray-500 focus:outline-none"
                     >
                         <svg
-                            className="h-6 w-6"
+                            className="w-6 h-6"
                             stroke="currentColor"
                             fill="none"
                             viewBox="0 0 24 24"

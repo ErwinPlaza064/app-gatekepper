@@ -52,13 +52,28 @@ export default function Dashboard({ auth, visits }) {
                     <span className="text-gray-700">{auth.user.name}!</span>
                 </Typography>
                 {isAdmin ? (
-                    <div className="mt-5">
-                        <Link
-                            href="/admin"
-                            className="p-2 text-white bg-black rounded-lg hover:bg-blue-700"
+                    <div className="p-6 mt-10 bg-gray-100 shadow-md rounded-xl">
+                        <Typography
+                            as="h2"
+                            variant="h2"
+                            className="mb-4 text-lg font-semibold text-black"
                         >
-                            Ir al Panel de Administración
-                        </Link>
+                            Panel de Administración
+                        </Typography>
+                        <p className="mb-6 text-gray-600">
+                            Tienes privilegios de administrador. Puedes
+                            gestionar usuarios, ver reportes y realizar otras
+                            tareas administrativas.
+                        </p>
+
+                        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                            <Link
+                                href="/admin"
+                                className="p-4 text-center text-white transition-all duration-300 ease-in-out bg-black rounded-lg hover:bg-blue-700"
+                            >
+                                Ir al Panel de Administración
+                            </Link>
+                        </div>
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
@@ -93,7 +108,7 @@ export default function Dashboard({ auth, visits }) {
                                     </ul>
                                     <button
                                         onClick={markAsRead}
-                                        className="px-3 py-1 mt-3 text-sm text-white bg-black rounded hover:bg-blue-700"
+                                        className="px-3 py-1 mt-3 text-sm text-white transition-all duration-300 ease-in-out bg-black rounded hover:bg-blue-700"
                                     >
                                         Marcar todas como leídas
                                     </button>
@@ -209,7 +224,7 @@ export default function Dashboard({ auth, visits }) {
                                 <button
                                     type="submit"
                                     disabled={processing}
-                                    className="px-3 py-1 mt-1 text-sm text-white bg-black rounded hover:bg-blue-700"
+                                    className="px-3 py-1 mt-1 text-sm text-white transition-all duration-300 ease-in-out bg-black rounded hover:bg-blue-700"
                                 >
                                     Enviar Queja
                                 </button>

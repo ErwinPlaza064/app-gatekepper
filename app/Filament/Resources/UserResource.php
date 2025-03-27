@@ -70,11 +70,14 @@ class UserResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->label('Nombre'),
+                    ->label('Nombre')
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('email')
-                    ->label('Correo Electrónico'),
+                    ->label('Correo Electrónico')
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('address')
                     ->label('Dirección')
+                    ->searchable(),
             ])
             ->filters([])
             ->actions([
@@ -82,8 +85,11 @@ class UserResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
-            ]);
+            ])
+            ->defaultSort('name', 'asc')
+            ->searchable();
     }
+
 
     public static function getRelations(): array
     {

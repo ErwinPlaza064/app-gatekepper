@@ -49,7 +49,6 @@ class DashboardController extends Controller
 
     public function store(Request $request)
     {
-        try {
             $request->validate([
                 'message' => 'required|string|max:255',
             ]);
@@ -59,11 +58,7 @@ class DashboardController extends Controller
                 'user_id' => auth()->id(),
             ]);
 
-            return redirect()->back()->with('success', 'Queja enviada correctamente.');
-        } catch (\Exception $e) {
-            Log::error('Error en store Complaint: ' . $e->getMessage());
-            return response()->json(['error' => $e->getMessage()], 500);
-        }
+            return redirect()->back()->with('success', 'Queja enviada correctamente');
     }
 
 

@@ -33,9 +33,6 @@ export default function Dashboard({ auth, visits }) {
             onSuccess: () => {
                 reset("message");
             },
-            onError: (errors) => {
-                console.error(errors);
-            },
         });
     };
 
@@ -200,7 +197,7 @@ export default function Dashboard({ auth, visits }) {
 
                                 {props.flash?.success && (
                                     <div
-                                        className="relative px-4 py-3 text-green-700 bg-green-100 border border-green-400 rounded"
+                                        className="relative text-green-700"
                                         role="alert"
                                     >
                                         <span className="block sm:inline">
@@ -212,7 +209,7 @@ export default function Dashboard({ auth, visits }) {
                                 <button
                                     type="submit"
                                     disabled={processing}
-                                    className="px-3 py-1 mt-20 text-sm text-white bg-black rounded hover:bg-blue-700"
+                                    className="px-3 py-1 mt-1 text-sm text-white bg-black rounded hover:bg-blue-700"
                                 >
                                     Enviar Queja
                                 </button>

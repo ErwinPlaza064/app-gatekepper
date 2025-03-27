@@ -28,13 +28,14 @@ export default function Dashboard({ auth, visits }) {
         success: "",
     });
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
+    const handleSubmit = () => {
         post(route("complaints.store"), {
             onSuccess: (response) => {
                 setData({ message: "", success: response.success });
             },
-            onError: () => {},
+            onError: (error) => {
+                setData({ ...data, errors }); // Manejar errores
+            },
         });
     };
 
@@ -203,24 +204,24 @@ export default function Dashboard({ auth, visits }) {
                                 onSubmit={handleSubmit}
                                 className="flex flex-col gap-5"
                             >
-                                <textarea
+                                <input
                                     name="message"
                                     value={data.message}
                                     onChange={(e) =>
                                         setData("message", e.target.value)
                                     }
-                                    className="w-full p-2 border rounded"
+                                    className={`w-full p-2 border rounded ${
+                                        errors.message ? "border-red-600" : ""
+                                    }`}
                                     placeholder="Escribe tu queja aquí..."
-                                ></textarea>
+                                ></input>
 
-                                {/* Mensaje de error */}
                                 {errors.message && (
                                     <div className="text-red-600">
                                         {errors.message}
                                     </div>
                                 )}
 
-                                {/* Mensaje de éxito */}
                                 {data.success && (
                                     <div className="mt-3 text-green-600">
                                         {data.success}

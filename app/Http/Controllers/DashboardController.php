@@ -47,17 +47,18 @@ class DashboardController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validatedData = $request->validate([
             'message' => 'required|string',
         ]);
 
         Complaint::create([
             'user_id' => auth()->id(),
-            'message' => $request->message,
+            'message' => $validatedData['message'],
         ]);
 
         return response()->json(['success' => 'Queja enviada correctamente']);
     }
+
 
     public function markNotificationsAsRead(Request $request)
     {

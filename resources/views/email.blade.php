@@ -34,14 +34,14 @@
         <section
             style="margin-left: auto; margin-right: auto; max-width: 336px; background-color: #fff; padding: 32px 24px; font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif; color: #000">
             <main style="margin-top: 32px">
-                <h2 style="margin-top: 24px">Te contacta {{ $fullname }}</h2>
+                <h2 style="margin-top: 24px">Te contacta {{ $data['fullname'] }}</h2>
                 <p style="margin-top: 8px; line-height: 2; color: #4b5563">
-                    {{ $messages }}
+                    {{ $data['message'] }}
                 </p>
             </main>
             <footer
                 style="margin-top: 32px; background-color: #fafafa; text-align: center; font-size: 12px; font-weight: 600; color: #a3a3a3">
-                <p>Todos los derechos reservados &copy; 2024 por GateKepper </p>
+                <p>Todos los derechos reservados &copy; 2025 por GateKepper </p>
             </footer>
         </section>
     </div>

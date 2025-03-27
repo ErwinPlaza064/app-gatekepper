@@ -5,6 +5,8 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ContactController;
+
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -38,6 +40,9 @@ Route::get("/reglamento", function(){
 Route::get('/success', function () {
     return Inertia::render('Email/ResponseEmail');
 })->name('success');
+
+Route::post('/send-email', [ContactController::class, 'send'])->name('contact.send');
+
 
 Route::get('/error', function () {
     return Inertia::render('Auth/Error');

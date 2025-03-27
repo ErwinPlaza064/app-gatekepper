@@ -18,7 +18,7 @@ export default function Footer() {
 
             <div className="border border-black"></div>
 
-            <div className="flex flex-col justify-center md:flex-row md:px-64">
+            <div className="flex flex-col justify-center md:flex-row md:px-10">
                 <div className="p-4 text-center md:p-10">
                     <Typography as={"h4"} variant={"h4"} color={"black"}>
                         Registrador de visitantes
@@ -41,7 +41,7 @@ export default function Footer() {
             <div className="flex items-center justify-center h-auto p-5 bg-black">
                 <span className="text-white">
                     ©Todos los derechos reservados para: Registrador de
-                    visitantes
+                    visitantes 2025
                 </span>
             </div>
         </footer>

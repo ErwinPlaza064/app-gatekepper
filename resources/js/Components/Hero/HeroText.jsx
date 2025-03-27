@@ -3,7 +3,7 @@ import { Link } from "@inertiajs/react";
 
 export default function HeroText() {
     return (
-        <div className="flex flex-col-reverse lg:flex-row justify-center px-4 lg:px-64 py-32 gap-6">
+        <div className="flex flex-col-reverse justify-center gap-6 px-4 py-32 lg:flex-row lg:px-64">
             <div className="flex-1">
                 <Typography
                     className="text-center"
@@ -27,17 +27,17 @@ export default function HeroText() {
                     tranquilidad para todos los residentes.
                 </Typography>
 
-                <div className="flex flex-col sm:flex-row gap-5 justify-center items-center mt-8">
+                <div className="flex flex-col items-center justify-center gap-5 mt-8 sm:flex-row">
                     <Link
                         href={"contacto"}
-                        className="border px-6 py-2 items-center rounded-xl border-black hover:bg-black hover:text-white text-center"
+                        className="items-center px-6 py-2 text-center transition-all duration-300 border border-black rounded-xl hover:bg-black hover:text-white"
                     >
                         Contáctanos
                     </Link>
                 </div>
             </div>
 
-            <div className="flex-1 flex justify-center">
+            <div className="flex justify-center flex-1">
                 <picture className="w-80 lg:w-96">
                     <img
                         src="/Assets/computer.svg"

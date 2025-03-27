@@ -13,12 +13,21 @@ use Filament\Forms\Components\TextInput;
 
 
 class ComplaintResource extends Resource
+
 {
-    protected static ?string $model = Complaint::class;
+
+
+    public static function getModelLabel(): string
+    {
+        return 'Queja';
+    }
+
     public static function getPluralModelLabel(): string
     {
         return 'Quejas';
     }
+    protected static ?string $navigationGroup = 'Quejas';
+    protected static ?string $model = Complaint::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 

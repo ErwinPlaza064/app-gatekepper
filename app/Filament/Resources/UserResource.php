@@ -10,13 +10,13 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 
 class UserResource extends Resource
 {
-
     public static function getModelLabel(): string
     {
         return 'Residente';
@@ -26,6 +26,7 @@ class UserResource extends Resource
     {
         return 'Residentes';
     }
+
     protected static ?string $model = User::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-users';
@@ -36,33 +37,46 @@ class UserResource extends Resource
         return parent::getEloquentQuery();
     }
 
+    /**
+     * Restringe la visibilidad de este recurso según el rol del usuario.
+     */
+    public static function canViewAny(): bool
+    {
+        $user = auth()->user();
+        return in_array($user?->rol, ['administrador', 'adminresidencial']);
+    }
+    public static function canCreate(): bool
+    {
+        $user = auth()->user();
+        return $user?->rol !== 'adminresidencial';
+    }
     public static function form(Form $form): Form
     {
         return $form
-        ->schema([
-            Forms\Components\TextInput::make('name')
-                ->label('Nombre')
-                ->required(),
+            ->schema([
+                Forms\Components\TextInput::make('name')
+                    ->label('Nombre')
+                    ->required(),
 
-            Forms\Components\TextInput::make('email')
-                ->label('Correo Electrónico')
-                ->email()
-                ->required(),
+                Forms\Components\TextInput::make('email')
+                    ->label('Correo Electrónico')
+                    ->email()
+                    ->required(),
 
-            Forms\Components\TextInput::make('address')
-                ->label('Dirección')
-                ->required(),
+                Forms\Components\TextInput::make('address')
+                    ->label('Dirección')
+                    ->required(),
 
-            Forms\Components\TextInput::make('password')
-                ->label('Contraseña')
-                ->password()
-                ->required()
-                ->dehydrateStateUsing(fn ($state) => Hash::make($state))
-                ->dehydrated(fn ($state) => filled($state)),
+                Forms\Components\TextInput::make('password')
+                    ->label('Contraseña')
+                    ->password()
+                    ->required()
+                    ->dehydrateStateUsing(fn ($state) => Hash::make($state))
+                    ->dehydrated(fn ($state) => filled($state)),
 
                 Forms\Components\Hidden::make('remember_token')
-                ->default(fn () => Str::random(60)),
-        ]);
+                    ->default(fn () => Str::random(60)),
+            ]);
     }
 
     public static function table(Table $table): Table
@@ -90,12 +104,9 @@ class UserResource extends Resource
             ->searchable();
     }
 
-
     public static function getRelations(): array
     {
-        return [
-            //
-        ];
+        return [];
     }
 
     public static function getPages(): array

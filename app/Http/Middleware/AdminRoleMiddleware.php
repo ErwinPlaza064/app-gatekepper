@@ -10,7 +10,7 @@ class AdminRoleMiddleware
 {
     public function handle(Request $request, Closure $next)
     {
-        if (Auth::check() && Auth::user()->rol === 'administrador') {
+        if (Auth::check() && in_array(Auth::user()->rol, ['administrador', 'adminresidencial', 'portero'])) {
             return $next($request);
         }
 

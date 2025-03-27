@@ -23,6 +23,7 @@ Route::get('/welcome',function(){
 
 Route::middleware(['auth', 'verified'])->get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
+
 Route::post('/notifications/mark-as-read', [DashboardController::class, 'markNotificationsAsRead'])
     ->middleware('auth')
     ->name('notifications.markAsRead');
@@ -55,5 +56,6 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
 
 require __DIR__.'/auth.php';

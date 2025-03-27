@@ -20,6 +20,12 @@ class VisitorResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-user-group';
     protected static ?string $navigationLabel = 'Visitantes';
 
+
+    public static function canViewAny(): bool
+    {
+        $user = auth()->user();
+        return in_array($user?->rol, ['administrador', 'portero']);
+    }
     public static function form(Form $form): Form
     {
         return $form

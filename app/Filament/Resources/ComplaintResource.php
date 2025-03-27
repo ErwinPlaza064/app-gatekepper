@@ -26,10 +26,20 @@ class ComplaintResource extends Resource
     {
         return 'Quejas';
     }
-    protected static ?string $navigationGroup = 'Quejas';
     protected static ?string $model = Complaint::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+
+    public static function canViewAny(): bool
+    {
+        $user = auth()->user();
+        return in_array($user?->rol, ['administrador', 'adminresidencial']);
+    }
+    public static function canCreate(): bool
+    {
+        $user = auth()->user();
+        return $user?->rol !== 'adminresidencial';
+    }
 
     public static function form(Form $form): Form
     {

@@ -36,7 +36,10 @@ export default function Dashboard({ auth, visits }) {
         });
     };
 
-    const isAdmin = auth.user.rol === "administrador";
+    const isAdmin =
+        auth.user.rol === "administrador" ||
+        auth.user.rol === "portero" ||
+        auth.user.rol === "adminresidencial";
 
     return (
         <Authenticated user={auth.user}>

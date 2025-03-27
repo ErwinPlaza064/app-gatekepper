@@ -15,7 +15,6 @@ class ContactController extends Controller
             'message' => 'required|string|max:1000',
         ]);
 
-        // Pasamos los datos a ContactMail
         Mail::to('plazaerwin41@gmail.com')->send(new ContactMail($request->all()));
 
         return redirect()->route('success')->with('success', 'Mensaje enviado correctamente');

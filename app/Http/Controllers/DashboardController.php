@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\Visitor;
 use App\Models\Complaint;
+use Illuminate\Support\Facades\Log;
+
 
 
 
@@ -47,17 +49,23 @@ class DashboardController extends Controller
 
     public function store(Request $request)
     {
-        $validatedData = $request->validate([
-            'message' => 'required|string',
-        ]);
+        try {
+            $request->validate([
+                'message' => 'required|string|max:255',
+            ]);
 
-        Complaint::create([
-            'user_id' => auth()->id(),
-            'message' => $validatedData['message'],
-        ]);
+            Complaint::create([
+                'message' => $request->message,
+                'user_id' => auth()->id(),
+            ]);
 
-        return response()->json(['success' => 'Queja enviada correctamente']);
+            return redirect()->back()->with('success', 'Queja enviada correctamente.');
+        } catch (\Exception $e) {
+            Log::error('Error en store Complaint: ' . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
+
 
 
     public function markNotificationsAsRead(Request $request)

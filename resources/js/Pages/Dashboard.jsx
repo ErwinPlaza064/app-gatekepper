@@ -8,6 +8,8 @@ import { useForm } from "@inertiajs/react";
 
 export default function Dashboard({ auth, visits }) {
     const { props } = usePage();
+    const { flash = {} } = usePage().props;
+    console.log(props.flash);
     const [notifications, setNotifications] = useState(
         props.auth.notifications || []
     );
@@ -23,18 +25,18 @@ export default function Dashboard({ auth, visits }) {
             );
     };
 
-    const { data, setData, post, processing, errors } = useForm({
+    const { data, setData, post, processing, errors, reset } = useForm({
         message: "",
-        success: "",
     });
 
-    const handleSubmit = () => {
+    const handleSubmit = (e) => {
+        e.preventDefault();
         post(route("complaints.store"), {
-            onSuccess: (response) => {
-                setData({ message: "", success: response.success });
+            onSuccess: () => {
+                reset("message");
             },
-            onError: (error) => {
-                setData({ ...data, errors }); // Manejar errores
+            onError: (errors) => {
+                console.error(errors);
             },
         });
     };
@@ -52,7 +54,7 @@ export default function Dashboard({ auth, visits }) {
                     color={"black"}
                 >
                     Bienvenid@,{" "}
-                    <span className="text-blue-700">{auth.user.name}!</span>
+                    <span className="text-gray-700">{auth.user.name}!</span>
                 </Typography>
                 {isAdmin ? (
                     <div className="mt-5">
@@ -112,6 +114,7 @@ export default function Dashboard({ auth, visits }) {
                                 </Typography>
                             )}
                         </div>
+
                         <div className="p-5 bg-white rounded-lg shadow-md">
                             <Typography
                                 as={"h2"}
@@ -165,32 +168,7 @@ export default function Dashboard({ auth, visits }) {
                                 {auth.user.address ?? "No disponible"}
                             </Typography>
                         </div>
-                        <div className="flex flex-col items-center gap-5 p-5 bg-white shadow-md rounden-lg">
-                            <Typography
-                                as={"h2"}
-                                variant={"h2"}
-                                color={"black"}
-                                className="mb-3 text-xl font-semibold"
-                            >
-                                Contactanos
-                            </Typography>
-                            <Typography
-                                className="px-10 text-center"
-                                as={"p"}
-                                variant={"p"}
-                                color={"black"}
-                            >
-                                No dudes en{" "}
-                                <Link
-                                    href={"/contacto"}
-                                    className="text-blue-700"
-                                >
-                                    contactarnos
-                                </Link>
-                                <br />
-                                para cualquier sugerencia o duda.
-                            </Typography>
-                        </div>
+
                         <div className="p-5 bg-white rounded-lg shadow-md">
                             <Typography
                                 as="h2"
@@ -213,8 +191,8 @@ export default function Dashboard({ auth, visits }) {
                                     className={`w-full p-2 border rounded ${
                                         errors.message ? "border-red-600" : ""
                                     }`}
-                                    placeholder="Escribe tu queja aquí..."
-                                ></input>
+                                    placeholder="Escribe tu queja aqui"
+                                />
 
                                 {errors.message && (
                                     <div className="text-red-600">
@@ -222,9 +200,14 @@ export default function Dashboard({ auth, visits }) {
                                     </div>
                                 )}
 
-                                {data.success && (
-                                    <div className="mt-3 text-green-600">
-                                        {data.success}
+                                {props.flash?.success && (
+                                    <div
+                                        className="relative px-4 py-3 text-green-700 bg-green-100 border border-green-400 rounded"
+                                        role="alert"
+                                    >
+                                        <span className="block sm:inline">
+                                            {props.flash.success}
+                                        </span>
                                     </div>
                                 )}
 

@@ -25,7 +25,6 @@ Route::post('/notifications/mark-as-read', [DashboardController::class, 'markNot
     ->middleware('auth')
     ->name('notifications.markAsRead');
 
-
 Route::get('/mis-visitas', [DashboardController::class, 'misVisitas'])->middleware(['auth', 'verified'])->name('mis-visitas');
 
 Route::get("/contacto", function(){
@@ -36,20 +35,15 @@ Route::get("/reglamento", function(){
     return Inertia::render('Links/Reglamento');
 })->name('reglamento');
 
-//Ruta para el envio de correos
 Route::get('/success', function () {
     return Inertia::render('Email/ResponseEmail');
 })->name('success');
 
-
-//Ruta para Permisos de Usuario
 Route::get('/error', function () {
     return Inertia::render('Auth/Error');
 })->name('error');
 
-
 Route::post('/complaints', [DashboardController::class, 'store'])->name('complaints.store');
-
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

@@ -8,8 +8,6 @@ import { useForm } from "@inertiajs/react";
 
 export default function Dashboard({ auth, visits }) {
     const { props } = usePage();
-    const { flash = {} } = usePage().props;
-    console.log(props.flash);
     const [notifications, setNotifications] = useState(
         props.auth.notifications || []
     );
@@ -214,7 +212,7 @@ export default function Dashboard({ auth, visits }) {
                                 <button
                                     type="submit"
                                     disabled={processing}
-                                    className="px-4 py-2 mt-3 text-white bg-black rounded hover:bg-blue-700"
+                                    className="px-3 py-1 mt-20 text-sm text-white bg-black rounded hover:bg-blue-700"
                                 >
                                     Enviar Queja
                                 </button>

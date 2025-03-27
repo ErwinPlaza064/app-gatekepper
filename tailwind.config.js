@@ -15,10 +15,7 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: [
-                    '"Montserrat Variable"',
-                    ...defaultTheme.fontFamily.sans,
-                ],
+                sans: ["Open Sans", ...defaultTheme.fontFamily.sans],
             },
             colors: {
                 primary: "#44749d",

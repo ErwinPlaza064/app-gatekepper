@@ -1,4 +1,4 @@
-import { Link } from "@inertiajs/react";
+import { Link, usePage } from "@inertiajs/react";
 import Dropdown from "../UI/Dropdown";
 import AnimatedLink from "../UI/AnimatedLink";
 import { links } from "../../../../public/links";
@@ -8,6 +8,8 @@ export default function DesktopNav({
     handleOnClick,
     showingNavigationDropdown,
 }) {
+    const { url } = usePage(); // Obtiene la ruta actual
+
     return (
         <div className="px-5">
             <div className="flex justify-between h-16">
@@ -19,21 +21,30 @@ export default function DesktopNav({
                     </div>
 
                     <ul className="hidden gap-7 md:flex">
-                        {links.map((link, index) => (
-                            <li key={index + link}>
-                                <AnimatedLink
-                                    href={link.href}
-                                    variant={"black"}
-                                    color={"black"}
-                                    className={"h-full"}
-                                >
-                                    {link.name}
-                                </AnimatedLink>
-                            </li>
-                        ))}
+                        {links.map((link, index) => {
+                            const isActive = url === link.href; // Verifica si el link es el activo
+
+                            return (
+                                <li key={index}>
+                                    <AnimatedLink
+                                        href={link.href}
+                                        variant={"black"}
+                                        color={"black"}
+                                        className={`relative h-full pb-2 ${
+                                            isActive
+                                                ? "border-b-2 border-black"
+                                                : ""
+                                        }`}
+                                    >
+                                        {link.name}
+                                    </AnimatedLink>
+                                </li>
+                            );
+                        })}
                     </ul>
                 </div>
 
+                {/* Menú de usuario */}
                 <div className="hidden md:flex md:ms-6 md:items-center">
                     <div className="relative ms-3">
                         {userSession != null ? (
@@ -74,18 +85,17 @@ export default function DesktopNav({
                                 </Dropdown.Content>
                             </Dropdown>
                         ) : (
-                            <>
-                                <Link
-                                    className="px-6 py-2 text-white transition-all duration-300 ease-in-out bg-black rounded-xl hover:bg-gray-700"
-                                    href={"/login"}
-                                >
-                                    Ingresa
-                                </Link>
-                            </>
+                            <Link
+                                className="px-6 py-2 text-white transition-all duration-300 ease-in-out bg-black rounded-xl hover:bg-gray-700"
+                                href={"/login"}
+                            >
+                                Ingresa
+                            </Link>
                         )}
                     </div>
                 </div>
 
+                {/* Botón de menú móvil */}
                 <div className="flex items-center -me-2 sm:hidden">
                     <button
                         onClick={handleOnClick}

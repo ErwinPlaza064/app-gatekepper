@@ -1,8 +1,10 @@
-import { Link } from "@inertiajs/react";
+import { Link, usePage } from "@inertiajs/react";
 import ResponsiveNavLink from "../UI/ResponsiveNavLink";
 import { links } from "../../../../public/links";
 
 export default function MobileNav({ showingNavigationDropdown, userSession }) {
+    const { url } = usePage(); // Obtiene la ruta actual
+
     return (
         <div
             className={
@@ -22,16 +24,24 @@ export default function MobileNav({ showingNavigationDropdown, userSession }) {
                         </div>
 
                         <ul className="space-y-2">
-                            {links.map((link, index) => (
-                                <li key={index + link}>
-                                    <ResponsiveNavLink
-                                        href={link.href}
-                                        className="block px-4 py-2 rounded-md hover:bg-gray-100"
-                                    >
-                                        {link.name}
-                                    </ResponsiveNavLink>
-                                </li>
-                            ))}
+                            {links.map((link, index) => {
+                                const isActive = url === link.href;
+
+                                return (
+                                    <li key={index}>
+                                        <ResponsiveNavLink
+                                            href={link.href}
+                                            className={`block px-4 py-2 rounded-md hover:bg-gray-100 ${
+                                                isActive
+                                                    ? "border-b-2 border-black"
+                                                    : ""
+                                            }`}
+                                        >
+                                            {link.name}
+                                        </ResponsiveNavLink>
+                                    </li>
+                                );
+                            })}
                         </ul>
 
                         <div className="pt-4 mt-4 space-y-2 border-t">
@@ -47,16 +57,25 @@ export default function MobileNav({ showingNavigationDropdown, userSession }) {
                     </>
                 ) : (
                     <ul className="space-y-2">
-                        {links.map((link, index) => (
-                            <li key={index + link}>
-                                <ResponsiveNavLink
-                                    href={link.href}
-                                    className="block px-4 py-2 rounded-md hover:bg-gray-100"
-                                >
-                                    {link.name}
-                                </ResponsiveNavLink>
-                            </li>
-                        ))}
+                        {links.map((link, index) => {
+                            const isActive = url === link.href;
+
+                            return (
+                                <li key={index}>
+                                    <ResponsiveNavLink
+                                        href={link.href}
+                                        className={`block px-4 py-2 rounded-md hover:bg-gray-100 ${
+                                            isActive
+                                                ? "border-b-2 border-black"
+                                                : ""
+                                        }`}
+                                    >
+                                        {link.name}
+                                    </ResponsiveNavLink>
+                                </li>
+                            );
+                        })}
+
                         <Link
                             className="block px-4 py-2 rounded-md hover:bg-gray-100"
                             href={route("login")}

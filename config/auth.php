@@ -3,7 +3,7 @@
 return [
 
 
-    
+
     /*
     |--------------------------------------------------------------------------
     | Authentication Defaults
@@ -44,7 +44,7 @@ return [
     ],
 
     'api' => [
-        'driver' => 'sanctum', // Cambiar según tu método de autenticación (ver sección siguiente)
+        'driver' => 'sanctum',
         'provider' => 'users',
     ],
 ],

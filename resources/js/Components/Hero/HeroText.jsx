@@ -3,7 +3,7 @@ import { Link } from "@inertiajs/react";
 
 export default function HeroText() {
     return (
-        <div className="flex flex-col-reverse justify-center gap-6 px-4 py-32 lg:flex-row lg:px-64">
+        <div className="flex flex-col-reverse items-center justify-center gap-6 px-4 py-32 lg:flex-row lg:px-64">
             <div className="flex-1">
                 <Typography
                     className="text-center"
@@ -37,7 +37,7 @@ export default function HeroText() {
                 </div>
             </div>
 
-            <div className="flex justify-center flex-1">
+            <div className="flex items-center justify-center flex-1">
                 <picture className="w-80 lg:w-96">
                     <img
                         src="/Assets/computer.svg"

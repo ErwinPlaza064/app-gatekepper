@@ -45,11 +45,15 @@ class UserResource extends Resource
         $user = auth()->user();
         return in_array($user?->rol, ['administrador', 'adminresidencial']);
     }
+    /**
+     * Restringe la creación de nuevos registros según el rol del usuario.
+     */
     public static function canCreate(): bool
     {
         $user = auth()->user();
         return $user?->rol !== 'adminresidencial';
     }
+
     public static function form(Form $form): Form
     {
         return $form

@@ -5,7 +5,6 @@ import axios from "axios";
 import { useState } from "react";
 import { Link } from "@inertiajs/react";
 import { useForm } from "@inertiajs/react";
-import { QRCodeCanvas } from "qrcode.react";
 import QRGenerator from "@/Components/Common/QRGenerator";
 
 export default function Dashboard({ auth, visits }) {
@@ -64,9 +63,10 @@ export default function Dashboard({ auth, visits }) {
                 {isAdmin ? (
                     <div className="p-6 mt-10 bg-gray-100 shadow-md rounded-xl">
                         <Typography
-                            as="h2"
-                            variant="h2"
-                            className="mb-4 text-lg font-semibold text-black"
+                            as={"h2"}
+                            variant={"h2"}
+                            color={"black"}
+                            className="mb-4"
                         >
                             Panel de Administración
                         </Typography>
@@ -240,8 +240,8 @@ export default function Dashboard({ auth, visits }) {
                                 </button>
                             </form>
                         </div>
-                        <div className="p-5 bg-white rounded-lg shadow-md">
-                            <QRGenerator />
+                        <div className="p-5 bg-white rounded-lg shadow-md md:flex-col">
+                            <QRGenerator userId={auth.user.id} />
                         </div>
                     </div>
                 )}

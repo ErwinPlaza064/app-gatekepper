@@ -5,6 +5,8 @@ import axios from "axios";
 import { useState } from "react";
 import { Link } from "@inertiajs/react";
 import { useForm } from "@inertiajs/react";
+import { QRCodeCanvas } from "qrcode.react";
+import QRGenerator from "@/Components/Common/QRGenerator";
 
 export default function Dashboard({ auth, visits }) {
     const { props } = usePage();
@@ -40,6 +42,11 @@ export default function Dashboard({ auth, visits }) {
         auth.user.rol === "administrador" ||
         auth.user.rol === "portero" ||
         auth.user.rol === "adminresidencial";
+
+    const [visitorInfo, setVisitorInfo] = useState({
+        name: "",
+        id: Date.now(),
+    });
 
     return (
         <Authenticated user={auth.user}>
@@ -232,6 +239,9 @@ export default function Dashboard({ auth, visits }) {
                                     Enviar Queja
                                 </button>
                             </form>
+                        </div>
+                        <div className="p-5 bg-white rounded-lg shadow-md">
+                            <QRGenerator />
                         </div>
                     </div>
                 )}

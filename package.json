@@ -22,6 +22,7 @@
     },
     "dependencies": {
         "keen-slider": "^6.8.6",
-        "lodash": "^4.17.21"
+        "lodash": "^4.17.21",
+        "qrcode.react": "^4.2.0"
     }
 }

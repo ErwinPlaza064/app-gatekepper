@@ -17,7 +17,6 @@ class VisitorController extends Controller
             'vehicle_plate' => 'nullable|string',
         ]);
 
-        // Verificar si el documento ya fue registrado
         if (Visitor::where('id_document', $validated['document_id'])->exists()) {
             return response()->json(['error' => 'Este código QR ya ha sido escaneado'], 400);
         }
@@ -31,7 +30,6 @@ class VisitorController extends Controller
             'entry_time' => now(),
         ]);
 
-        // Notificar al residente
         $resident = $visitor->user;
         if ($resident) {
             $resident->notify(new NewVisitorNotification($visitor));

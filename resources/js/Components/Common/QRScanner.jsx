@@ -44,7 +44,6 @@ export default function QRScanner({ onScanSuccess }) {
                         vehicle_plate: data.vehicle_plate,
                     };
 
-                    // Enviar al backend
                     await axios
                         .post(
                             "http://127.0.0.1:8000/api/scan-qr",

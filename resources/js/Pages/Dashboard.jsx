@@ -45,15 +45,12 @@ export default function Dashboard({ auth, visits }) {
 
     const handleScanSuccess = (data) => {
         try {
-            const parsedData = JSON.parse(data); // ✔️ Asegura que sea un JSON válido
-
+            const parsedData = JSON.parse(data);
             axios
                 .post(route("visitors.store"), parsedData)
                 .then(() => alert("Visitante registrado correctamente"))
                 .catch(() => alert("Error al registrar visitante"));
-        } catch (error) {
-            alert("Código QR inválido: no es un JSON válido.");
-        }
+        } catch (error) {}
     };
 
     const [visitorInfo, setVisitorInfo] = useState({

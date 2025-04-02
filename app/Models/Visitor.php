@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 use App\Notifications\NewVisitorNotification;
+use Illuminate\Support\Facades\Log;
+
 
 class Visitor extends Model
 {
@@ -30,16 +32,16 @@ class Visitor extends Model
         return $this->belongsTo(User::class);
     }
 
-        public function qrCode()
-    {
-        return $this->hasOne(QrCode::class);
-    }
-
 
     protected static function booted()
     {
         static::created(function ($visitor) {
-            $visitor->user->notify(new NewVisitorNotification($visitor));
+            // Verifica que exista un usuario relacionado con este visitante antes de notificar
+            if ($visitor->user) {
+                $visitor->user->notify(new NewVisitorNotification($visitor));
+            } else {
+                Log::warning("No se pudo notificar al residente. No se encontró un usuario para el visitante con ID {$visitor->id}.");
+            }
         });
     }
 }

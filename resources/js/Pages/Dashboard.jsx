@@ -5,6 +5,7 @@ import axios from "axios";
 import { useState } from "react";
 import { Link } from "@inertiajs/react";
 import { useForm } from "@inertiajs/react";
+import QRScanner from "@/Components/Common/QRScanner";
 import QRGenerator from "@/Components/Common/QRGenerator";
 
 export default function Dashboard({ auth, visits }) {
@@ -41,6 +42,19 @@ export default function Dashboard({ auth, visits }) {
         auth.user.rol === "administrador" ||
         auth.user.rol === "portero" ||
         auth.user.rol === "adminresidencial";
+
+    const handleScanSuccess = (data) => {
+        try {
+            const parsedData = JSON.parse(data); // ✔️ Asegura que sea un JSON válido
+
+            axios
+                .post(route("visitors.store"), parsedData)
+                .then(() => alert("Visitante registrado correctamente"))
+                .catch(() => alert("Error al registrar visitante"));
+        } catch (error) {
+            alert("Código QR inválido: no es un JSON válido.");
+        }
+    };
 
     const [visitorInfo, setVisitorInfo] = useState({
         name: "",
@@ -83,6 +97,17 @@ export default function Dashboard({ auth, visits }) {
                             >
                                 Ir al Panel de Administración
                             </Link>
+                        </div>
+                        <div className="p-5 mt-10 bg-white rounded-lg shadow-md w-72 md:flex-col">
+                            <Typography
+                                as="h2"
+                                variant="h2"
+                                color="black"
+                                className="mb-3 text-xl font-semibold"
+                            >
+                                Escanear QR
+                            </Typography>
+                            <QRScanner onScanSuccess={handleScanSuccess} />
                         </div>
                     </div>
                 ) : (

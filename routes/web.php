@@ -7,7 +7,6 @@ use Inertia\Inertia;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ContactController;
 
-
 Route::get('/', function () {
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
@@ -43,7 +42,6 @@ Route::get('/success', function () {
 })->name('success');
 
 Route::post('/send-email', [ContactController::class, 'send'])->name('contact.send');
-
 
 Route::get('/error', function () {
     return Inertia::render('Auth/Error');

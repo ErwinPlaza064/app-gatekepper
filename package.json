@@ -22,8 +22,10 @@
     },
     "dependencies": {
         "firebase": "^11.6.0",
+        "html5-qrcode": "^2.3.8",
         "keen-slider": "^6.8.6",
         "lodash": "^4.17.21",
-        "qrcode.react": "^4.2.0"
+        "qrcode.react": "^4.2.0",
+        "react-qr-scanner": "^1.0.0-alpha.11"
     }
 }

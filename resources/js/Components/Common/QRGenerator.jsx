@@ -82,7 +82,7 @@ export default function QRGenerator({ userId }) {
     };
 
     return (
-        <div>
+        <div className="p-5 bg-white rounded-lg shadow-md md:flex-col">
             <Typography
                 as={"h4"}
                 variant={"h4"}

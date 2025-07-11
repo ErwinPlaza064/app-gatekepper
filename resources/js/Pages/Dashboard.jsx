@@ -18,15 +18,6 @@ export default function Dashboard({ auth, visits }) {
         <Authenticated user={auth.user}>
             <Head title="Dashboard" />
             <section className="px-10 py-20 max-w-7xl mx-aut">
-                <Typography
-                    className="p-2"
-                    as={"h1"}
-                    variant={"h1"}
-                    color={"black"}
-                >
-                    Bienvenid@,{" "}
-                    <span className="text-gray-700">{auth.user.name}!</span>
-                </Typography>
                 {isAdmin ? (
                     <IsAdmin />
                 ) : (

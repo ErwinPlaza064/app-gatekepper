@@ -1,6 +1,7 @@
 import { useState } from "react";
 import DesktopNav from "@/Components/Common/DesktopNav";
 import MobileNav from "@/Components/Common/MobileNav";
+import { Toaster } from "react-hot-toast";
 
 export default function Authenticated({ user, children }) {
     const [showingNavigationDropdown, setShowingNavigationDropdown] =
@@ -14,8 +15,9 @@ export default function Authenticated({ user, children }) {
     return (
         <div>
             <div className="min-h-screen bg-gray-50">
+                <Toaster position="top-right" />
                 <div className="relative">
-                    <nav className="bg-white border-b border-gray-100 shadow fixed top-0 left-0 right-0 z-10">
+                    <nav className="fixed top-0 left-0 right-0 z-10 bg-white border-b border-gray-100 shadow">
                         <DesktopNav
                             userSession={userSession}
                             handleOnClick={handleOnClick}
@@ -32,7 +34,6 @@ export default function Authenticated({ user, children }) {
                         />
                     </nav>
                 </div>
-
                 <main className="min-h-screen">{children}</main>
             </div>
         </div>

@@ -48,5 +48,44 @@ El patrón Observer se utiliza para notificar automáticamente a los usuarios cu
 
 ---
 
-**Conclusión:**
-El proyecto cumple con la consigna de implementar al menos dos patrones de diseño: MVC y Observer.
+## Endpoints principales de la API
+
+A continuación se documentan los endpoints clave del proyecto, útiles para la integración y pruebas.
+
+| Método | Endpoint           | Descripción                                    | Parámetros principales                                | Respuesta esperada                                |
+| ------ | ------------------ | ---------------------------------------------- | ----------------------------------------------------- | ------------------------------------------------- |
+| POST   | /api/scan-qr       | Registrar visitante por QR                     | visitor_name, document_id, resident_id, vehicle_plate | JSON con mensaje y datos del visitante registrado |
+| GET    | /api/notifications | Obtener notificaciones del usuario autenticado | (token de autenticación)                              | JSON con lista de notificaciones                  |
+| POST   | /login             | Iniciar sesión                                 | email, password                                       | Redirección o JSON con datos de usuario/token     |
+| POST   | /register          | Registrar usuario                              | name, email, password, password_confirmation          | Redirección o JSON con datos de usuario           |
+| POST   | /send-email        | Enviar mensaje de contacto                     | email, fullname, message                              | Redirección con mensaje de éxito                  |
+| POST   | /complaints        | Registrar queja                                | message (requiere autenticación)                      | Redirección con mensaje de éxito                  |
+
+### Ejemplo de uso: Registrar visitante por QR
+
+**POST /api/scan-qr**
+
+```json
+{
+    "visitor_name": "Juan Pérez",
+    "document_id": "ABC123456",
+    "resident_id": 5,
+    "vehicle_plate": "XYZ-987"
+}
+```
+
+**Respuesta exitosa:**
+
+```json
+{
+    "message": "Visitante registrado con éxito",
+    "visitor": {
+        "id": 10,
+        "name": "Juan Pérez",
+        "id_document": "ABC123456",
+        "user_id": 5,
+        "vehicle_plate": "XYZ-987",
+        "entry_time": "2025-07-10T12:34:56.000000Z"
+    }
+}
+```

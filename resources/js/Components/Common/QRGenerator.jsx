@@ -31,7 +31,46 @@ export default function QRGenerator({ userId }) {
         user_id: userId,
     });
 
+    const [qrOptions, setQrOptions] = useState({
+        type: "single_use",
+        duration: 24,
+        maxUses: 1,
+    });
+
     const qrRef = useRef(null);
+
+    const generateQRId = () => {
+        return (
+            "qr_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9)
+        );
+    };
+
+    const calculateExpirationDate = (hours) => {
+        const now = new Date();
+        return new Date(now.getTime() + hours * 60 * 60 * 1000);
+    };
+
+    const generateQRData = () => {
+        const qrId = generateQRId();
+        let qrData = {
+            ...visitorInfo,
+            qr_id: qrId,
+            qr_type: qrOptions.type,
+            created_at: new Date().toISOString(),
+            max_uses: qrOptions.maxUses,
+        };
+
+        if (
+            qrOptions.type === "time_limited" ||
+            qrOptions.type === "recurring"
+        ) {
+            qrData.valid_until = calculateExpirationDate(
+                qrOptions.duration
+            ).toISOString();
+        }
+
+        return qrData;
+    };
 
     const downloadQR = () => {
         const canvas = qrRef.current.querySelector("canvas");
@@ -76,6 +115,70 @@ export default function QRGenerator({ userId }) {
                 Generar Código QR para Visitante
             </Typography>
 
+            <div className="mb-4">
+                <label className="block mb-2 text-sm font-medium text-gray-700">
+                    Tipo de acceso:
+                </label>
+                <select
+                    value={qrOptions.type}
+                    onChange={(e) =>
+                        setQrOptions({ ...qrOptions, type: e.target.value })
+                    }
+                    className="w-full p-2 mb-3 border rounded"
+                >
+                    <option value="single_use">Uso único</option>
+                    <option value="time_limited">Por tiempo limitado</option>
+                    <option value="recurring">Acceso recurrente</option>
+                </select>
+            </div>
+
+            {(qrOptions.type === "time_limited" ||
+                qrOptions.type === "recurring") && (
+                <div className="mb-4">
+                    <label className="block mb-2 text-sm font-medium text-gray-700">
+                        Duración:
+                    </label>
+                    <select
+                        value={qrOptions.duration}
+                        onChange={(e) =>
+                            setQrOptions({
+                                ...qrOptions,
+                                duration: parseInt(e.target.value),
+                            })
+                        }
+                        className="w-full p-2 mb-3 border rounded"
+                    >
+                        <option value={2}>2 horas</option>
+                        <option value={6}>6 horas</option>
+                        <option value={12}>12 horas</option>
+                        <option value={24}>1 día</option>
+                        <option value={72}>3 días</option>
+                        <option value={168}>1 semana</option>
+                    </select>
+                </div>
+            )}
+
+            {qrOptions.type === "recurring" && (
+                <div className="mb-4">
+                    <label className="block mb-2 text-sm font-medium text-gray-700">
+                        Máximo de usos:
+                    </label>
+                    <input
+                        type="number"
+                        min="1"
+                        max="10"
+                        value={qrOptions.maxUses}
+                        onChange={(e) =>
+                            setQrOptions({
+                                ...qrOptions,
+                                maxUses: parseInt(e.target.value),
+                            })
+                        }
+                        className="w-full p-2 mb-3 border rounded"
+                    />
+                </div>
+            )}
+
             <input
                 type="text"
                 placeholder="Nombre del visitante"
@@ -116,7 +219,7 @@ export default function QRGenerator({ userId }) {
                 <div className="flex flex-col items-center mt-3">
                     <div ref={qrRef}>
                         <QRCodeCanvas
-                            value={JSON.stringify(visitorInfo)}
+                            value={JSON.stringify(generateQRData())}
                             size={150}
                         />
                     </div>
@@ -125,10 +228,16 @@ export default function QRGenerator({ userId }) {
                         as={"p"}
                         variant={"p"}
                         color={"black"}
-                        className="mt-2 text-sm text-gray-600"
+                        className="mt-2 text-sm text-center text-gray-600"
                     >
-                        Escanea este código QR al ingresar.
+                        {qrOptions.type === "single_use" &&
+                            "Código de uso único"}
+                        {qrOptions.type === "time_limited" &&
+                            `Válido por ${qrOptions.duration} horas`}
+                        {qrOptions.type === "recurring" &&
+                            `Válido por ${qrOptions.duration} horas - Máximo ${qrOptions.maxUses} usos`}
                     </Typography>
+
                     <div className="flex items-center justify-center mt-3 space-x-2">
                         <button
                             onClick={downloadQR}

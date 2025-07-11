@@ -18,6 +18,19 @@ export default function QRScanner({ onScanSuccess }) {
         };
     }, []);
 
+    const validateQRCode = (data) => {
+        const now = new Date();
+
+        if (data.valid_until) {
+            const expiration = new Date(data.valid_until);
+            if (now > expiration) {
+                throw new Error("El código QR ha expirado");
+            }
+        }
+
+        return true;
+    };
+
     const startScanner = async () => {
         setErrorMessage("");
         setLoading(false);
@@ -37,28 +50,44 @@ export default function QRScanner({ onScanSuccess }) {
                     setLoading(true);
                     try {
                         const data = JSON.parse(decodedText);
+
+                        // Validar QR antes de enviar
+                        validateQRCode(data);
+
                         const formattedData = {
+                            qr_id: data.qr_id,
                             visitor_name: data.name,
                             document_id: data.id_document,
                             resident_id: data.user_id,
                             vehicle_plate: data.vehicle_plate,
+                            qr_type: data.qr_type,
+                            qr_data: data,
                         };
 
-                        await axios.post(
+                        const response = await axios.post(
                             "http://127.0.0.1:8000/api/scan-qr",
                             formattedData
                         );
+
                         onScanSuccess(data);
-                        toast.success("Visitante registrado correctamente");
+                        toast.success(
+                            response.data.message ||
+                                "Visitante registrado correctamente"
+                        );
                         await html5QrCode.stop();
                         setScanning(false);
                     } catch (error) {
-                        setErrorMessage(
-                            "Código QR inválido o error en el registro."
-                        );
-                        toast.error(
-                            "Código QR inválido o error en el registro."
-                        );
+                        let errorMessage =
+                            "Código QR inválido o error en el registro.";
+
+                        if (error.response?.data?.message) {
+                            errorMessage = error.response.data.message;
+                        } else if (error.message) {
+                            errorMessage = error.message;
+                        }
+
+                        setErrorMessage(errorMessage);
+                        toast.error(errorMessage);
                         await html5QrCode.stop();
                         setScanning(false);
                     } finally {
@@ -87,24 +116,41 @@ export default function QRScanner({ onScanSuccess }) {
             .then(async (decodedText) => {
                 try {
                     const data = JSON.parse(decodedText);
+
+                    validateQRCode(data);
+
                     const formattedData = {
+                        qr_id: data.qr_id,
                         visitor_name: data.name,
                         document_id: data.id_document,
                         resident_id: data.user_id,
                         vehicle_plate: data.vehicle_plate,
+                        qr_type: data.qr_type,
+                        qr_data: data,
                     };
 
-                    await axios.post(
+                    const response = await axios.post(
                         "http://127.0.0.1:8000/api/scan-qr",
                         formattedData
                     );
+
                     onScanSuccess(data);
-                    toast.success("Visitante registrado correctamente");
-                } catch (error) {
-                    setErrorMessage(
-                        "Código QR inválido o error en el registro."
+                    toast.success(
+                        response.data.message ||
+                            "Visitante registrado correctamente"
                     );
-                    toast.error("Código QR inválido o error en el registro.");
+                } catch (error) {
+                    let errorMessage =
+                        "Código QR inválido o error en el registro.";
+
+                    if (error.response?.data?.message) {
+                        errorMessage = error.response.data.message;
+                    } else if (error.message) {
+                        errorMessage = error.message;
+                    }
+
+                    setErrorMessage(errorMessage);
+                    toast.error(errorMessage);
                 } finally {
                     setLoading(false);
                     html5QrCode.clear();

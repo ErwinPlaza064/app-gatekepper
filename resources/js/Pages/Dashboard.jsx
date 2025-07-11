@@ -22,49 +22,12 @@ export default function Dashboard({ auth, visits }) {
     return (
         <Authenticated user={auth.user}>
             <Head title="Dashboard" />
-            <section className="px-10 py-20 mx-auto max-w-7xl">
+            <section className="px-10 mx-auto max-w-7xl">
                 {isAdmin ? (
                     <IsAdmin />
                 ) : (
                     <>
-                        <div className="mb-8">
-                            <nav className="flex p-1 space-x-4 bg-white rounded-lg shadow-sm">
-                                <button
-                                    onClick={() => setActiveTab("dashboard")}
-                                    className={`px-6 py-3 rounded-md font-medium transition-all duration-200 ${
-                                        activeTab === "dashboard"
-                                            ? "bg-blue-600 text-white shadow-md"
-                                            : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-                                    }`}
-                                >
-                                    📊 Dashboard
-                                </button>
-                                <button
-                                    onClick={() => setActiveTab("generate")}
-                                    className={`px-6 py-3 rounded-md font-medium transition-all duration-200 ${
-                                        activeTab === "generate"
-                                            ? "bg-blue-600 text-white shadow-md"
-                                            : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-                                    }`}
-                                >
-                                    🔗 Generar QR
-                                </button>
-                                <button
-                                    onClick={() =>
-                                        setActiveTab("qr-management")
-                                    }
-                                    className={`px-6 py-3 rounded-md font-medium transition-all duration-200 ${
-                                        activeTab === "qr-management"
-                                            ? "bg-blue-600 text-white shadow-md"
-                                            : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-                                    }`}
-                                >
-                                    📱 Mis QR Codes
-                                </button>
-                            </nav>
-                        </div>
-
-                        <div className="min-h-[500px]">
+                        <div className="min-h-[500px] py-20">
                             {activeTab === "dashboard" && (
                                 <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
                                     <NotificationCard />
@@ -85,6 +48,42 @@ export default function Dashboard({ auth, visits }) {
                                     <QRDashboard userId={auth.user.id} />
                                 </div>
                             )}
+                        </div>
+                        <div className="flex justify-center">
+                            <nav className="flex p-1 py-2 space-x-4 rounded-lg shadow-sm">
+                                <button
+                                    onClick={() => setActiveTab("dashboard")}
+                                    className={`px-6 py-3 rounded-md font-medium transition-all duration-200 ${
+                                        activeTab === "dashboard"
+                                            ? "bg-blue-600 text-white shadow-md"
+                                            : "text-gray-600  bg-gray-200 hover:text-gray-400 hover:bg-gray-50"
+                                    }`}
+                                >
+                                    Dashboard
+                                </button>
+                                <button
+                                    onClick={() => setActiveTab("generate")}
+                                    className={`px-6 py-3 rounded-md font-medium transition-all duration-200 ${
+                                        activeTab === "generate"
+                                            ? "bg-blue-600 text-white shadow-md"
+                                            : "text-gray-600 bg-gray-200  hover:text-gray-900 hover:bg-gray-50"
+                                    }`}
+                                >
+                                    Generar QR
+                                </button>
+                                <button
+                                    onClick={() =>
+                                        setActiveTab("qr-management")
+                                    }
+                                    className={`px-6 py-3 rounded-md font-medium transition-all duration-200 ${
+                                        activeTab === "qr-management"
+                                            ? "bg-blue-600 text-white shadow-md"
+                                            : "text-gray-600 bg-gray-200 hover:text-gray-900 hover:bg-gray-50"
+                                    }`}
+                                >
+                                    Mis QR
+                                </button>
+                            </nav>
                         </div>
                     </>
                 )}

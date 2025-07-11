@@ -27,7 +27,6 @@ export default function Dashboard({ auth, visits }) {
                     <IsAdmin />
                 ) : (
                     <>
-                        {/* Navegación con pestañas - Solo para residentes */}
                         <div className="mb-8">
                             <nav className="flex p-1 space-x-4 bg-white rounded-lg shadow-sm">
                                 <button
@@ -65,7 +64,6 @@ export default function Dashboard({ auth, visits }) {
                             </nav>
                         </div>
 
-                        {/* Contenido de las pestañas */}
                         <div className="min-h-[500px]">
                             {activeTab === "dashboard" && (
                                 <div className="grid grid-cols-1 gap-6 md:grid-cols-4">

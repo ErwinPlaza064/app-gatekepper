@@ -21,7 +21,6 @@
         "vite": "^4.0.0"
     },
     "dependencies": {
-        "firebase": "^11.6.0",
         "html5-qrcode": "^2.3.8",
         "keen-slider": "^6.8.6",
         "lodash": "^4.17.21",

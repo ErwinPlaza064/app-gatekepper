@@ -1,39 +1,29 @@
 import { QRCodeCanvas } from "qrcode.react";
 import { useState, useRef } from "react";
 import Typography from "@/Components/UI/Typography";
-import {
-    getStorage,
-    ref,
-    uploadString,
-    getDownloadURL,
-} from "firebase/storage";
-import { initializeApp } from "firebase/app";
+import axios from "axios";
+
+// Cloudinary config
+const CLOUD_NAME = "dibbibwqd";
+const UPLOAD_PRESET = "qr-gatekepper";
+
+const uploadQRToCloudinary = async (qrRef) => {
+    if (!qrRef.current) return null;
+    const canvas = qrRef.current.querySelector("canvas");
+    const qrImage = canvas.toDataURL("image/png");
+
+    const formData = new FormData();
+    formData.append("file", qrImage);
+    formData.append("upload_preset", UPLOAD_PRESET);
+
+    const response = await axios.post(
+        `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
+        formData
+    );
+    return response.data.secure_url;
+};
 
 export default function QRGenerator({ userId }) {
-    const firebaseConfig = {
-        apiKey: "AIzaSyDNrtfvpzs7kMoh7KLk7wUnaJuxp94ovzY",
-        authDomain: "app-gatekepper.firebaseapp.com",
-        projectId: "app-gatekepper",
-        storageBucket: "app-gatekepper.firebasestorage.app",
-        messagingSenderId: "879293731964",
-        appId: "1:879293731964:web:91a704ccdcbc23734ee5f9",
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const storage = getStorage(app);
-
-    const uploadQRToFirebase = async (qrRef) => {
-        if (!qrRef.current) return;
-
-        const canvas = qrRef.current.querySelector("canvas");
-        const qrImage = canvas.toDataURL("image/png");
-
-        const storageRef = ref(storage, `qr-codes/${Date.now()}.png`);
-        await uploadString(storageRef, qrImage.split(",")[1], "base64");
-
-        return await getDownloadURL(storageRef);
-    };
-
     const [visitorInfo, setVisitorInfo] = useState({
         name: "",
         id_document: "",
@@ -53,12 +43,8 @@ export default function QRGenerator({ userId }) {
     };
 
     const sendWhatsApp = async () => {
-        console.log("Subiendo QR...");
-
         try {
-            const qrURL = await uploadQRToFirebase(qrRef);
-            console.log("QR subido:", qrURL);
-
+            const qrURL = await uploadQRToCloudinary(qrRef);
             if (!qrURL) {
                 console.error("Error: No se obtuvo la URL del QR.");
                 return;
@@ -73,8 +59,6 @@ export default function QRGenerator({ userId }) {
             const whatsappURL = `https://api.whatsapp.com/send?text=${encodeURIComponent(
                 message
             )}`;
-
-            console.log("Abriendo WhatsApp con URL:", whatsappURL);
             window.open(whatsappURL, "_blank");
         } catch (error) {
             console.error("Error al subir el QR:", error);
@@ -117,7 +101,7 @@ export default function QRGenerator({ userId }) {
 
             <input
                 type="text"
-                placeholder="Placa del vehículo (opcional)"
+                placeholder="Placa del vehículo"
                 value={visitorInfo.vehicle_plate}
                 onChange={(e) =>
                     setVisitorInfo({

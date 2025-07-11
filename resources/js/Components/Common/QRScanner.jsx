@@ -1,20 +1,19 @@
-import { useEffect, useRef, useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Html5Qrcode } from "html5-qrcode";
 import axios from "axios";
-import toast from "react-hot-toast";
+import { toast } from "react-hot-toast";
 
 export default function QRScanner({ onScanSuccess }) {
-    const scannerRef = useRef(null);
+    const [scanning, setScanning] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
     const [loading, setLoading] = useState(false);
-    const [scanning, setScanning] = useState(false);
+    const scannerRef = useRef(null);
+    const [isScanning, setIsScanning] = useState(false);
 
+    // Cleanup al desmontar el componente
     useEffect(() => {
         return () => {
-            if (scannerRef.current) {
-                scannerRef.current.stop().catch(() => {});
-                scannerRef.current.clear().catch(() => {});
-            }
+            stopScanner();
         };
     }, []);
 
@@ -31,23 +30,45 @@ export default function QRScanner({ onScanSuccess }) {
         return true;
     };
 
+    const stopScanner = async () => {
+        if (scannerRef.current && isScanning) {
+            try {
+                await scannerRef.current.stop();
+                scannerRef.current.clear();
+            } catch (error) {
+                console.log("Scanner already stopped");
+            } finally {
+                setScanning(false);
+                setIsScanning(false);
+                scannerRef.current = null;
+            }
+        }
+    };
+
     const startScanner = async () => {
+        // Detener scanner anterior si existe
+        await stopScanner();
+
         setErrorMessage("");
         setLoading(false);
         setScanning(true);
 
-        const html5QrCode = new Html5Qrcode("reader");
-        scannerRef.current = html5QrCode;
+        try {
+            const html5QrCode = new Html5Qrcode("reader");
+            scannerRef.current = html5QrCode;
 
-        html5QrCode
-            .start(
+            await html5QrCode.start(
                 { facingMode: "environment" },
                 {
                     fps: 10,
                     qrbox: { width: 250, height: 250 },
                 },
                 async (decodedText) => {
+                    if (loading) return; // Prevenir múltiples escaneos
+
                     setLoading(true);
+                    setIsScanning(true);
+
                     try {
                         const data = JSON.parse(decodedText);
 
@@ -74,13 +95,18 @@ export default function QRScanner({ onScanSuccess }) {
                             response.data.message ||
                                 "Visitante registrado correctamente"
                         );
-                        await html5QrCode.stop();
-                        setScanning(false);
+
+                        // Detener scanner después del éxito
+                        await stopScanner();
                     } catch (error) {
                         let errorMessage =
                             "Código QR inválido o error en el registro.";
 
-                        if (error.response?.data?.message) {
+                        if (error.response?.status === 400) {
+                            errorMessage =
+                                error.response.data.message ||
+                                "Código QR inválido o expirado";
+                        } else if (error.response?.data?.message) {
                             errorMessage = error.response.data.message;
                         } else if (error.message) {
                             errorMessage = error.message;
@@ -88,119 +114,166 @@ export default function QRScanner({ onScanSuccess }) {
 
                         setErrorMessage(errorMessage);
                         toast.error(errorMessage);
-                        await html5QrCode.stop();
-                        setScanning(false);
+
+                        // Detener scanner en caso de error
+                        await stopScanner();
                     } finally {
                         setLoading(false);
                     }
+                },
+                (errorMessage) => {
+                    // Error de escaneo silencioso
                 }
-            )
-            .catch((err) => {
-                setErrorMessage("No se pudo iniciar la cámara.");
-                setScanning(false);
-            });
+            );
+
+            setIsScanning(true);
+        } catch (err) {
+            console.error("Error starting scanner:", err);
+            setErrorMessage(
+                "No se pudo iniciar la cámara. Verifica los permisos."
+            );
+            setScanning(false);
+            setIsScanning(false);
+        }
     };
 
     const scanFromFile = async (event) => {
         setErrorMessage("");
         setLoading(true);
+
         const file = event.target.files[0];
         if (!file) {
             setLoading(false);
             return;
         }
-        const html5QrCode = new Html5Qrcode("reader");
-        scannerRef.current = html5QrCode;
-        html5QrCode
-            .scanFile(file, true)
-            .then(async (decodedText) => {
-                try {
-                    const data = JSON.parse(decodedText);
 
-                    validateQRCode(data);
+        // Detener scanner si está corriendo
+        await stopScanner();
 
-                    const formattedData = {
-                        qr_id: data.qr_id,
-                        visitor_name: data.name,
-                        document_id: data.id_document,
-                        resident_id: data.user_id,
-                        vehicle_plate: data.vehicle_plate,
-                        qr_type: data.qr_type,
-                        qr_data: data,
-                    };
+        try {
+            const html5QrCode = new Html5Qrcode("reader");
+            scannerRef.current = html5QrCode;
 
-                    const response = await axios.post(
-                        "http://127.0.0.1:8000/api/scan-qr",
-                        formattedData
-                    );
+            const decodedText = await html5QrCode.scanFile(file, true);
 
-                    onScanSuccess(data);
-                    toast.success(
-                        response.data.message ||
-                            "Visitante registrado correctamente"
-                    );
-                } catch (error) {
-                    let errorMessage =
-                        "Código QR inválido o error en el registro.";
+            try {
+                const data = JSON.parse(decodedText);
 
-                    if (error.response?.data?.message) {
-                        errorMessage = error.response.data.message;
-                    } else if (error.message) {
-                        errorMessage = error.message;
-                    }
+                validateQRCode(data);
 
-                    setErrorMessage(errorMessage);
-                    toast.error(errorMessage);
-                } finally {
-                    setLoading(false);
-                    html5QrCode.clear();
+                const formattedData = {
+                    qr_id: data.qr_id,
+                    visitor_name: data.name,
+                    document_id: data.id_document,
+                    resident_id: data.user_id,
+                    vehicle_plate: data.vehicle_plate,
+                    qr_type: data.qr_type,
+                    qr_data: data,
+                };
+
+                const response = await axios.post(
+                    "http://127.0.0.1:8000/api/scan-qr",
+                    formattedData
+                );
+
+                onScanSuccess(data);
+                toast.success(
+                    response.data.message ||
+                        "Visitante registrado correctamente"
+                );
+            } catch (error) {
+                let errorMessage = "Código QR inválido o error en el registro.";
+
+                if (error.response?.status === 400) {
+                    errorMessage =
+                        error.response.data.message ||
+                        "Código QR inválido o expirado";
+                } else if (error.response?.data?.message) {
+                    errorMessage = error.response.data.message;
+                } else if (error.message) {
+                    errorMessage = error.message;
                 }
-            })
-            .catch(() => {
-                setErrorMessage("No se pudo leer el archivo.");
-                setLoading(false);
-                html5QrCode.clear();
-            });
+
+                setErrorMessage(errorMessage);
+                toast.error(errorMessage);
+            }
+        } catch (error) {
+            setErrorMessage("No se pudo leer el archivo QR.");
+            toast.error("No se pudo leer el archivo QR.");
+        } finally {
+            setLoading(false);
+            if (scannerRef.current) {
+                try {
+                    scannerRef.current.clear();
+                } catch (e) {
+                    console.log("Scanner already cleared");
+                }
+                scannerRef.current = null;
+            }
+        }
     };
 
     return (
-        <div className="p-2 rounded-lg shadow-md">
-            <h2 className="text-2xl font-bold text-center ">Escanear QR</h2>
-            <div
-                id="reader"
-                className="flex justify-center mb-4"
-                style={{ minHeight: 250 }}
-            ></div>
-            {!scanning && (
-                <div className="flex flex-col items-center gap-2">
-                    <button
-                        onClick={startScanner}
-                        className="px-4 py-2 text-white transition bg-blue-600 rounded hover:bg-blue-700"
-                    >
-                        Iniciar escaneo con cámara
-                    </button>
-                    <label className="text-blue-700 underline cursor-pointer">
-                        Escanear desde archivo
-                        <input
-                            type="file"
-                            accept="image/*"
-                            onChange={scanFromFile}
-                            className="hidden"
-                        />
-                    </label>
-                </div>
-            )}
-            {loading && (
-                <div className="flex items-center justify-center mt-4">
-                    <div className="w-8 h-8 border-4 border-blue-500 rounded-full border-t-transparent animate-spin"></div>
-                    <span className="ml-2 text-blue-600">
-                        Registrando visitante...
-                    </span>
-                </div>
-            )}
+        <div className="p-5 bg-white rounded-lg shadow-md">
+            <h4 className="mb-3 text-lg font-semibold text-center">
+                Escanear Código QR
+            </h4>
+
             {errorMessage && (
-                <p className="mt-2 text-center text-red-500">{errorMessage}</p>
+                <div className="p-4 mb-4 text-red-700 bg-red-100 border border-red-300 rounded">
+                    {errorMessage}
+                </div>
             )}
+
+            {loading && (
+                <div className="p-4 mb-4 text-blue-700 bg-blue-100 border border-blue-300 rounded">
+                    Procesando código QR...
+                </div>
+            )}
+
+            <div className="flex flex-col items-center space-y-4">
+                {!scanning ? (
+                    <div className="w-full space-y-4">
+                        <button
+                            onClick={startScanner}
+                            className="w-full px-4 py-2 text-white transition duration-200 bg-blue-600 rounded hover:bg-blue-700"
+                        >
+                            Iniciar Escáner
+                        </button>
+
+                        <div className="text-center">
+                            <span className="text-gray-500">o</span>
+                        </div>
+
+                        <div>
+                            <label className="block mb-2 text-sm font-medium text-gray-700">
+                                Subir imagen QR:
+                            </label>
+                            <input
+                                type="file"
+                                accept="image/*"
+                                onChange={scanFromFile}
+                                className="w-full p-2 border border-gray-300 rounded"
+                            />
+                        </div>
+                    </div>
+                ) : (
+                    <div className="w-full space-y-4">
+                        <div
+                            id="reader"
+                            className="w-full border border-gray-300 rounded"
+                            style={{ minHeight: "300px" }}
+                        ></div>
+
+                        <button
+                            onClick={stopScanner}
+                            className="w-full px-4 py-2 text-white transition duration-200 bg-red-600 rounded hover:bg-red-700"
+                        >
+                            Detener Escáner
+                        </button>
+                    </div>
+                )}
+            </div>
         </div>
     );
 }

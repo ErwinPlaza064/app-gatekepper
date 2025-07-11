@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\VisitorController;
 use App\Http\Controllers\QrController;
+use App\Http\Controllers\QrCodeController;
+
 
 
 Route::middleware('auth:sanctum')->get('/notifications', [NotificationController::class, 'index']);

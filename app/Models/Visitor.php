@@ -32,6 +32,11 @@ class Visitor extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function qrCode()
+    {
+        return $this->belongsTo(QrCode::class);
+    }
+
 
     protected static function booted()
     {

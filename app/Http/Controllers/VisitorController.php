@@ -5,6 +5,7 @@ use Illuminate\Http\Request;
 use App\Models\Visitor;
 use App\Models\QrCode;
 use App\Notifications\NewVisitorNotification;
+use App\Notifications\QrUsedNotification;
 
 class VisitorController extends Controller
 {
@@ -32,10 +33,11 @@ class VisitorController extends Controller
 
                 // Incrementar uso
                 $qrCode->incrementUsage();
+                $qrCode->user->notify(new QrUsedNotification($qrCode));
             } else {
                 // Si no existe el QR, crear registro
                 $qrData = $validated['qr_data'] ?? [];
-                QrCode::create([
+                $qrCode = QrCode::create([
                     'qr_id' => $validated['qr_id'],
                     'user_id' => $validated['resident_id'],
                     'visitor_name' => $validated['visitor_name'],
@@ -48,6 +50,7 @@ class VisitorController extends Controller
                     'is_active' => $qrData['qr_type'] !== 'single_use',
                     'metadata' => $qrData
                 ]);
+                $qrCode->user->notify(new QrUsedNotification($qrCode));
             }
         }
 
@@ -58,6 +61,7 @@ class VisitorController extends Controller
             'user_id' => $validated['resident_id'],
             'vehicle_plate' => $validated['vehicle_plate'],
             'entry_time' => now(),
+            'qr_code_id' => $qrCode ? $qrCode->id : null,
         ]);
 
         $resident = $visitor->user;
@@ -67,5 +71,41 @@ class VisitorController extends Controller
         }
 
         return response()->json(['message' => 'Visitante registrado con éxito', 'visitor' => $visitor], 201);
+    }
+
+    public function getUserVisitors(Request $request)
+    {
+        $userId = auth()->id();
+
+        if (!$userId) {
+            return response()->json(['message' => 'No autenticado'], 401);
+        }
+
+        $query = Visitor::where('user_id', $userId)
+            ->with(['qrCode' => function($q) {
+                $q->select('id', 'qr_id', 'qr_type');
+            }])
+            ->orderBy('entry_time', 'desc');
+
+        // Aplicar filtros si existen
+        if ($request->has('search') && !empty($request->search)) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('id_document', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->has('dateFrom') && !empty($request->dateFrom)) {
+            $query->whereDate('entry_time', '>=', $request->dateFrom);
+        }
+
+        if ($request->has('dateTo') && !empty($request->dateTo)) {
+            $query->whereDate('entry_time', '<=', $request->dateTo);
+        }
+
+        $visitors = $query->limit(50)->get();
+
+        return response()->json($visitors);
     }
 }

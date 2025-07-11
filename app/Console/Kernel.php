@@ -8,11 +8,26 @@ use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 class Kernel extends ConsoleKernel
 {
     /**
+     * The application's command schedule.
+     *
+     * @var array
+     */
+    protected $commands = [
+        Commands\NotifyExpiringQrCodes::class,
+    ];
+
+    /**
      * Define the application's command schedule.
      */
     protected function schedule(Schedule $schedule): void
     {
-        // $schedule->command('inspire')->hourly();
+        $schedule->command('qr:notify-expiring --hours=2')
+                 ->hourly()
+                 ->withoutOverlapping();
+
+        $schedule->command('qr:notify-expiring --hours=24')
+                 ->dailyAt('09:00')
+                 ->withoutOverlapping();
     }
 
     /**

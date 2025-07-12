@@ -14,7 +14,10 @@ export default function VisitsCard({ visits }) {
             {visits.length > 0 ? (
                 <ul className="space-y-3">
                     {visits.slice(0, 2).map((visit, index) => (
-                        <li key={index} className="flex justify-between">
+                        <li
+                            key={index}
+                            className="flex items-center justify-between"
+                        >
                             <span>{visit.name}</span>
                             <span className="text-sm text-gray-600">
                                 {new Date(visit.entry_time).toLocaleString()}

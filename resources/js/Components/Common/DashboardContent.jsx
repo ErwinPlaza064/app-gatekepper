@@ -3,13 +3,8 @@ import VisitsCard from "@/Components/Cards/VisitsCard";
 import ComplaintsCard from "@/Components/Cards/ComplaintsCard";
 import QRGenerator from "@/Components/Common/QRGenerator";
 import QRDashboard from "@/Components/Common/QRDashboard";
-import IsAdmin from "@/Components/UI/IsAdmin";
 
-export default function DashboardContent({ activeTab, isAdmin, auth, visits }) {
-    if (isAdmin) {
-        return <IsAdmin />;
-    }
-
+export default function DashboardContent({ activeTab, auth, visits }) {
     return (
         <div className="space-y-6">
             {activeTab === "dashboard" && (

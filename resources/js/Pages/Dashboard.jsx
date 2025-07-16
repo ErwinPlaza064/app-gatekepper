@@ -8,11 +8,6 @@ export default function Dashboard({ auth, visits }) {
     const [activeTab, setActiveTab] = useState("dashboard");
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
-    const isAdmin =
-        auth.user.rol === "administrador" ||
-        auth.user.rol === "portero" ||
-        auth.user.rol === "adminresidencial";
-
     return (
         <>
             <Head title="Dashboard" />
@@ -38,7 +33,6 @@ export default function Dashboard({ auth, visits }) {
                     <section className="p-6">
                         <DashboardContent
                             activeTab={activeTab}
-                            isAdmin={isAdmin}
                             auth={auth}
                             visits={visits}
                         />

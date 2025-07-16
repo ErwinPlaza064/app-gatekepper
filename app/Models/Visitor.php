@@ -17,6 +17,7 @@ class Visitor extends Model
         'name',
         'id_document',
         'user_id',
+        'qr_code_id',
         'entry_time',
         'exit_time',
         'vehicle_plate',

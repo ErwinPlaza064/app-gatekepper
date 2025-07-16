@@ -47,7 +47,7 @@ class VisitorController extends Controller
                     'valid_until' => isset($qrData['valid_until']) ? $qrData['valid_until'] : null,
                     'max_uses' => $qrData['max_uses'] ?? 1,
                     'current_uses' => 1,
-                    'is_active' => $qrData['qr_type'] !== 'single_use',
+                    'is_active' => ($qrData['qr_type'] ?? 'single_use') !== 'single_use',
                     'metadata' => $qrData
                 ]);
                 $qrCode->user->notify(new QrUsedNotification($qrCode));
@@ -107,5 +107,29 @@ class VisitorController extends Controller
         $visitors = $query->limit(50)->get();
 
         return response()->json($visitors);
+    }
+
+    public function getRecentScans()
+    {
+        // Obtener los últimos 20 escaneos para administradores
+        $recentScans = Visitor::with(['user:id,name'])
+            ->orderBy('entry_time', 'desc')
+            ->limit(20)
+            ->get()
+            ->map(function ($visitor) {
+                return [
+                    'id' => $visitor->id,
+                    'name' => $visitor->name,
+                    'id_document' => $visitor->id_document,
+                    'vehicle_plate' => $visitor->vehicle_plate,
+                    'entry_time' => $visitor->entry_time,
+                    'user' => $visitor->user ? [
+                        'id' => $visitor->user->id,
+                        'name' => $visitor->user->name
+                    ] : null
+                ];
+            });
+
+        return response()->json($recentScans);
     }
 }

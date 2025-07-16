@@ -60,6 +60,7 @@ Route::middleware('auth')->group(function () {
     Route::patch('/api/qr-codes/{qrId}/deactivate', [QrCodeController::class, 'deactivateQr']);
     Route::patch('/api/qr-codes/{qrId}/reactivate', [QrCodeController::class, 'reactivateQr']);
     Route::get('/api/user/visitors', [VisitorController::class, 'getUserVisitors']);
+    Route::post('/api/qr-codes', [QrCodeController::class, 'store']);
 });
 
 

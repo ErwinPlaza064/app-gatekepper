@@ -12,6 +12,10 @@ use Carbon\Carbon;
 
 class DashboardStatsWidget extends BaseWidget
 {
+    protected static ?int $sort = 1;
+
+    protected int | string | array $columnSpan = 'full';
+
     protected function getStats(): array
     {
         // Total de QR activos
@@ -29,29 +33,33 @@ class DashboardStatsWidget extends BaseWidget
         // Total de usuarios
         $totalUsers = User::count();
 
-        // Quejas pendientes
-        $pendingComplaints = Complaint::where('status', 'pending')->count();
+        // Total de quejas
+        $totalComplaints = Complaint::count();
 
         return [
             Stat::make('QR Activos', $activeQrCodes)
                 ->description('Códigos QR válidos y disponibles')
                 ->descriptionIcon('heroicon-m-qr-code')
-                ->color('success'),
+                ->color('success')
+                ->chart([7, 12, 18, 24, 30, 35, $activeQrCodes]),
 
             Stat::make('Visitas de Hoy', $todayVisits)
                 ->description('Ingresos registrados hoy')
                 ->descriptionIcon('heroicon-m-user-group')
-                ->color('info'),
+                ->color('info')
+                ->chart([5, 8, 12, 15, 20, 25, $todayVisits]),
 
             Stat::make('Total Usuarios', $totalUsers)
                 ->description('Usuarios registrados en el sistema')
                 ->descriptionIcon('heroicon-m-users')
-                ->color('primary'),
+                ->color('primary')
+                ->chart([10, 25, 40, 55, 70, 85, $totalUsers]),
 
-            Stat::make('Quejas Pendientes', $pendingComplaints)
-                ->description('Quejas sin resolver')
+            Stat::make('Total Quejas', $totalComplaints)
+                ->description('Quejas registradas en el sistema')
                 ->descriptionIcon('heroicon-m-exclamation-triangle')
-                ->color($pendingComplaints > 0 ? 'warning' : 'success'),
+                ->color($totalComplaints > 0 ? 'warning' : 'success')
+                ->chart([0, 2, 4, 6, 8, 10, $totalComplaints]),
         ];
     }
 }

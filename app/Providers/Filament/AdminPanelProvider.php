@@ -38,14 +38,12 @@ class AdminPanelProvider extends PanelProvider
             ->pages([
                 Pages\Dashboard::class,
             ])
-            ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
                 Widgets\AccountWidget::class,
                 \App\Filament\Widgets\DashboardStatsWidget::class,
                 \App\Filament\Widgets\QrGeneratedWeeklyChart::class,
                 \App\Filament\Widgets\QrTypeDistributionChart::class,
                 \App\Filament\Widgets\AccessMethodChart::class,
-                \App\Filament\Widgets\ActiveVisitorsTable::class,
             ])
             ->middleware([
                 EncryptCookies::class,

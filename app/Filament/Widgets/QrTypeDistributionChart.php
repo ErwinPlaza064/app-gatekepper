@@ -8,6 +8,12 @@ use Filament\Widgets\ChartWidget;
 class QrTypeDistributionChart extends ChartWidget
 {
     protected static ?string $heading = 'Distribución de Tipos de QR';
+    protected static ?int $sort = 3;
+
+    protected int | string | array $columnSpan = [
+        'md' => 1,
+        'xl' => 1,
+    ];
 
     protected function getData(): array
     {
@@ -20,14 +26,14 @@ class QrTypeDistributionChart extends ChartWidget
                 [
                     'data' => [$singleUse, $timeLimited, $recurring],
                     'backgroundColor' => [
-                        'rgb(239, 68, 68)',   // Red para single_use
-                        'rgb(245, 158, 11)',  // Yellow para time_limited
-                        'rgb(34, 197, 94)',   // Green para recurring
+                        '#EF4444', // Red for single use
+                        '#F59E0B', // Yellow for time limited
+                        '#10B981', // Green for recurring
                     ],
                     'borderColor' => [
-                        'rgb(220, 38, 38)',
-                        'rgb(217, 119, 6)',
-                        'rgb(21, 128, 61)',
+                        '#DC2626',
+                        '#D97706',
+                        '#059669',
                     ],
                     'borderWidth' => 2,
                 ],

@@ -8,7 +8,13 @@ use Carbon\Carbon;
 
 class QrGeneratedWeeklyChart extends ChartWidget
 {
-    protected static ?string $heading = 'QR Generados por Semana';
+    protected static ?string $heading = 'QR Generados - Últimos 7 Días';
+    protected static ?int $sort = 2;
+
+    protected int | string | array $columnSpan = [
+        'md' => 2,
+        'xl' => 3,
+    ];
 
     protected function getData(): array
     {
@@ -21,7 +27,7 @@ class QrGeneratedWeeklyChart extends ChartWidget
             $count = QrCode::whereDate('created_at', $date)->count();
 
             $data[] = $count;
-            $labels[] = $date->format('d/m');
+            $labels[] = $date->format('M d');
         }
 
         return [
@@ -29,8 +35,9 @@ class QrGeneratedWeeklyChart extends ChartWidget
                 [
                     'label' => 'QR Generados',
                     'data' => $data,
-                    'borderColor' => 'rgb(59, 130, 246)',
+                    'borderColor' => '#3B82F6',
                     'backgroundColor' => 'rgba(59, 130, 246, 0.1)',
+                    'fill' => true,
                     'tension' => 0.4,
                 ],
             ],

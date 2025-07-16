@@ -8,7 +8,13 @@ use Carbon\Carbon;
 
 class AccessMethodChart extends ChartWidget
 {
-    protected static ?string $heading = 'Accesos por Método (Últimos 7 días)';
+    protected static ?string $heading = 'Métodos de Acceso - Últimos 7 Días';
+    protected static ?int $sort = 4;
+    
+    protected int | string | array $columnSpan = [
+        'md' => 2,
+        'xl' => 2,
+    ];
 
     protected function getData(): array
     {
@@ -32,7 +38,7 @@ class AccessMethodChart extends ChartWidget
 
             $qrAccess[] = $qrCount;
             $manualAccess[] = $manualCount;
-            $labels[] = $date->format('d/m');
+            $labels[] = $date->format('M d');
         }
 
         return [
@@ -40,15 +46,15 @@ class AccessMethodChart extends ChartWidget
                 [
                     'label' => 'Acceso con QR',
                     'data' => $qrAccess,
-                    'backgroundColor' => 'rgba(34, 197, 94, 0.8)',
-                    'borderColor' => 'rgb(34, 197, 94)',
+                    'backgroundColor' => '#10B981',
+                    'borderColor' => '#059669',
                     'borderWidth' => 2,
                 ],
                 [
                     'label' => 'Acceso Manual',
                     'data' => $manualAccess,
-                    'backgroundColor' => 'rgba(245, 158, 11, 0.8)',
-                    'borderColor' => 'rgb(245, 158, 11)',
+                    'backgroundColor' => '#F59E0B',
+                    'borderColor' => '#D97706',
                     'borderWidth' => 2,
                 ],
             ],

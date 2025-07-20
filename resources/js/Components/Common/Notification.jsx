@@ -52,52 +52,82 @@ export default function Notification({ notifications, setNotifications }) {
                 )}
             </button>
             {showNotifications && (
-                <div className="absolute right-0 z-50 mt-2 overflow-hidden bg-white border border-gray-100 shadow-2xl w-80 rounded-xl animate-fade-in">
-                    <div className="flex items-center justify-between px-5 py-3 border-b border-gray-100 bg-gray-50">
-                        <span className="text-base font-semibold text-gray-700">
-                            Notificaciones
-                        </span>
-                        <button
-                            className="px-3 py-1 text-xs font-medium text-blue-700 transition rounded bg-blue-50 hover:bg-blue-100"
-                            onClick={markAllAsRead}
+                <>
+                    <div
+                        className="fixed inset-0 z-40 bg-black/10 backdrop-blur-sm"
+                        style={{ transition: "all 0.2s" }}
+                        onClick={() => setShowNotifications(false)}
+                    />
+                    <div
+                        className="absolute right-0 z-50 mt-2 overflow-hidden bg-white border border-gray-100 shadow-2xl rounded-xl animate-fade-in"
+                        style={{
+                            width: "18rem",
+                            maxWidth: "95vw",
+                            left: "auto",
+                            right: 0,
+                            ...(window.innerWidth <= 500
+                                ? {
+                                      width: "70vw",
+                                      right: "-1vw",
+                                      borderRadius: "1rem",
+                                  }
+                                : {}),
+                        }}
+                    >
+                        <div className="flex items-center justify-between px-3 py-2 border-b border-gray-100 bg-gray-50">
+                            <span className="text-base font-semibold text-gray-700">
+                                Notificaciones
+                            </span>
+                            <button
+                                className="px-2 py-1 text-xs font-medium text-blue-700 transition rounded bg-blue-50 hover:bg-blue-100"
+                                onClick={markAllAsRead}
+                            >
+                                Marcar como leídas
+                            </button>
+                        </div>
+                        <div
+                            className="overflow-y-auto divide-y divide-gray-100 max-h-64"
+                            style={{ maxHeight: "16rem" }}
                         >
-                            Marcar como leídas
-                        </button>
-                    </div>
-                    <div className="overflow-y-auto divide-y divide-gray-100 max-h-64">
-                        {notifications.length === 0 ? (
-                            <div className="px-5 py-8 text-sm text-center text-gray-400">
-                                No tienes notificaciones.
-                            </div>
-                        ) : (
-                            notifications.map((n) => (
-                                <div
-                                    key={n.id}
-                                    className={`group px-5 py-4 text-sm cursor-pointer transition-all ${
-                                        n.read_at
-                                            ? "bg-white text-gray-400 hover:bg-gray-50"
-                                            : "bg-blue-50 text-gray-800 hover:bg-blue-100"
-                                    }`}
-                                >
-                                    <div className="flex items-center gap-2">
-                                        <span className="font-medium">
-                                            {n.data?.message ||
-                                                n.data?.body ||
-                                                "Notificación"}
-                                        </span>
-                                    </div>
-                                    <div className="mt-1 text-xs text-gray-400">
-                                        {n.created_at
-                                            ? new Date(
-                                                  n.created_at
-                                              ).toLocaleString()
-                                            : ""}
-                                    </div>
+                            {notifications.length === 0 ? (
+                                <div className="px-3 py-8 text-sm text-center text-gray-400">
+                                    No tienes notificaciones.
                                 </div>
-                            ))
-                        )}
+                            ) : (
+                                notifications.map((n) => (
+                                    <div
+                                        key={n.id}
+                                        className={`group px-3 py-3 text-sm cursor-pointer transition-all ${
+                                            n.read_at
+                                                ? "bg-white text-gray-400 hover:bg-gray-50"
+                                                : "bg-blue-50 text-gray-800 hover:bg-blue-100"
+                                        }`}
+                                    >
+                                        <div className="flex items-center gap-2">
+                                            <span
+                                                className="text-sm font-medium"
+                                                style={{
+                                                    wordBreak: "break-word",
+                                                }}
+                                            >
+                                                {n.data?.message ||
+                                                    n.data?.body ||
+                                                    "Notificación"}
+                                            </span>
+                                        </div>
+                                        <div className="mt-1 text-xs text-gray-400">
+                                            {n.created_at
+                                                ? new Date(
+                                                      n.created_at
+                                                  ).toLocaleString()
+                                                : ""}
+                                        </div>
+                                    </div>
+                                ))
+                            )}
+                        </div>
                     </div>
-                </div>
+                </>
             )}
         </div>
     );

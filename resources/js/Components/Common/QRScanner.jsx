@@ -4,6 +4,15 @@ import axios from "axios";
 import { toast } from "react-hot-toast";
 
 export default function QRScanner({ onScanSuccess }) {
+    // Verificar soporte de cámara
+    const [cameraSupported, setCameraSupported] = useState(true);
+
+    useEffect(() => {
+        // Verifica si el navegador soporta getUserMedia
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            setCameraSupported(false);
+        }
+    }, []);
     const [scanning, setScanning] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
     const [loading, setLoading] = useState(false);
@@ -219,6 +228,17 @@ export default function QRScanner({ onScanSuccess }) {
                 Escanear Código QR
             </h4>
 
+            {!cameraSupported && (
+                <div className="p-4 mb-4 text-yellow-800 bg-yellow-100 border border-yellow-300 rounded">
+                    <b>Tu navegador no soporta el acceso a la cámara.</b>
+                    <br />
+                    Usa Chrome, Firefox o Safari y asegúrate de acceder por
+                    HTTPS para escanear QR con la cámara.
+                    <br />
+                    También puedes subir una imagen QR.
+                </div>
+            )}
+
             {errorMessage && (
                 <div className="p-4 mb-4 text-red-700 bg-red-100 border border-red-300 rounded">
                     {errorMessage}
@@ -237,6 +257,7 @@ export default function QRScanner({ onScanSuccess }) {
                         <button
                             onClick={startScanner}
                             className="w-full px-4 py-2 text-white transition duration-200 bg-blue-600 rounded hover:bg-blue-700"
+                            disabled={!cameraSupported}
                         >
                             Iniciar Escáner
                         </button>

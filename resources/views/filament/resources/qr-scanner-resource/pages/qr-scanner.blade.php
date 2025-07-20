@@ -11,6 +11,12 @@ Escáner de Códigos QR
 Utiliza la cámara para escanear códigos QR o sube una imagen desde tu dispositivo.
 </x-slot>
 <div id="qr-scanner-container">
+<div id="camera-support-warning" class="p-4 mb-4 text-sm text-yellow-800 bg-yellow-100 border border-yellow-300 rounded">
+<strong>¿Problemas para iniciar la cámara?</strong><br>
+Si ves un error, verifica que tu navegador tenga permisos y soporte para cámara.<br>
+Usa Chrome, Firefox o Safari y accede por HTTPS para mejor compatibilidad.<br>
+Si no funciona, puedes subir una imagen QR.
+</div>
 <div id="scanner-initial-state" class="text-center">
 <div class="flex items-center justify-center w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full dark:bg-gray-800">
 <x-heroicon-o-camera class="w-8 h-8 text-gray-400 dark:text-gray-500" />

@@ -26,7 +26,7 @@ export default function DashboardContent({
                             <ComplaintsCard />
                         </div>
                     </div>
-                    <div className="max-w-3xl mx-auto mt-6">
+                    <div className="max-w-3xl py-10 mx-auto lg:py-6">
                         <VisitsChart data={visitsChartData} />
                     </div>
                 </React.Fragment>

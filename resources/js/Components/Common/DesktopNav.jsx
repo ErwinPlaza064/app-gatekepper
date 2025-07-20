@@ -8,7 +8,7 @@ export default function DesktopNav({
     handleOnClick,
     showingNavigationDropdown,
 }) {
-    const { url } = usePage(); // Obtiene la ruta actual
+    const { url } = usePage();
 
     return (
         <div className="px-5">
@@ -22,8 +22,7 @@ export default function DesktopNav({
 
                     <ul className="hidden gap-7 md:flex">
                         {links.map((link, index) => {
-                            const isActive = url === link.href; // Verifica si el link es el activo
-
+                            const isActive = url === link.href;
                             return (
                                 <li key={index}>
                                     <AnimatedLink
@@ -95,7 +94,6 @@ export default function DesktopNav({
                     </div>
                 </div>
 
-                {/* Botón de menú móvil */}
                 <div className="flex items-center -me-2 sm:hidden">
                     <button
                         onClick={handleOnClick}

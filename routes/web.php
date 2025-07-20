@@ -24,10 +24,9 @@ Route::get('/welcome',function(){
 
 Route::middleware(['auth', 'verified'])->get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-
-Route::post('/notifications/mark-as-read', [DashboardController::class, 'markNotificationsAsRead'])
+Route::post('/notifications/mark-all-read', [DashboardController::class, 'markNotificationsAsRead'])
     ->middleware('auth')
-    ->name('notifications.markAsRead');
+    ->name('notifications.markAllRead');
 
 Route::get('/mis-visitas', [DashboardController::class, 'misVisitas'])->middleware(['auth', 'verified'])->name('mis-visitas');
 

@@ -1,28 +1,21 @@
 import React, { useState } from "react";
 import { FaSignOutAlt } from "react-icons/fa";
+import { router } from "@inertiajs/react";
 
 export default function UserProfile({ user, showThemeToggle, showLogout }) {
     const [open, setOpen] = useState(false);
 
-    const handleLogout = () => {
-        console.log("Logout button clicked");
-        const form = document.createElement("form");
-        form.method = "POST";
-        form.action = "/logout";
-        const token = document.querySelector('meta[name="csrf-token"]');
-        if (token) {
-            console.log("CSRF token found:", token.content);
-            const input = document.createElement("input");
-            input.type = "hidden";
-            input.name = "_token";
-            input.value = token.content;
-            form.appendChild(input);
-        } else {
-            console.log("CSRF token NOT found");
-        }
-        document.body.appendChild(form);
-        console.log("Submitting logout form...");
-        form.submit();
+    const handleLogout = (e) => {
+        e.preventDefault();
+        router.post(
+            "/logout",
+            {},
+            {
+                onFinish: () => {
+                    router.visit("/", { replace: true });
+                },
+            }
+        );
     };
 
     return (
@@ -57,8 +50,9 @@ export default function UserProfile({ user, showThemeToggle, showLogout }) {
                 {showLogout && (
                     <button
                         className="flex items-center w-full gap-2 px-5 py-4 text-sm font-semibold text-left text-red-600 transition-all duration-200 hover:bg-neutral-100 dark:hover:bg-neutral-800"
-                        onClick={handleLogout}
+                        type="button"
                         tabIndex={0}
+                        onClick={handleLogout}
                     >
                         <FaSignOutAlt className="w-4 h-4" />
                         Cerrar sesión

@@ -10,4 +10,12 @@ export default defineConfig({
         }),
         react(),
     ],
+    server: {
+        host: "192.168.1.44",
+        port: 5173,
+        cors: true,
+        headers: {
+            "Access-Control-Allow-Origin": "*",
+        },
+    },
 });

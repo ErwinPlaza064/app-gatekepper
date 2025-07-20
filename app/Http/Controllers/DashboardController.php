@@ -17,6 +17,25 @@ class DashboardController extends Controller
     {
         $user = $request->user();
 
+        // Estadísticas rápidas
+        $visitsCount = Visitor::where('user_id', $user->id)->count();
+        $complaintsCount = Complaint::where('user_id', $user->id)->count();
+        $usersCount = \App\Models\User::count();
+        $qrCount = \App\Models\QrCode::where('user_id', $user->id)->count();
+
+        // Datos para la gráfica de visitas por día (últimos 7 días)
+        $visitsByDay = Visitor::where('user_id', $user->id)
+            ->selectRaw('DATE(entry_time) as day, COUNT(*) as count')
+            ->groupBy('day')
+            ->orderBy('day', 'desc')
+            ->limit(7)
+            ->get();
+
+        $chartLabels = $visitsByDay->pluck('day')->map(function($date) {
+            return date('D', strtotime($date));
+        });
+        $chartValues = $visitsByDay->pluck('count');
+
         return Inertia::render('Dashboard', [
             'auth' => [
                 'user' => $user,
@@ -25,6 +44,16 @@ class DashboardController extends Controller
             'visits' => Visitor::where('user_id', $user->id)
                 ->orderBy('entry_time', 'desc')
                 ->get(['name', 'id_document', 'vehicle_plate', 'entry_time', 'created_at']),
+            'stats' => [
+                ['label' => 'Visitas', 'value' => $visitsCount],
+                ['label' => 'Quejas', 'value' => $complaintsCount],
+                ['label' => 'Usuarios', 'value' => $usersCount],
+                ['label' => 'QR generados', 'value' => $qrCount],
+            ],
+            'visitsChartData' => [
+                'labels' => $chartLabels,
+                'values' => $chartValues,
+            ],
         ]);
     }
 

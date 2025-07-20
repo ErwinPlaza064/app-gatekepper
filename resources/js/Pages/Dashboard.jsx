@@ -7,8 +7,8 @@ import DashboardContent from "@/Components/Common/DashboardContent";
 import UserProfile from "@/Components/Common/UserProfile";
 import Notification from "@/Components/Common/Notification";
 
-export default function Dashboard({ auth, visits }) {
-    const [activeTab, setActiveTab] = useState("dashboard");
+export default function Dashboard({ auth, visits, stats, visitsChartData }) {
+    const [activeTab, setActiveTab] = useState("escritorio");
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [notifications, setNotifications] = useState(
         auth.user.notifications || []

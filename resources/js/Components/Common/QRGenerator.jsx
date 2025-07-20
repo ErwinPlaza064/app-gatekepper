@@ -1,10 +1,10 @@
 import { QRCodeCanvas } from "qrcode.react";
 import { useState, useRef } from "react";
+import { FaDownload, FaWhatsapp, FaPlus } from "react-icons/fa";
 import Typography from "@/Components/UI/Typography";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 
-// Cloudinary config
 const CLOUD_NAME = "dibbibwqd";
 const UPLOAD_PRESET = "qr-gatekepper";
 
@@ -38,7 +38,6 @@ export default function QRGenerator({ userId }) {
         maxUses: 1,
     });
 
-    // NUEVO: Estados para el flujo
     const [savedQrData, setSavedQrData] = useState(null);
     const [isSaving, setIsSaving] = useState(false);
     const [isQrSaved, setIsQrSaved] = useState(false);
@@ -50,12 +49,10 @@ export default function QRGenerator({ userId }) {
         return new Date(now.getTime() + hours * 60 * 60 * 1000);
     };
 
-    // NUEVO: Función para guardar QR en la base de datos
     const saveQrToDatabase = async () => {
         setIsSaving(true);
 
         try {
-            // Preparar datos para enviar al backend
             const qrData = {
                 visitor_name: visitorInfo.name,
                 document_id: visitorInfo.id_document,
@@ -65,7 +62,6 @@ export default function QRGenerator({ userId }) {
                 valid_until: null,
             };
 
-            // Calcular fecha de expiración si es necesario
             if (
                 qrOptions.type === "time_limited" ||
                 qrOptions.type === "recurring"
@@ -79,14 +75,9 @@ export default function QRGenerator({ userId }) {
                 headers: {
                     "Content-Type": "application/json",
                     "X-Requested-With": "XMLHttpRequest",
-                    "X-CSRF-TOKEN":
-                        document
-                            .querySelector('meta[name="csrf-token"]')
-                            ?.getAttribute("content") || "",
                 },
             });
 
-            // Guardar datos del QR creado
             setSavedQrData(response.data.qr_code);
             setIsQrSaved(true);
             toast.success("QR guardado correctamente");
@@ -107,7 +98,6 @@ export default function QRGenerator({ userId }) {
         }
     };
 
-    // Función para generar datos del QR para mostrar
     const generateQRDataForDisplay = () => {
         if (!savedQrData) return "";
 
@@ -160,7 +150,6 @@ export default function QRGenerator({ userId }) {
         }
     };
 
-    // Función para resetear y crear nuevo QR
     const resetForm = () => {
         setVisitorInfo({
             name: "",
@@ -189,7 +178,6 @@ export default function QRGenerator({ userId }) {
             </Typography>
 
             {!isQrSaved ? (
-                // FORMULARIO PARA CREAR QR
                 <div>
                     <div className="mb-4">
                         <label className="block mb-2 text-sm font-medium text-gray-700">
@@ -300,7 +288,6 @@ export default function QRGenerator({ userId }) {
                         className="w-full p-2 mb-4 border rounded"
                     />
 
-                    {/* BOTÓN PARA GUARDAR QR */}
                     <button
                         onClick={saveQrToDatabase}
                         disabled={
@@ -320,7 +307,6 @@ export default function QRGenerator({ userId }) {
                     </button>
                 </div>
             ) : (
-                // MOSTRAR QR GUARDADO Y OPCIONES
                 <div>
                     <div className="p-4 mb-4 border border-green-200 rounded-lg bg-green-50">
                         <div className="flex items-center">
@@ -389,23 +375,24 @@ export default function QRGenerator({ userId }) {
                         <div className="flex flex-col w-full gap-3 sm:flex-row">
                             <button
                                 onClick={downloadQR}
-                                className="flex-1 px-4 py-2 text-white transition duration-200 bg-blue-600 rounded hover:bg-blue-700"
+                                className="flex items-center justify-center flex-1 gap-2 px-4 py-2 text-white transition duration-200 bg-blue-600 rounded hover:bg-blue-700"
                             >
-                                📥 Descargar QR
+                                <FaDownload className="text-lg" /> Descargar QR
                             </button>
                             <button
                                 onClick={sendWhatsApp}
-                                className="flex-1 px-4 py-2 text-white transition duration-200 bg-green-600 rounded hover:bg-green-700"
+                                className="flex items-center justify-center flex-1 gap-2 px-4 py-2 text-white transition duration-200 bg-green-600 rounded hover:bg-green-700"
                             >
-                                📱 Enviar por WhatsApp
+                                <FaWhatsapp className="text-lg" /> Enviar por
+                                WhatsApp
                             </button>
                         </div>
 
                         <button
                             onClick={resetForm}
-                            className="w-full px-4 py-2 mt-3 text-gray-700 transition duration-200 bg-gray-200 rounded hover:bg-gray-300"
+                            className="flex items-center justify-center w-full gap-2 px-4 py-2 mt-3 text-gray-700 transition duration-200 bg-gray-200 rounded hover:bg-gray-300"
                         >
-                            ➕ Crear Nuevo QR
+                            <FaPlus className="text-lg" /> Crear Nuevo QR
                         </button>
                     </div>
                 </div>

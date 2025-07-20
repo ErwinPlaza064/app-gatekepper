@@ -3,6 +3,7 @@ import { useState } from "react";
 import Sidebar from "@/Components/Common/Sidebar";
 import MobileHeader from "@/Components/Common/MobileHeader";
 import DashboardContent from "@/Components/Common/DashboardContent";
+import UserProfile from "@/Components/Common/UserProfile";
 
 export default function Dashboard({ auth, visits }) {
     const [activeTab, setActiveTab] = useState("dashboard");
@@ -11,33 +12,38 @@ export default function Dashboard({ auth, visits }) {
     return (
         <>
             <Head title="Dashboard" />
-            <div className="flex h-screen bg-gradient-to-br from-indigo-50 via-white to-cyan-50">
-                <Sidebar
-                    sidebarOpen={sidebarOpen}
-                    setSidebarOpen={setSidebarOpen}
-                    activeTab={activeTab}
-                    setActiveTab={setActiveTab}
-                    user={auth.user}
-                />
-
-                {sidebarOpen && (
-                    <div
-                        className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm lg:hidden"
-                        onClick={() => setSidebarOpen(false)}
-                    />
-                )}
-
-                <main className="flex-1 overflow-auto">
+            <div className="flex flex-col h-screen bg-gradient-to-br from-indigo-50 via-white to-cyan-50">
+                <header className="flex items-center w-full gap-4 py-0 bg-white shadow-md">
                     <MobileHeader setSidebarOpen={setSidebarOpen} />
 
-                    <section className="p-6">
-                        <DashboardContent
-                            activeTab={activeTab}
-                            auth={auth}
-                            visits={visits}
+                    <div className="flex-1"></div>
+                    <UserProfile user={auth.user} showThemeToggle showLogout />
+                </header>
+                <div className="flex flex-1">
+                    <Sidebar
+                        sidebarOpen={sidebarOpen}
+                        setSidebarOpen={setSidebarOpen}
+                        activeTab={activeTab}
+                        setActiveTab={setActiveTab}
+                    />
+
+                    {sidebarOpen && (
+                        <div
+                            className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm"
+                            onClick={() => setSidebarOpen(false)}
                         />
-                    </section>
-                </main>
+                    )}
+
+                    <main className="flex-1 overflow-auto">
+                        <section className="p-6">
+                            <DashboardContent
+                                activeTab={activeTab}
+                                auth={auth}
+                                visits={visits}
+                            />
+                        </section>
+                    </main>
+                </div>
             </div>
         </>
     );

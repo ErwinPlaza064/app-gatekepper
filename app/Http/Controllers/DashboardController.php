@@ -24,7 +24,7 @@ class DashboardController extends Controller
             ],
             'visits' => Visitor::where('user_id', $user->id)
                 ->orderBy('entry_time', 'desc')
-                ->get(['name', 'entry_time']),
+                ->get(['name', 'id_document', 'vehicle_plate', 'entry_time', 'created_at']),
         ]);
     }
 

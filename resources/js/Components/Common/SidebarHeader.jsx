@@ -1,3 +1,4 @@
+import { FaTimes } from "react-icons/fa";
 export default function SidebarHeader({ setSidebarOpen }) {
     return (
         <div className="p-6 mx-auto border-b border-white/20">
@@ -14,9 +15,9 @@ export default function SidebarHeader({ setSidebarOpen }) {
                 </div>
                 <button
                     onClick={() => setSidebarOpen(false)}
-                    className="p-2 transition-colors lg:hidden rounded-xl hover:bg-white/30"
+                    className="p-2 transition-colors rounded-xl hover:bg-white/30"
                 >
-                    ✕
+                    <FaTimes className="w-4 h-4 mx-auto" />
                 </button>
             </div>
         </div>

@@ -1,4 +1,6 @@
 import { Link } from "@inertiajs/react";
+import * as FaIcons from "react-icons/fa";
+import React from "react";
 
 export default function SidebarMenuItem({ item, activeTab, setActiveTab }) {
     if (item.isExternal) {
@@ -22,16 +24,18 @@ export default function SidebarMenuItem({ item, activeTab, setActiveTab }) {
             onClick={() => setActiveTab(item.id)}
             className={`group w-full flex items-center space-x-4 px-4 py-4 rounded-2xl font-medium transition-all duration-300 ${
                 activeTab === item.id
-                    ? `bg-gradient-to-r ${item.gradient} text-white shadow-xl transform scale-105`
+                    ? "bg-black text-white shadow-xl transform scale-105"
                     : "text-gray-700 bg-white hover:bg-white/50 hover:shadow-lg hover:scale-102"
             }`}
         >
             <div
                 className={`text-2xl transition-transform group-hover:scale-110 ${
-                    activeTab === item.id ? "" : "grayscale"
+                    activeTab === item.id ? "text-white" : "grayscale"
                 }`}
             >
-                {item.icon}
+                {item.icon && item.icon.startsWith("Fa") && FaIcons[item.icon]
+                    ? React.createElement(FaIcons[item.icon])
+                    : item.icon}
             </div>
             <span className="text-base">{item.label}</span>
             {activeTab === item.id && (

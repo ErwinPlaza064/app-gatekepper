@@ -19,7 +19,6 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::post('/qr/upload', [QrController::class, 'upload']);
 
-// Rutas para QR Codes
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user/qr-codes', [QrCodeController::class, 'getUserQrCodes']);
     Route::post('/qr-codes', [QrCodeController::class, 'store']);
@@ -27,5 +26,4 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::patch('/qr-codes/{qrId}/reactivate', [QrCodeController::class, 'reactivateQr']);
 });
 
-// Ruta para obtener escaneos recientes (para administradores)
 Route::get('/recent-visitor-scans', [VisitorController::class, 'getRecentScans']);

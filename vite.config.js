@@ -17,5 +17,9 @@ export default defineConfig({
         headers: {
             "Access-Control-Allow-Origin": "*",
         },
+        https: {
+            key: "ssl/server.key",
+            cert: "ssl/server.crt",
+        },
     },
 });

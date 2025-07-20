@@ -1,13 +1,18 @@
+import React from "react";
 import { Head } from "@inertiajs/react";
 import { useState } from "react";
 import Sidebar from "@/Components/Common/Sidebar";
 import MobileHeader from "@/Components/Common/MobileHeader";
 import DashboardContent from "@/Components/Common/DashboardContent";
 import UserProfile from "@/Components/Common/UserProfile";
+import Notification from "@/Components/Common/Notification";
 
 export default function Dashboard({ auth, visits }) {
     const [activeTab, setActiveTab] = useState("dashboard");
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [notifications, setNotifications] = useState(
+        auth.user.notifications || []
+    );
 
     return (
         <>
@@ -16,8 +21,17 @@ export default function Dashboard({ auth, visits }) {
                 <header className="flex items-center w-full gap-4 py-0 bg-white shadow-md">
                     <MobileHeader setSidebarOpen={setSidebarOpen} />
 
-                    <div className="flex-1"></div>
-                    <UserProfile user={auth.user} showThemeToggle showLogout />
+                    <div className="flex items-center">
+                        <Notification
+                            notifications={notifications}
+                            setNotifications={setNotifications}
+                        />
+                        <UserProfile
+                            user={auth.user}
+                            showThemeToggle
+                            showLogout
+                        />
+                    </div>
                 </header>
                 <div className="flex flex-1">
                     <Sidebar

@@ -11,12 +11,7 @@ Escáner de Códigos QR
 Utiliza la cámara para escanear códigos QR o sube una imagen desde tu dispositivo.
 </x-slot>
 <div id="qr-scanner-container">
-<div id="camera-support-warning" class="p-4 mb-4 text-sm text-yellow-800 bg-yellow-100 border border-yellow-300 rounded">
-<strong>¿Problemas para iniciar la cámara?</strong><br>
-Si ves un error, verifica que tu navegador tenga permisos y soporte para cámara.<br>
-Usa Chrome, Firefox o Safari y accede por HTTPS para mejor compatibilidad.<br>
-Si no funciona, puedes subir una imagen QR.
-</div>
+
 <div id="scanner-initial-state" class="text-center">
 <div class="flex items-center justify-center w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full dark:bg-gray-800">
 <x-heroicon-o-camera class="w-8 h-8 text-gray-400 dark:text-gray-500" />
@@ -32,7 +27,7 @@ Iniciar Cámara
 Subir Imagen QR
 </x-filament::button>
 </label>
-<input type="file" id="qr-file-input" accept="image/*" class="hidden">
+<input type="file" id="qr-file-input" accept="image/*" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:auto;" tabindex="-1">
 </div>
 </div>
 </div>
@@ -115,6 +110,8 @@ Cargando datos...
 </x-filament::section>
 </div>
 @push('scripts')
+
+<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 <script type="module">
 import QrScanner from 'https://cdn.jsdelivr.net/npm/qr-scanner@1.4.2/qr-scanner.min.js';
 
@@ -149,13 +146,7 @@ class QRScannerManager {
   setupEventListeners() {
     this.startBtn.addEventListener('click', () => this.startCamera());
     this.stopBtn.addEventListener('click', () => this.stopCamera());
-    // Compatibilidad móvil: verificar soporte antes de usar input file
-    this.fileInput.addEventListener('click', (e) => {
-      if (!window.FileReader || !window.URL || !window.Blob) {
-        e.preventDefault();
-        this.showError('Tu navegador no soporta la selección de archivos. Usa un navegador actualizado.');
-      }
-    });
+    // Solo usar el evento change, no bloquear el click
     this.fileInput.addEventListener('change', (e) => this.scanFromFile(e));
     if (this.switchCameraBtn) {
       this.switchCameraBtn.addEventListener('click', () => this.switchCamera());
@@ -287,24 +278,33 @@ class QRScannerManager {
     }
     try {
       this.showLoading('Procesando imagen...');
-      // Validar tipo de archivo en móviles
-      if (!file.type.startsWith('image/')) {
-        throw new Error('El archivo seleccionado no es una imagen.');
+      // Detectar móvil (userAgent simple)
+      const isMobile = /android|iphone|ipad|ipod|opera mini|iemobile|mobile/i.test(navigator.userAgent);
+      if (isMobile && window.Html5Qrcode) {
+        // Usar html5-qrcode para móviles
+        const html5QrCode = new Html5Qrcode("reader");
+        const decodedText = await html5QrCode.scanFile(file, true);
+        await this.onScanSuccess(decodedText);
+        html5QrCode.clear();
+      } else {
+        // Usar QrScanner para escritorio
+        if (!file.type.startsWith('image/')) {
+          throw new Error('El archivo seleccionado no es una imagen.');
+        }
+        if (file.size > 5 * 1024 * 1024) {
+          throw new Error('La imagen es demasiado grande. Selecciona una imagen menor a 5MB.');
+        }
+        const img = new Image();
+        const url = URL.createObjectURL(file);
+        img.src = url;
+        await new Promise((resolve, reject) => {
+          img.onload = resolve;
+          img.onerror = reject;
+        });
+        const result = await QrScanner.scanImage(img, { returnDetailedScanResult: true });
+        URL.revokeObjectURL(url);
+        await this.onScanSuccess(result.data || result);
       }
-      // Validar tamaño de archivo (ejemplo: 5MB máximo)
-      if (file.size > 5 * 1024 * 1024) {
-        throw new Error('La imagen es demasiado grande. Selecciona una imagen menor a 5MB.');
-      }
-      const img = new Image();
-      const url = URL.createObjectURL(file);
-      img.src = url;
-      await new Promise((resolve, reject) => {
-        img.onload = resolve;
-        img.onerror = reject;
-      });
-      const result = await QrScanner.scanImage(img, { returnDetailedScanResult: true });
-      URL.revokeObjectURL(url);
-      await this.onScanSuccess(result.data || result);
     } catch (err) {
       console.error('Error escaneando imagen QR:', err);
       let msg = 'No se pudo leer el archivo QR.';
@@ -313,7 +313,9 @@ class QRScannerManager {
       } else if (err && err.message) {
         msg = err.message;
       }
-      // Mensaje especial para móviles sin soporte
+      if (err && err.stack) {
+        msg += `<br><span style='font-size:11px;opacity:0.7;'>[${err.stack.split('\n')[0]}]</span>`;
+      }
       if (/safari/i.test(navigator.userAgent) && !window.FileReader) {
         msg = 'Tu navegador móvil no soporta la selección de archivos. Usa Chrome, Firefox o Safari actualizado.';
       }

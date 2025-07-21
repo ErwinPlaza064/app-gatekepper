@@ -190,16 +190,41 @@ class QRScannerManager {
         this.qrScanner.destroy();
         this.qrScanner = null;
       }
-      this.cameras = await QrScanner.listCameras(true);
-      if (!this.cameras || this.cameras.length === 0) {
-        throw new Error('No se encontraron cámaras disponibles.');
+      // Intentar listar cámaras, pero si no hay, forzar getUserMedia para pedir permisos
+      try {
+        this.cameras = await QrScanner.listCameras(true);
+      } catch (e) {
+        this.cameras = [];
       }
-      if (this.currentCameraIndex >= this.cameras.length || this.currentCameraIndex < 0) {
+      if (!this.cameras || this.cameras.length === 0) {
+        // Forzar prompt de permisos
+        try {
+          await navigator.mediaDevices.getUserMedia({ video: true });
+          // Volver a listar cámaras tras conceder permiso
+          this.cameras = await QrScanner.listCameras(true);
+        } catch (permErr) {
+          let msg = 'No se pudo iniciar la cámara.';
+          if (permErr && permErr.name === 'NotAllowedError') {
+            msg = 'Permiso de cámara denegado. Permite el acceso a la cámara en tu navegador.';
+          } else if (permErr && permErr.name === 'NotFoundError') {
+            msg = 'No se encontró ninguna cámara en el dispositivo.';
+          } else if (permErr && permErr.message) {
+            msg += ' ' + permErr.message;
+          }
+          this.showError(msg);
+          return;
+        }
+      }
+      // Seleccionar cámara preferida si hay, si no, dejar undefined
+      let preferredCameraId = undefined;
+      if (this.cameras && this.cameras.length > 0) {
+        // Siempre buscar la cámara trasera como predeterminada
         let backIndex = this.cameras.findIndex(cam =>
           cam.label.toLowerCase().includes('back') ||
           cam.label.toLowerCase().includes('environment')
         );
         this.currentCameraIndex = backIndex !== -1 ? backIndex : 0;
+        preferredCameraId = this.cameras[this.currentCameraIndex].id;
       }
       let videoElem = this.readerDiv.querySelector('video');
       if (!videoElem) {
@@ -212,11 +237,12 @@ class QRScannerManager {
         this.readerDiv.innerHTML = '';
         this.readerDiv.appendChild(videoElem);
       }
+      // Aquí se solicita el permiso realmente
       this.qrScanner = new QrScanner(
         videoElem,
         (result) => this.onScanSuccess(result.data),
         {
-          preferredCamera: this.cameras[this.currentCameraIndex].id,
+          preferredCamera: preferredCameraId,
           highlightScanRegion: true,
           highlightCodeOutline: true,
           returnDetailedScanResult: true
@@ -236,6 +262,8 @@ class QRScannerManager {
       if (err && err.name === 'NotAllowedError') {
         msg = 'Permiso de cámara denegado. Permite el acceso a la cámara en tu navegador.';
       } else if (err && err.name === 'NotFoundError') {
+        msg = 'No se encontró ninguna cámara en el dispositivo.';
+      } else if (err && err.message && err.message.includes('Requested device not found')) {
         msg = 'No se encontró ninguna cámara en el dispositivo.';
       } else if (err && err.message) {
         msg += ' ' + err.message;
@@ -261,6 +289,12 @@ class QRScannerManager {
     }
   }
   async switchCamera() {
+    // Siempre recargar la lista de cámaras antes de alternar
+    try {
+      this.cameras = await QrScanner.listCameras(true);
+    } catch (e) {
+      this.cameras = [];
+    }
     if (!this.cameras || this.cameras.length < 2) {
       this.showError('No hay más de una cámara disponible para alternar.');
       return;

@@ -344,7 +344,9 @@ export default function QRGenerator({ userId }) {
                         <div ref={qrRef} className="mb-4">
                             <QRCodeCanvas
                                 value={generateQRDataForDisplay()}
-                                size={200}
+                                size={400} // Tamaño mayor para mejor legibilidad
+                                level="H" // Mayor corrección de errores
+                                includeMargin={true} // Margen blanco alrededor
                             />
                         </div>
 

@@ -65,7 +65,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/api/qr-codes', [QrCodeController::class, 'store']);
 });
 
-Broadcast::routes();
+
 
 require __DIR__.'/auth.php';
-require base_path('routes/channels.php');
+

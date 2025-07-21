@@ -473,19 +473,37 @@ class QRScannerManager {
     </tr>
     `;
   }
+  // --- Cola de toasts y control de mensajes ---
+  toastQueue = [];
+  isToastShowing = false;
+
   showSuccess(message) {
     this.hideAllMessages();
-    this.showFilamentToast('success', '¡Éxito!', message);
+    this.enqueueToast('success', '¡Éxito!', message);
   }
   showError(message) {
     this.hideAllMessages();
-    this.showFilamentToast('danger', 'Error', message);
+    this.enqueueToast('danger', 'Error', message);
   }
   showLoading(message = 'Procesando código QR...') {
+    // No mostrar loading como toast, solo limpiar mensajes visuales
     this.hideAllMessages();
-    this.showFilamentToast('info', 'Procesando', message);
   }
-  showFilamentToast(type, title, message) {
+
+  enqueueToast(type, title, message) {
+    this.toastQueue.push({ type, title, message });
+    if (!this.isToastShowing) {
+      this.processToastQueue();
+    }
+  }
+
+  processToastQueue() {
+    if (this.toastQueue.length === 0) {
+      this.isToastShowing = false;
+      return;
+    }
+    this.isToastShowing = true;
+    const { type, title, message } = this.toastQueue.shift();
     const toast = document.createElement('div');
     const toastId = 'toast-' + Date.now();
     toast.id = toastId;
@@ -549,7 +567,7 @@ class QRScannerManager {
     <button style="flex-shrink: 0; padding: 6px; margin: -6px; border-radius: 6px; border: none; background: transparent; cursor: pointer; transition: background-color 0.2s; color: ${colors.color}; opacity: 0.7;"
             onmouseover="this.style.backgroundColor='rgba(0,0,0,0.05)'; this.style.opacity='1';"
             onmouseout="this.style.backgroundColor='transparent'; this.style.opacity='0.7';"
-            onclick="document.getElementById('${toastId}').remove()">
+            onclick="document.getElementById('${toastId}').remove();">
     <svg style="width: 16px; height: 16px;" fill="currentColor" viewBox="0 0 20 20">
     <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
     </svg>
@@ -578,8 +596,10 @@ class QRScannerManager {
       toast.style.transform = 'translateX(0)';
       toast.style.opacity = '1';
     }, 100);
-    const duration = type === 'info' ? 3000 : 5000;
-    setTimeout(() => {
+    // Mostrar cada toast por 5 segundos y luego esperar 2 segundos antes del siguiente
+    const duration = 5000;
+    const gap = 2000;
+    const closeAndContinue = () => {
       toast.style.transform = 'translateX(100%)';
       toast.style.opacity = '0';
       setTimeout(() => {
@@ -589,8 +609,11 @@ class QRScannerManager {
             toastContainer.remove();
           }
         }
+        setTimeout(() => this.processToastQueue(), gap);
       }, 300);
-    }, duration);
+    };
+    toast.querySelector('button').onclick = closeAndContinue;
+    setTimeout(closeAndContinue, duration);
   }
   hideAllMessages() {
     this.successMessage.classList.add('hidden');

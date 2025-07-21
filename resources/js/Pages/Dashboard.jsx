@@ -7,7 +7,6 @@ import UserProfile from "@/Components/Common/UserProfile";
 import Notification from "@/Components/Common/Notification";
 import NotificationListener from "@/Components/Common/NotificationListener";
 import toast from "react-hot-toast";
-import { subscribeUserToPush } from "@/Utils/pushNotifications";
 
 export default function Dashboard({ auth, visits, stats, visitsChartData }) {
     const [activeTab, setActiveTab] = useState("escritorio");
@@ -25,10 +24,7 @@ export default function Dashboard({ auth, visits, stats, visitsChartData }) {
         ) {
             window.Notification.requestPermission();
         }
-        // Solo suscribir si el usuario está autenticado
-        if (auth.user) {
-            subscribeUserToPush(import.meta.env.VITE_VAPID_PUBLIC_KEY);
-        }
+        // Eliminada suscripción push
     }, []);
 
     return (

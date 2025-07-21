@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Inertia\Response;
+use Illuminate\Support\Facades\Log;
 
 class AuthenticatedSessionController extends Controller
 {
@@ -37,12 +38,20 @@ class AuthenticatedSessionController extends Controller
         // Obtener el usuario autenticado
         $user = Auth::user();
 
+        Log::info('[LOGIN] Usuario autenticado', [
+            'id' => $user->id,
+            'email' => $user->email,
+            'rol' => $user->rol,
+        ]);
+
         // Redireccionar según el rol del usuario
         if (in_array($user->rol, ['administrador', 'portero', 'adminresidencial'])) {
+            Log::info('[LOGIN] Redireccionando a /admin', ['id' => $user->id, 'rol' => $user->rol]);
             return redirect()->intended('/admin');
         }
 
         // Para usuarios regulares (residentes)
+        Log::info('[LOGIN] Redireccionando a HOME', ['id' => $user->id, 'rol' => $user->rol]);
         return redirect()->intended(RouteServiceProvider::HOME);
     }
 

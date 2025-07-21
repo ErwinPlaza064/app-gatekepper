@@ -5,8 +5,11 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
+use NotificationChannels\WebPush\WebPushMessage;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
 class NewVisitorNotification extends Notification
+implements ShouldBroadcast
 {
     use Queueable;
 
@@ -19,7 +22,16 @@ class NewVisitorNotification extends Notification
 
     public function via($notifiable)
     {
-        return ['mail', 'database'];
+        return ['mail', 'database', 'broadcast', 'webpush'];
+    }
+
+    public function toWebPush($notifiable, $notification)
+    {
+        return (new WebPushMessage)
+            ->title('Nuevo visitante registrado')
+            ->body('Se ha registrado un nuevo visitante.')
+            ->icon('/icon-192x192.png') // Cambia por el ícono de tu app si tienes uno
+            ->action('Ver', 'open_app');
     }
 
     public function toDatabase($notifiable)
@@ -39,5 +51,14 @@ class NewVisitorNotification extends Notification
             ->greeting("Hola {$notifiable->name},")
             ->line("{$this->visitor->name} está llendo para tu dirección.")
             ->line('Gracias por usar nuestra aplicación!');
+    }
+
+    public function toBroadcast($notifiable)
+    {
+        return [
+            'title' => 'Nuevo visitante registrado',
+            'body' => 'Se ha registrado un nuevo visitante.',
+            'visitor' => $this->visitor ?? null,
+        ];
     }
 }

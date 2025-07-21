@@ -27,3 +27,12 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 
 Route::get('/recent-visitor-scans', [VisitorController::class, 'getRecentScans']);
+
+Route::post('/push/subscribe', function (Request $request) {
+    $request->user()->updatePushSubscription(
+        $request->endpoint,
+        $request->keys['p256dh'],
+        $request->keys['auth']
+    );
+    return response()->json(['success' => true]);
+})->middleware('auth:sanctum');

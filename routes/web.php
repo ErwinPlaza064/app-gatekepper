@@ -8,6 +8,9 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ContactController;
+use Illuminate\Support\Facades\Broadcast;
+
+
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -62,5 +65,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/api/qr-codes', [QrCodeController::class, 'store']);
 });
 
+Broadcast::routes();
 
 require __DIR__.'/auth.php';
+require base_path('routes/channels.php');

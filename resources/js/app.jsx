@@ -23,3 +23,16 @@ createInertiaApp({
         color: "#4B5563",
     },
 });
+
+if ("serviceWorker" in navigator) {
+    window.addEventListener("load", function () {
+        navigator.serviceWorker
+            .register("/service-worker.js")
+            .then(function (registration) {
+                console.log("ServiceWorker registrado:", registration);
+            })
+            .catch(function (error) {
+                console.log("Error registrando ServiceWorker:", error);
+            });
+    });
+}

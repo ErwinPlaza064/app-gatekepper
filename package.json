@@ -25,6 +25,7 @@
         "html5-qrcode": "^2.3.8",
         "keen-slider": "^6.8.6",
         "lodash": "^4.17.21",
+        "lucide-react": "^0.525.0",
         "qrcode.react": "^4.2.0",
         "react-chartjs-2": "^5.3.0",
         "react-hot-toast": "^2.5.2",

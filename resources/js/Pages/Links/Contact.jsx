@@ -29,74 +29,196 @@ export default function Contact({ auth }) {
             preserveScroll: true,
         });
     };
+
     return (
         <Authenticated user={user}>
             <Head title="Contacto" />
-            <div className="flex flex-col items-start justify-start px-4 py-28 lg:px-64">
-                <div className="flex flex-col items-center justify-start gap-10 lg:flex-row">
-                    <form onSubmit={handleSubmit} className="w-full lg:w-1/2">
-                        <label htmlFor="email">CORREO ELECTRONICO</label>
-                        <input
-                            id="email"
-                            name="email"
-                            type="email"
-                            className="w-full h-10 p-4 mt-2 border border-black rounded-xl"
-                            placeholder="correo@ejemplo.com"
-                            onChange={handleChange}
-                        />
-                        <InputError message={errors.email} />
-                        <div className="py-8">
-                            <label htmlFor="fullname">NOMBRE COMPLETO</label>
-                            <input
-                                id="fullname"
-                                name="fullname"
-                                type="text"
-                                className="w-full h-10 p-4 mt-2 border border-black rounded-xl"
-                                placeholder="Pedro Perez"
-                                onChange={handleChange}
-                            />
-                            <InputError message={errors.fullname} />
-                        </div>
-                        <textarea
-                            className="w-full h-32 p-4 mt-4 border border-black rounded-xl"
-                            placeholder="Escribe tu mensaje aquí..."
-                            id="message"
-                            name="message"
-                            onChange={handleChange}
-                        />
-                        <InputError message={errors.message} />
-                        <button className="w-full px-5 m-0 mt-5 text-white bg-black lg:w-auto hover:bg-teal-900 rounded-xl">
-                            Enviar
-                        </button>
-                    </form>
-                    <div className="flex flex-col items-center justify-center w-full lg:w-1/2">
-                        <picture>
-                            <img
-                                src="/Assets/contact.svg"
-                                alt="Imagen de contacto"
-                                className="w-full max-w-md"
-                            />
-                        </picture>
 
-                        <Typography
-                            as={"h3"}
-                            variant={"h3"}
-                            color={"black"}
-                            className="mt-4"
-                        >
-                            OTRAS FORMAS DE CONTACTO
-                        </Typography>
-                        <Typography
-                            className="mt-2 text-center"
-                            as={"p"}
-                            variant={"p"}
-                            color={"black"}
-                        >
-                            Si prefieres, puedes contactarnos a través de
-                            nuestras redes sociales o directamente a nuestro
-                            correo electrónico.
-                        </Typography>
-                        <Social_Icons className="mt-4" />
+            {/* Hero Section */}
+            <div className="py-16 bg-gradient-to-br from-slate-50 to-blue-50">
+                <div className="max-w-4xl px-6 mx-auto text-center">
+                    <h1 className="mb-4 text-4xl font-bold text-gray-900 lg:text-5xl">
+                        Contáctanos
+                    </h1>
+                    <p className="max-w-2xl mx-auto text-xl text-gray-600">
+                        ¿Tienes alguna pregunta o comentario? Nos encantaría
+                        escucharte. Completa el formulario y te responderemos
+                        pronto.
+                    </p>
+                </div>
+            </div>
+
+            {/* Contact Form Section */}
+            <div className="bg-white ">
+                <div className="px-6 mx-auto max-w-7xl lg:px-8">
+                    <div className="grid items-stretch gap-16 lg:grid-cols-2">
+                        {/* Form Column */}
+                        <div className="order-2 lg:order-1">
+                            <div className="p-8 bg-white border border-gray-100 shadow-xl rounded-2xl lg:p-10">
+                                <div className="mb-8">
+                                    <h2 className="mb-2 text-2xl font-bold text-gray-900">
+                                        Envíanos un mensaje
+                                    </h2>
+                                    <p className="text-gray-600">
+                                        Completa todos los campos y te
+                                        contactaremos a la brevedad.
+                                    </p>
+                                </div>
+
+                                <form
+                                    onSubmit={handleSubmit}
+                                    className="space-y-6"
+                                >
+                                    {/* Email Field */}
+                                    <div className="space-y-2">
+                                        <label
+                                            htmlFor="email"
+                                            className="block text-sm font-semibold tracking-wide text-gray-700 uppercase"
+                                        >
+                                            Correo Electrónico *
+                                        </label>
+                                        <div className="relative">
+                                            <input
+                                                id="email"
+                                                name="email"
+                                                type="email"
+                                                className="w-full px-4 py-3 placeholder-gray-400 transition-colors duration-200 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-0"
+                                                placeholder="tu@correo.com"
+                                                value={data.email}
+                                                onChange={handleChange}
+                                            />
+                                            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                                <svg
+                                                    className="w-5 h-5 text-gray-400"
+                                                    fill="none"
+                                                    viewBox="0 0 24 24"
+                                                    stroke="currentColor"
+                                                >
+                                                    <path
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                        strokeWidth={2}
+                                                        d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"
+                                                    />
+                                                </svg>
+                                            </div>
+                                        </div>
+                                        <InputError message={errors.email} />
+                                    </div>
+
+                                    {/* Full Name Field */}
+                                    <div className="space-y-2">
+                                        <label
+                                            htmlFor="fullname"
+                                            className="block text-sm font-semibold tracking-wide text-gray-700 uppercase"
+                                        >
+                                            Nombre Completo *
+                                        </label>
+                                        <div className="relative">
+                                            <input
+                                                id="fullname"
+                                                name="fullname"
+                                                type="text"
+                                                className="w-full px-4 py-3 placeholder-gray-400 transition-colors duration-200 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-0"
+                                                placeholder="Pedro Pérez González"
+                                                value={data.fullname}
+                                                onChange={handleChange}
+                                            />
+                                            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                                <svg
+                                                    className="w-5 h-5 text-gray-400"
+                                                    fill="none"
+                                                    viewBox="0 0 24 24"
+                                                    stroke="currentColor"
+                                                >
+                                                    <path
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                        strokeWidth={2}
+                                                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                                                    />
+                                                </svg>
+                                            </div>
+                                        </div>
+                                        <InputError message={errors.fullname} />
+                                    </div>
+
+                                    {/* Message Field */}
+                                    <div className="space-y-2">
+                                        <label
+                                            htmlFor="message"
+                                            className="block text-sm font-semibold tracking-wide text-gray-700 uppercase"
+                                        >
+                                            Mensaje *
+                                        </label>
+                                        <textarea
+                                            id="message"
+                                            name="message"
+                                            rows={5}
+                                            className="w-full px-4 py-3 placeholder-gray-400 transition-colors duration-200 border-2 border-gray-200 resize-none rounded-xl focus:border-blue-500 focus:ring-0"
+                                            placeholder="Escribe tu mensaje aquí... Cuéntanos cómo podemos ayudarte."
+                                            value={data.message}
+                                            onChange={handleChange}
+                                        />
+                                        <InputError message={errors.message} />
+                                    </div>
+
+                                    {/* Submit Button */}
+                                    <div className="pt-4">
+                                        <button
+                                            type="submit"
+                                            className="w-full bg-black hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-blue-300"
+                                        >
+                                            <span className="flex items-center justify-center">
+                                                Enviar Mensaje
+                                            </span>
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        {/* Info Column */}
+                        <div className="flex flex-col justify-center order-1 h-full space-y-8 lg:order-2">
+                            {/* Image */}
+                            <div className="text-center">
+                                <div className="p-8 mb-6 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-2xl">
+                                    <img
+                                        src="/Assets/contact.svg"
+                                        alt="Imagen de contacto"
+                                        className="w-full max-w-sm mx-auto"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="space-y-6">
+                                {/* Response Time Card */}
+                                <div className="p-6 border border-green-200 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl">
+                                    <div className="flex items-center mb-3">
+                                        <svg
+                                            className="w-6 h-6 mr-3 text-green-600"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke="currentColor"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                                            />
+                                        </svg>
+                                        <h4 className="text-lg font-semibold text-green-800">
+                                            Tiempo de Respuesta
+                                        </h4>
+                                    </div>
+                                    <p className="text-green-700">
+                                        Normalmente respondemos en menos de 24
+                                        horas durante días laborales.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

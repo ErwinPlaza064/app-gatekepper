@@ -1,48 +1,54 @@
 import React from "react";
 import Typography from "../UI/Typography";
 import Social_Icons from "./Social_Icons";
+import { Shield, Mail, Phone } from "lucide-react";
 
 export default function Footer() {
     return (
-        <footer className="px-5">
-            <div className="px-5 py-4 mx-auto">
-                <div className="flex flex-col items-center justify-between md:flex-row">
-                    <div className="mb-4 md:mb-0">
-                        <Typography as={"h4"} variant={"h4"} color={"black"}>
-                            Nuestras Redes Sociales:
-                        </Typography>
+        <footer className="text-white bg-gray-900">
+            <div className="px-4 py-16 mx-auto max-w-7xl sm:px-6 lg:px-8">
+                <div className="grid items-start grid-cols-1 gap-12 md:grid-cols-3">
+                    <div className="flex flex-col justify-center md:col-span-2">
+                        <div className="flex items-center mb-6 space-x-2">
+                            <Shield className="w-8 h-8 text-blue-400" />
+                            <span className="text-2xl font-bold">
+                                GateKeeper
+                            </span>
+                        </div>
+                        <p className="mb-6 text-lg leading-relaxed text-gray-300">
+                            "Seguridad en la entrada, tranquilidad en tu hogar."
+                        </p>
+                        <p className="text-gray-400">
+                            Protegemos lo que más te importa con tecnología de
+                            vanguardia y un servicio excepcional.
+                        </p>
                     </div>
-                    <Social_Icons />
+                    <div className="flex flex-col justify-center">
+                        <h4 className="mb-6 text-xl font-semibold">Contacto</h4>
+                        <div className="space-y-4">
+                            <div className="flex items-center space-x-3">
+                                <Mail className="w-5 h-5 text-blue-400" />
+                                <span className="text-gray-300">
+                                    gatekepper064@gmail.com
+                                </span>
+                            </div>
+                            <div className="flex items-center space-x-3">
+                                <Phone className="w-5 h-5 text-blue-400" />
+                                <span className="text-gray-300">
+                                    464-112-3632
+                                </span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-
-            <div className="border border-black"></div>
-
-            <div className="flex flex-col justify-center md:flex-row md:px-10">
-                <div className="p-4 text-center md:p-10">
-                    <Typography as={"h4"} variant={"h4"} color={"black"}>
-                        Registrador de visitantes
-                    </Typography>
-                    <Typography as={"p"} variant={"p"} color={"black"}>
-                        “Seguridad en la entrada tranquilidad en tu hogar.”
-                    </Typography>
+                <div className="pt-8 mt-12 border-t border-gray-700">
+                    <div className="text-center text-gray-400">
+                        <p>
+                            © 2025 Registrador de visitantes. Todos los derechos
+                            reservados.
+                        </p>
+                    </div>
                 </div>
-
-                <div className="p-4 text-center md:p-10">
-                    <Typography as={"h4"} variant={"h4"} color={"black"}>
-                        Contacto
-                    </Typography>
-                    <Typography as={"p"} variant={"p"} color={"black"}>
-                        gatekepper064@gmail.com <br /> 464-112-3632
-                    </Typography>
-                </div>
-            </div>
-
-            <div className="flex items-center justify-center h-auto p-5 bg-black">
-                <span className="text-white">
-                    ©Todos los derechos reservados para: Registrador de
-                    visitantes 2025
-                </span>
             </div>
         </footer>
     );

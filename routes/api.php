@@ -6,6 +6,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\VisitorController;
 use App\Http\Controllers\QrController;
 use App\Http\Controllers\QrCodeController;
+use App\Http\Controllers\ComplaintController;
 
 
 
@@ -36,3 +37,4 @@ Route::post('/push/subscribe', function (Request $request) {
     );
     return response()->json(['success' => true]);
 })->middleware('auth:sanctum');
+

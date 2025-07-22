@@ -2,7 +2,7 @@ import Typography from "@/Components/UI/Typography";
 
 export default function VisitsCard({ visits }) {
     return (
-        <div className="p-5 bg-white rounded-lg shadow-md">
+        <div className="flex flex-col h-full p-6 bg-white border shadow rounded-xl">
             <Typography
                 as={"h2"}
                 variant={"h2"}

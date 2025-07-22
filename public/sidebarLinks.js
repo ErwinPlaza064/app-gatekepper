@@ -19,4 +19,9 @@ export const sidebarLinks = [
         icon: "FaHistory",
         label: "Historial de visitas",
     },
+    {
+        id: "generar-quejas",
+        icon: "FaExclamationCircle",
+        label: "Generar quejas",
+    },
 ];

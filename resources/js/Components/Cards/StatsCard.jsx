@@ -15,20 +15,39 @@ const colors = [
     "bg-yellow-100 text-yellow-700 border-yellow-300",
 ];
 
-export default function StatsCard({ stats = [] }) {
+export default function StatsCard({ stats = {} }) {
+    // stats: { visitas, quejas, qrs }
+    const items = [
+        {
+            label: "Mis visitas",
+            value: stats.visitas || 0,
+            icon: icons[0],
+            color: colors[0],
+        },
+        {
+            label: "Mis quejas",
+            value: stats.quejas || 0,
+            icon: icons[1],
+            color: colors[1],
+        },
+        {
+            label: "Mis QRs generados",
+            value: stats.qrs || 0,
+            icon: icons[3],
+            color: colors[3],
+        },
+    ];
     return (
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-            {stats.map((stat, idx) => (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 max-w-4xl mx-auto w-full">
+            {items.map((item, idx) => (
                 <div
-                    key={stat.label}
-                    className={`border rounded-xl shadow p-4 flex flex-col items-center ${
-                        colors[idx % colors.length]
-                    }`}
+                    key={item.label}
+                    className={`border rounded-xl shadow p-6 flex flex-col items-center ${item.color} transition-transform hover:scale-105`}
                 >
-                    <div className="mb-2">{icons[idx % icons.length]}</div>
-                    <span className="text-2xl font-bold">{stat.value}</span>
-                    <span className="mt-2 text-sm font-semibold">
-                        {stat.label}
+                    <div className="mb-2">{item.icon}</div>
+                    <span className="text-3xl font-bold">{item.value}</span>
+                    <span className="mt-2 text-base font-semibold">
+                        {item.label}
                     </span>
                 </div>
             ))}

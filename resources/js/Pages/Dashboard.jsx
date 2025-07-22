@@ -9,23 +9,17 @@ import NotificationListener from "@/Components/Common/NotificationListener";
 import toast from "react-hot-toast";
 
 export default function Dashboard({ auth, visits, stats, visitsChartData }) {
-    const [activeTab, setActiveTab] = useState("escritorio");
+    const [activeTab, setActiveTab] = useState(() => {
+        return localStorage.getItem("sidebarActiveTab") || "escritorio";
+    });
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [notifications, setNotifications] = useState(
         auth.user.notifications || []
     );
 
     useEffect(() => {
-        if (
-            typeof window !== "undefined" &&
-            "Notification" in window &&
-            typeof window.Notification.requestPermission === "function" &&
-            window.Notification.permission !== "granted"
-        ) {
-            window.Notification.requestPermission();
-        }
-        // Eliminada suscripción push
-    }, []);
+        localStorage.setItem("sidebarActiveTab", activeTab);
+    }, [activeTab]);
 
     return (
         <>
@@ -73,6 +67,7 @@ export default function Dashboard({ auth, visits, stats, visitsChartData }) {
                                 activeTab={activeTab}
                                 auth={auth}
                                 visits={visits}
+                                stats={stats}
                             />
                         </section>
                     </main>

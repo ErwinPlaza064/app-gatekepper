@@ -11,7 +11,7 @@ export default defineConfig({
         react(),
     ],
     server: {
-        host: "192.168.1.44",
+        host: process.env.VITE_HOST,
         port: 5173,
         cors: true,
         headers: {

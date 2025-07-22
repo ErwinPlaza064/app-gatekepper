@@ -45,15 +45,18 @@ class DashboardController extends Controller
                 ->orderBy('entry_time', 'desc')
                 ->get(['name', 'id_document', 'vehicle_plate', 'entry_time', 'created_at']),
             'stats' => [
-                ['label' => 'Visitas', 'value' => $visitsCount],
-                ['label' => 'Quejas', 'value' => $complaintsCount],
-                ['label' => 'Usuarios', 'value' => $usersCount],
-                ['label' => 'QR generados', 'value' => $qrCount],
+                'visitas' => $visitsCount,
+                'quejas' => $complaintsCount,
+                'qrs' => $qrCount,
             ],
             'visitsChartData' => [
                 'labels' => $chartLabels,
                 'values' => $chartValues,
             ],
+            // Historial de quejas del usuario autenticado
+            'complaints' => Complaint::where('user_id', $user->id)
+                ->orderBy('created_at', 'desc')
+                ->get(['id', 'message', 'created_at']),
         ]);
     }
 

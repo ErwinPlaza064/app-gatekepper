@@ -225,8 +225,8 @@ export default function QRDashboard({ userId }) {
                                 <div className="space-x-2">
                                     {qr.status === "active" ? (
                                         <button
-                                            onClick={() =>
-                                                handleDeactivate(qr.qr_id)
+                                            onClick={
+                                                () => handleDeactivate(qr.id) // <--- Cambiado aquí
                                             }
                                             className="px-3 py-1 text-xs font-medium text-red-600 transition-colors rounded bg-red-50 hover:bg-red-100"
                                         >
@@ -238,8 +238,8 @@ export default function QRDashboard({ userId }) {
                                           new Date() <
                                               new Date(qr.valid_until)) ? (
                                         <button
-                                            onClick={() =>
-                                                handleReactivate(qr.qr_id)
+                                            onClick={
+                                                () => handleReactivate(qr.id) // <--- Cambiado aquí
                                             }
                                             className="px-3 py-1 text-xs font-medium text-green-600 transition-colors rounded bg-green-50 hover:bg-green-100"
                                         >

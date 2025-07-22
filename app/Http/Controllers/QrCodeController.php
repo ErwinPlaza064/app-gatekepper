@@ -115,7 +115,7 @@ class QrCodeController extends Controller
             return response()->json(['message' => 'No autenticado'], 401);
         }
 
-        $qrCode = QrCode::where('qr_id', $qrId)
+        $qrCode = QrCode::where('id', $qrId)
             ->where('user_id', $userId)
             ->first();
 
@@ -136,7 +136,7 @@ class QrCodeController extends Controller
             return response()->json(['message' => 'No autenticado'], 401);
         }
 
-        $qrCode = QrCode::where('qr_id', $qrId)
+        $qrCode = QrCode::where('id', $qrId)
             ->where('user_id', $userId)
             ->first();
 

@@ -5,7 +5,7 @@ import { Shield, Mail, Phone } from "lucide-react";
 
 export default function Footer() {
     return (
-        <footer className="text-white bg-gray-900">
+        <footer className="text-white bg-black">
             <div className="px-4 py-16 mx-auto max-w-7xl sm:px-6 lg:px-8">
                 <div className="grid items-start grid-cols-1 gap-12 md:grid-cols-3">
                     <div className="flex flex-col justify-center md:col-span-2">

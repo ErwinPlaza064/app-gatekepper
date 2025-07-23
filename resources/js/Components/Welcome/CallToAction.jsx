@@ -7,7 +7,7 @@ export default function CallToAction() {
             <div className="max-w-4xl px-4 mx-auto text-center sm:px-6 lg:px-8">
                 <div className="p-12 bg-white shadow-2xl rounded-3xl">
                     <div className="flex justify-center mb-6">
-                        <div className="flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl">
+                        <div className="flex items-center justify-center w-20 h-20 bg-black rounded-2xl">
                             <Building className="w-10 h-10 text-white" />
                         </div>
                     </div>
@@ -22,7 +22,7 @@ export default function CallToAction() {
                     <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
                         <Link
                             href="/contacto"
-                            className="inline-flex items-center px-8 py-4 font-semibold text-white transition-all duration-300 transform shadow-lg group bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl hover:from-blue-700 hover:to-purple-700 hover:shadow-xl hover:scale-105"
+                            className="inline-flex items-center px-8 py-4 font-semibold text-white transition-all duration-300 transform bg-black shadow-lg group rounded-xl hover:from-blue-700 hover:to-purple-700 hover:shadow-xl hover:scale-105"
                         >
                             Solicitar demostración
                             <ChevronRight className="w-5 h-5 ml-2 transition-transform group-hover:translate-x-1" />

@@ -1,6 +1,4 @@
 import Footer from "@/Components/Common/Footer";
-import Social_Icons from "@/Components/Common/Social_Icons";
-import Typography from "@/Components/UI/Typography";
 import Authenticated from "@/Layouts/AuthenticatedLayout";
 import { Head, useForm } from "@inertiajs/react";
 import InputError from "@/Components/UI/InputError";
@@ -33,9 +31,7 @@ export default function Contact({ auth }) {
     return (
         <Authenticated user={user}>
             <Head title="Contacto" />
-
-            {/* Hero Section */}
-            <div className="py-16 bg-gradient-to-br from-slate-50 to-blue-50">
+            <div className="py-28 bg-gradient-to-br from-slate-50 to-blue-50">
                 <div className="max-w-4xl px-6 mx-auto text-center">
                     <h1 className="mb-4 text-4xl font-bold text-gray-900 lg:text-5xl">
                         Contáctanos
@@ -47,12 +43,10 @@ export default function Contact({ auth }) {
                     </p>
                 </div>
             </div>
-
-            {/* Contact Form Section */}
             <div className="bg-white ">
+                <div className="h-16" />
                 <div className="px-6 mx-auto max-w-7xl lg:px-8">
                     <div className="grid items-stretch gap-16 lg:grid-cols-2">
-                        {/* Form Column */}
                         <div className="order-2 lg:order-1">
                             <div className="p-8 bg-white border border-gray-100 shadow-xl rounded-2xl lg:p-10">
                                 <div className="mb-8">
@@ -67,9 +61,8 @@ export default function Contact({ auth }) {
 
                                 <form
                                     onSubmit={handleSubmit}
-                                    className="space-y-6"
+                                    className="space-y-6 "
                                 >
-                                    {/* Email Field */}
                                     <div className="space-y-2">
                                         <label
                                             htmlFor="email"
@@ -105,8 +98,6 @@ export default function Contact({ auth }) {
                                         </div>
                                         <InputError message={errors.email} />
                                     </div>
-
-                                    {/* Full Name Field */}
                                     <div className="space-y-2">
                                         <label
                                             htmlFor="fullname"
@@ -143,7 +134,6 @@ export default function Contact({ auth }) {
                                         <InputError message={errors.fullname} />
                                     </div>
 
-                                    {/* Message Field */}
                                     <div className="space-y-2">
                                         <label
                                             htmlFor="message"
@@ -163,7 +153,6 @@ export default function Contact({ auth }) {
                                         <InputError message={errors.message} />
                                     </div>
 
-                                    {/* Submit Button */}
                                     <div className="pt-4">
                                         <button
                                             type="submit"
@@ -177,10 +166,7 @@ export default function Contact({ auth }) {
                                 </form>
                             </div>
                         </div>
-
-                        {/* Info Column */}
                         <div className="flex flex-col justify-center order-1 h-full space-y-8 lg:order-2">
-                            {/* Image */}
                             <div className="text-center">
                                 <div className="p-8 mb-6 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-2xl">
                                     <img
@@ -192,8 +178,7 @@ export default function Contact({ auth }) {
                             </div>
 
                             <div className="space-y-6">
-                                {/* Response Time Card */}
-                                <div className="p-6 border border-green-200 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl">
+                                <div className="p-6 border border-green-200 bg-green-50 rounded-xl">
                                     <div className="flex items-center mb-3">
                                         <svg
                                             className="w-6 h-6 mr-3 text-green-600"
@@ -222,7 +207,7 @@ export default function Contact({ auth }) {
                     </div>
                 </div>
             </div>
-
+            <div className="h-20 bg-white" />
             <Footer />
         </Authenticated>
     );

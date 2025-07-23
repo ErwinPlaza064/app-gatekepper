@@ -1,6 +1,6 @@
 export default function Stats() {
     return (
-        <div className="py-20 bg-gradient-to-r from-blue-600 to-purple-600">
+        <div className="py-20 bg-black">
             <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
                 <div className="grid gap-8 text-center md:grid-cols-4">
                     <div>

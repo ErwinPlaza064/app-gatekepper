@@ -1,5 +1,6 @@
 import { FaSignOutAlt } from "react-icons/fa";
 import React, { useState, useRef, useEffect } from "react";
+import { router } from "@inertiajs/react";
 
 export default function UserProfile({ user, showThemeToggle, showLogout }) {
     const [open, setOpen] = useState(false);
@@ -81,4 +82,3 @@ export default function UserProfile({ user, showThemeToggle, showLogout }) {
         </div>
     );
 }
-// ...existing code...

@@ -1,9 +1,25 @@
-import React, { useState } from "react";
 import { FaSignOutAlt } from "react-icons/fa";
-import { router } from "@inertiajs/react";
+import React, { useState, useRef, useEffect } from "react";
 
 export default function UserProfile({ user, showThemeToggle, showLogout }) {
     const [open, setOpen] = useState(false);
+    const dropdownRef = useRef(null);
+
+    useEffect(() => {
+        if (!open) return;
+        function handleClickOutside(event) {
+            if (
+                dropdownRef.current &&
+                !dropdownRef.current.contains(event.target)
+            ) {
+                setOpen(false);
+            }
+        }
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [open]);
 
     const handleLogout = (e) => {
         e.preventDefault();
@@ -19,7 +35,10 @@ export default function UserProfile({ user, showThemeToggle, showLogout }) {
     };
 
     return (
-        <div className="relative p-2 mr-4 border-t border-white/20">
+        <div
+            className="relative p-2 mr-4 border-t border-white/20"
+            ref={dropdownRef}
+        >
             <div
                 className="flex items-center p-1 space-x-3 transition-all duration-300 bg-black cursor-pointer rounded-2xl hover:bg-neutral-800"
                 onClick={() => setOpen((v) => !v)}
@@ -62,3 +81,4 @@ export default function UserProfile({ user, showThemeToggle, showLogout }) {
         </div>
     );
 }
+// ...existing code...

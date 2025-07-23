@@ -20,13 +20,6 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::post('/qr/upload', [QrController::class, 'upload']);
 
-Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/user/qr-codes', [QrCodeController::class, 'getUserQrCodes']);
-    Route::post('/qr-codes', [QrCodeController::class, 'store']);
-    Route::patch('/qr-codes/{qrId}/deactivate', [QrCodeController::class, 'deactivateQr']);
-    Route::patch('/qr-codes/{qrId}/reactivate', [QrCodeController::class, 'reactivateQr']);
-});
-
 Route::get('/recent-visitor-scans', [VisitorController::class, 'getRecentScans']);
 
 Route::post('/push/subscribe', function (Request $request) {

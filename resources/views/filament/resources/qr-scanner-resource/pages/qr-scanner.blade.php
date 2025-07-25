@@ -37,9 +37,6 @@ Subir Imagen QR
 </div>
 <div class="flex flex-col items-center gap-2 mt-4">
   <div class="flex gap-2">
-    <x-filament::button id="switch-camera-btn" color="secondary" icon="heroicon-o-arrow-path" size="lg">
-      Voltear Cámara
-    </x-filament::button>
     <x-filament::button id="stop-camera-btn" color="danger" icon="heroicon-o-stop" size="lg">
       Detener Cámara
     </x-filament::button>
@@ -358,65 +355,75 @@ class QRScannerManager {
       this.fileInput.value = '';
     }
   }
-  async onScanSuccess(decodedText) {
-    // Prevención de doble escaneo en 2 segundos
-    const now = Date.now();
-    if (decodedText === this.lastScannedText && (now - this.lastScanTime) < 2000) {
-      return;
-    }
-    this.lastScannedText = decodedText;
-    this.lastScanTime = now;
-    try {
-      let data;
-      try {
-        data = JSON.parse(decodedText);
-      } catch (e) {
-        throw new Error('El código QR no tiene un formato válido.');
-      }
-      console.log('[QR LEÍDO]', data);
-      this.validateQRCode(data);
-      const formattedData = {
-        qr_id: data.qr_id,
-        visitor_name: data.name,
-        document_id: data.id_document,
-        resident_id: data.user_id,
-        vehicle_plate: data.vehicle_plate,
-        qr_type: data.qr_type,
-        qr_data: data,
-      };
-      console.log('[OBJETO ENVIADO AL BACKEND]', formattedData);
-      this.showLoading('Registrando visitante...');
-      let response, result;
-      try {
-        response = await fetch('/api/scan-qr', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-          },
-          body: JSON.stringify(formattedData)
-        });
-        result = await response.json();
-      } catch (err) {
-        // Soporte offline: error de red
-        throw new Error('No se pudo conectar al servidor. Verifica tu conexión a internet.');
-      }
-      if (response.ok) {
-        this.showSuccess(result.message || 'Visitante registrado correctamente');
-        this.loadRecentScans();
-        await this.stopCamera();
-      } else {
-        throw new Error(result.message || 'Error en el registro');
-      }
-    } catch (error) {
-      let errorMessage = 'Código QR inválido o error en el registro.';
-      if (error.message) {
-        errorMessage = error.message;
-      }
-      this.showError(errorMessage);
-      await this.stopCamera();
-    }
+ async onScanSuccess(decodedText) {
+  // Prevención de doble escaneo en 2 segundos
+  const now = Date.now();
+  if (decodedText === this.lastScannedText && (now - this.lastScanTime) < 2000) {
+    return;
   }
+
+  this.lastScannedText = decodedText;
+  this.lastScanTime = now;
+
+  // *** DETENER LA CÁMARA INMEDIATAMENTE DESPUÉS DEL ESCANEO ***
+  await this.stopCamera();
+
+  try {
+    let data;
+    try {
+      data = JSON.parse(decodedText);
+    } catch (e) {
+      throw new Error('El código QR no tiene un formato válido.');
+    }
+
+    console.log('[QR LEÍDO]', data);
+    this.validateQRCode(data);
+
+    const formattedData = {
+      qr_id: data.qr_id,
+      visitor_name: data.name,
+      document_id: data.id_document,
+      resident_id: data.user_id,
+      vehicle_plate: data.vehicle_plate,
+      qr_type: data.qr_type,
+      qr_data: data,
+    };
+
+    console.log('[OBJETO ENVIADO AL BACKEND]', formattedData);
+    this.showLoading('Registrando visitante...');
+
+    let response, result;
+    try {
+      response = await fetch('/api/scan-qr', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify(formattedData)
+      });
+      result = await response.json();
+    } catch (err) {
+      // Soporte offline: error de red
+      throw new Error('No se pudo conectar al servidor. Verifica tu conexión a internet.');
+    }
+
+    if (response.ok) {
+      this.showSuccess(result.message || 'Visitante registrado correctamente');
+      this.loadRecentScans();
+      // La cámara ya se detuvo al inicio del método
+    } else {
+      throw new Error(result.message || 'Error en el registro');
+    }
+  } catch (error) {
+    let errorMessage = 'Código QR inválido o error en el registro.';
+    if (error.message) {
+      errorMessage = error.message;
+    }
+    this.showError(errorMessage);
+    // La cámara ya se detuvo al inicio del método
+  }
+}
   validateQRCode(data) {
     // Validación de estructura QR
     const requiredFields = ['qr_id', 'name', 'id_document', 'user_id', 'qr_type'];

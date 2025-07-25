@@ -18,10 +18,6 @@ export default function QRDashboard({ userId }) {
                 headers: {
                     "Content-Type": "application/json",
                     "X-Requested-With": "XMLHttpRequest",
-                    "X-CSRF-TOKEN":
-                        document
-                            .querySelector('meta[name="csrf-token"]')
-                            ?.getAttribute("content") || "",
                 },
                 credentials: "same-origin",
             });
@@ -40,6 +36,48 @@ export default function QRDashboard({ userId }) {
         }
     };
 
+    // Función para obtener el token CSRF de forma más robusta
+    const getCsrfToken = async () => {
+        // Intentar obtener el token de diferentes fuentes
+        let metaToken = document
+            .querySelector('meta[name="csrf-token"]')
+            ?.getAttribute("content");
+
+        // Si no hay token, esperar un poco e intentar de nuevo
+        if (!metaToken) {
+            await new Promise((resolve) => setTimeout(resolve, 100));
+            metaToken = document
+                .querySelector('meta[name="csrf-token"]')
+                ?.getAttribute("content");
+        }
+
+        // Si aún no hay token, intentar obtenerlo del endpoint
+        if (!metaToken) {
+            try {
+                const response = await fetch("/csrf-token");
+                if (response.ok) {
+                    const data = await response.json();
+                    return data.token;
+                }
+            } catch (e) {
+                console.warn("No se pudo obtener token del endpoint");
+            }
+        }
+
+        const inputToken = document.querySelector(
+            'input[name="_token"]'
+        )?.value;
+        const windowToken = window.Laravel?.csrfToken;
+
+        const token = metaToken || inputToken || windowToken || "";
+
+        if (!token) {
+            console.warn("No se pudo obtener el token CSRF");
+        }
+
+        return token;
+    };
+
     const handleDeactivate = async (qrId) => {
         try {
             const response = await fetch(`/api/qr-codes/${qrId}/deactivate`, {
@@ -47,10 +85,6 @@ export default function QRDashboard({ userId }) {
                 headers: {
                     "Content-Type": "application/json",
                     "X-Requested-With": "XMLHttpRequest",
-                    "X-CSRF-TOKEN":
-                        document
-                            .querySelector('meta[name="csrf-token"]')
-                            ?.getAttribute("content") || "",
                 },
                 credentials: "same-origin",
             });
@@ -60,9 +94,22 @@ export default function QRDashboard({ userId }) {
                 throw new Error(errorData.message || "Error al desactivar QR");
             }
 
-            toast.success("QR desactivado correctamente");
+            const data = await response.json();
+            toast.success(data.message || "QR desactivado correctamente");
+
+            // Actualizar el estado local inmediatamente para mejor UX
+            setQrCodes((prevCodes) =>
+                prevCodes.map((qr) =>
+                    qr.id === qrId
+                        ? { ...qr, status: "inactive", is_active: false }
+                        : qr
+                )
+            );
+
+            // Refrescar los datos del servidor
             fetchQrCodes();
         } catch (error) {
+            console.error("Error:", error);
             toast.error(error.message || "Error al desactivar QR");
         }
     };
@@ -74,10 +121,6 @@ export default function QRDashboard({ userId }) {
                 headers: {
                     "Content-Type": "application/json",
                     "X-Requested-With": "XMLHttpRequest",
-                    "X-CSRF-TOKEN":
-                        document
-                            .querySelector('meta[name="csrf-token"]')
-                            ?.getAttribute("content") || "",
                 },
                 credentials: "same-origin",
             });
@@ -87,9 +130,22 @@ export default function QRDashboard({ userId }) {
                 throw new Error(errorData.message || "Error al reactivar QR");
             }
 
-            toast.success("QR reactivado correctamente");
+            const data = await response.json();
+            toast.success(data.message || "QR reactivado correctamente");
+
+            // Actualizar el estado local inmediatamente para mejor UX
+            setQrCodes((prevCodes) =>
+                prevCodes.map((qr) =>
+                    qr.id === qrId
+                        ? { ...qr, status: "active", is_active: true }
+                        : qr
+                )
+            );
+
+            // Refrescar los datos del servidor
             fetchQrCodes();
         } catch (error) {
+            console.error("Error:", error);
             toast.error(error.message || "Error al reactivar QR");
         }
     };
@@ -225,8 +281,8 @@ export default function QRDashboard({ userId }) {
                                 <div className="space-x-2">
                                     {qr.status === "active" ? (
                                         <button
-                                            onClick={
-                                                () => handleDeactivate(qr.id) // <--- Cambiado aquí
+                                            onClick={() =>
+                                                handleDeactivate(qr.id)
                                             }
                                             className="px-3 py-1 text-xs font-medium text-red-600 transition-colors rounded bg-red-50 hover:bg-red-100"
                                         >
@@ -238,8 +294,8 @@ export default function QRDashboard({ userId }) {
                                           new Date() <
                                               new Date(qr.valid_until)) ? (
                                         <button
-                                            onClick={
-                                                () => handleReactivate(qr.id) // <--- Cambiado aquí
+                                            onClick={() =>
+                                                handleReactivate(qr.id)
                                             }
                                             className="px-3 py-1 text-xs font-medium text-green-600 transition-colors rounded bg-green-50 hover:bg-green-100"
                                         >

@@ -66,6 +66,10 @@ Route::middleware('auth')->group(function () {
 });
 
 
+Route::get('/csrf-token', function() {
+    return response()->json(['token' => csrf_token()]);
+})->middleware('web');
+
 
 require __DIR__.'/auth.php';
 

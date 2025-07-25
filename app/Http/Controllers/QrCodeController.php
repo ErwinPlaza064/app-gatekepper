@@ -10,7 +10,6 @@ class QrCodeController extends Controller
 {
     public function getUserQrCodes(Request $request)
     {
-        // CAMBIAR de $request->user() a auth()->user()
         $userId = auth()->id();
 
         if (!$userId) {
@@ -123,9 +122,20 @@ class QrCodeController extends Controller
             return response()->json(['message' => 'QR no encontrado'], 404);
         }
 
+        if (!$qrCode->is_active) {
+            return response()->json(['message' => 'El QR ya está desactivado'], 400);
+        }
+
         $qrCode->update(['is_active' => false]);
 
-        return response()->json(['message' => 'QR desactivado correctamente']);
+        return response()->json([
+            'message' => 'QR desactivado correctamente',
+            'qr_code' => [
+                'id' => $qrCode->id,
+                'status' => $this->getQrStatus($qrCode->fresh()),
+                'is_active' => false
+            ]
+        ]);
     }
 
     public function reactivateQr(Request $request, $qrId)
@@ -144,6 +154,10 @@ class QrCodeController extends Controller
             return response()->json(['message' => 'QR no encontrado'], 404);
         }
 
+        if ($qrCode->is_active) {
+            return response()->json(['message' => 'El QR ya está activo'], 400);
+        }
+
         if ($qrCode->valid_until && Carbon::now()->isAfter($qrCode->valid_until)) {
             return response()->json(['message' => 'No se puede reactivar un QR expirado'], 400);
         }
@@ -154,7 +168,14 @@ class QrCodeController extends Controller
 
         $qrCode->update(['is_active' => true]);
 
-        return response()->json(['message' => 'QR reactivado correctamente']);
+        return response()->json([
+            'message' => 'QR reactivado correctamente',
+            'qr_code' => [
+                'id' => $qrCode->id,
+                'status' => $this->getQrStatus($qrCode->fresh()),
+                'is_active' => true
+            ]
+        ]);
     }
 
     private function getQrStatus($qr)

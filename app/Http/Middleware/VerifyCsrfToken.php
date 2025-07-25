@@ -14,5 +14,7 @@ class VerifyCsrfToken extends Middleware
     protected $except = [
         'api/scan-qr',
         'api/recent-visitor-scans',
+        'api/qr-codes/*/deactivate',
+        'api/qr-codes/*/reactivate',
     ];
 }

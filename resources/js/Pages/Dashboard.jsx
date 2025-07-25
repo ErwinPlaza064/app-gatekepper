@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Head } from "@inertiajs/react";
+import { Head, router } from "@inertiajs/react";
 import Sidebar from "@/Components/Common/Sidebar";
 import MobileHeader from "@/Components/Common/MobileHeader";
 import DashboardContent from "@/Components/Common/DashboardContent";
@@ -18,8 +18,30 @@ export default function Dashboard({ auth, visits, stats, visitsChartData }) {
     );
 
     useEffect(() => {
+        if (auth.user.rol === "administrador" || auth.user.rol === "admin") {
+            const timeout = setTimeout(() => {
+                router.visit("/admin");
+            }, 2000);
+            return () => clearTimeout(timeout);
+        }
+    }, [auth.user.rol]);
+
+    useEffect(() => {
         localStorage.setItem("sidebarActiveTab", activeTab);
     }, [activeTab]);
+
+    if (auth.user.rol === "administrador" || auth.user.rol === "admin") {
+        return (
+            <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-indigo-50 via-white to-cyan-50">
+                <div className="text-center">
+                    <div className="inline-block w-8 h-8 border-4 border-indigo-600 border-solid rounded-full animate-spin border-t-transparent"></div>
+                    <p className="mt-4 text-lg text-gray-600">
+                        Redirigiendo al panel de administración...
+                    </p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <>

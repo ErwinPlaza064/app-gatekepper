@@ -6,7 +6,6 @@ export default function ComplaintsCard() {
     const { data, setData, post, processing, errors, reset } = useForm({
         message: "",
     });
-    // Usar las quejas pasadas como prop desde el backend
     const complaints = props.complaints || [];
 
     const handleSubmit = (e) => {

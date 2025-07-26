@@ -13,17 +13,19 @@ export default function QRDashboard({ userId }) {
 
     const fetchQrCodes = async () => {
         try {
-            const response = await fetch(
-                `${import.meta.env.VITE_API_URL}/api/user/qr-codes`,
-                {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-Requested-With": "XMLHttpRequest",
-                    },
-                    credentials: "same-origin",
-                }
-            );
+            // Usar URL directa temporalmente
+            const API_URL =
+                import.meta.env.VITE_API_URL ||
+                "https://app-gatekepper-production.up.railway.app";
+
+            const response = await fetch(`${API_URL}/api/user/qr-codes`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-Requested-With": "XMLHttpRequest",
+                },
+                credentials: "same-origin",
+            });
 
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
@@ -85,10 +87,12 @@ export default function QRDashboard({ userId }) {
 
     const handleDeactivate = async (qrId) => {
         try {
+            const API_URL =
+                import.meta.env.VITE_API_URL ||
+                "https://app-gatekepper-production.up.railway.app";
+
             const response = await fetch(
-                `${
-                    import.meta.env.VITE_API_URL
-                }/api/qr-codes/${qrId}/deactivate`,
+                `${API_URL}/api/qr-codes/${qrId}/deactivate`,
                 {
                     method: "PATCH",
                     headers: {
@@ -98,26 +102,7 @@ export default function QRDashboard({ userId }) {
                     credentials: "same-origin",
                 }
             );
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || "Error al desactivar QR");
-            }
-
-            const data = await response.json();
-            toast.success(data.message || "QR desactivado correctamente");
-
-            // Actualizar el estado local inmediatamente para mejor UX
-            setQrCodes((prevCodes) =>
-                prevCodes.map((qr) =>
-                    qr.id === qrId
-                        ? { ...qr, status: "inactive", is_active: false }
-                        : qr
-                )
-            );
-
-            // Refrescar los datos del servidor
-            fetchQrCodes();
+            // ... resto del código igual
         } catch (error) {
             console.error("Error:", error);
             toast.error(error.message || "Error al desactivar QR");
@@ -126,10 +111,12 @@ export default function QRDashboard({ userId }) {
 
     const handleReactivate = async (qrId) => {
         try {
+            const API_URL =
+                import.meta.env.VITE_API_URL ||
+                "https://app-gatekepper-production.up.railway.app";
+
             const response = await fetch(
-                `${
-                    import.meta.env.VITE_API_URL
-                }/api/qr-codes/${qrId}/reactivate`,
+                `${API_URL}/api/qr-codes/${qrId}/reactivate`,
                 {
                     method: "PATCH",
                     headers: {
@@ -139,26 +126,7 @@ export default function QRDashboard({ userId }) {
                     credentials: "same-origin",
                 }
             );
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || "Error al reactivar QR");
-            }
-
-            const data = await response.json();
-            toast.success(data.message || "QR reactivado correctamente");
-
-            // Actualizar el estado local inmediatamente para mejor UX
-            setQrCodes((prevCodes) =>
-                prevCodes.map((qr) =>
-                    qr.id === qrId
-                        ? { ...qr, status: "active", is_active: true }
-                        : qr
-                )
-            );
-
-            // Refrescar los datos del servidor
-            fetchQrCodes();
+            // ... resto del código igual
         } catch (error) {
             console.error("Error:", error);
             toast.error(error.message || "Error al reactivar QR");

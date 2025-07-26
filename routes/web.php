@@ -11,6 +11,7 @@ use App\Http\Controllers\ContactController;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Artisan;
 
 
 
@@ -78,6 +79,13 @@ Route::get('/create-admin', function () {
         return 'Usuario admin creado! Email: admin@admin.com, Password: password123';
     }
     return 'Ya existe un usuario admin';
+});
+
+Route::get('/clear-cache', function () {
+    Artisan::call('cache:clear');
+    Artisan::call('config:clear');
+    Artisan::call('route:clear');
+    return 'Cache limpiado';
 });
 
 

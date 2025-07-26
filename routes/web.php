@@ -9,6 +9,8 @@ use Inertia\Inertia;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ContactController;
 use Illuminate\Support\Facades\Broadcast;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 
 
@@ -63,6 +65,19 @@ Route::middleware('auth')->group(function () {
     Route::patch('/api/qr-codes/{qrId}/reactivate', [QrCodeController::class, 'reactivateQr']);
     Route::get('/api/user/visitors', [VisitorController::class, 'getUserVisitors']);
     Route::post('/api/qr-codes', [QrCodeController::class, 'store']);
+});
+
+Route::get('/create-admin', function () {
+    if (App\Models\User::count() === 0) {
+        App\Models\User::create([
+            'name' => 'Admin',
+            'email' => 'admin@admin.com',
+            'password' => Hash::make('admin'),
+            'email_verified_at' => now(),
+        ]);
+        return 'Usuario admin creado! Email: admin@admin.com, Password: password123';
+    }
+    return 'Ya existe un usuario admin';
 });
 
 

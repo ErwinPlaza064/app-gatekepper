@@ -37,17 +37,11 @@ class UserResource extends Resource
         return parent::getEloquentQuery();
     }
 
-    /**
-     * Restringe la visibilidad de este recurso según el rol del usuario.
-     */
     public static function canViewAny(): bool
     {
         $user = auth()->user();
         return in_array($user?->rol, ['administrador', 'adminresidencial']);
     }
-    /**
-     * Restringe la creación de nuevos registros según el rol del usuario.
-     */
     public static function canCreate(): bool
     {
         $user = auth()->user();

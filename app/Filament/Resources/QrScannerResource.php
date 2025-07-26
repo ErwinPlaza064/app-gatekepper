@@ -32,6 +32,13 @@ class QrScannerResource extends Resource
             ]);
     }
 
+     public static function canViewAny(): bool
+    {
+        $user = auth()->user();
+        return in_array($user?->rol, ['administrador', 'portero']);
+    }
+
+
     public static function table(Table $table): Table
     {
         return $table

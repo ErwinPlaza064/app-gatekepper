@@ -17,7 +17,10 @@
         "laravel/sanctum": "^3.2",
         "laravel/socialite": "^5.16",
         "laravel/tinker": "^2.8",
-        "tightenco/ziggy": "^2.0"
+        "tightenco/ziggy": "^2.0",
+        "ext-intl": "*",
+        "ext-zip": "*",
+        "ext-bcmath": "*"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",

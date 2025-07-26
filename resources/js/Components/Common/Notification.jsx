@@ -25,16 +25,46 @@ export default function Notification({ notifications, setNotifications }) {
 
     const markAllAsRead = async () => {
         try {
+            // Usar URL con fallback y forzar HTTPS
+            let API_URL =
+                import.meta.env.VITE_API_URL ||
+                "https://app-gatekepper-production.up.railway.app";
+
+            // Forzar HTTPS si la URL usa HTTP
+            if (API_URL.startsWith("http://")) {
+                API_URL = API_URL.replace("http://", "https://");
+            }
+
+            console.log("Using API URL for notifications:", API_URL);
+
             await axios.post(
-                `${import.meta.env.VITE_API_URL}/notifications/mark-all-read`
+                `${API_URL}/notifications/mark-all-read`,
+                {},
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-Requested-With": "XMLHttpRequest",
+                    },
+                    withCredentials: true,
+                }
             );
+
             setNotifications((prev) =>
                 prev.map((n) => ({
                     ...n,
                     read_at: n.read_at || new Date().toISOString(),
                 }))
             );
-        } catch (e) {}
+        } catch (error) {
+            console.error("Error marking notifications as read:", error);
+
+            // Opcional: mostrar un mensaje de error al usuario
+            if (error.response?.status === 404) {
+                console.warn("Endpoint de notificaciones no encontrado");
+            } else if (error.response?.status === 401) {
+                console.warn("No autorizado para marcar notificaciones");
+            }
+        }
     };
 
     const unreadCount = notifications.filter((n) => !n.read_at).length;

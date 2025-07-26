@@ -8,22 +8,6 @@ import { toast } from "react-hot-toast";
 const CLOUD_NAME = "dibbibwqd";
 const UPLOAD_PRESET = "qr-gatekepper";
 
-const uploadQRToCloudinary = async (qrRef) => {
-    if (!qrRef.current) return null;
-    const canvas = qrRef.current.querySelector("canvas");
-    const qrImage = canvas.toDataURL("image/png");
-
-    const formData = new FormData();
-    formData.append("file", qrImage);
-    formData.append("upload_preset", UPLOAD_PRESET);
-
-    const response = await axios.post(
-        `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
-        formData
-    );
-    return response.data.secure_url;
-};
-
 export default function QRGenerator({ userId }) {
     const [visitorInfo, setVisitorInfo] = useState({
         name: "",
@@ -53,9 +37,14 @@ export default function QRGenerator({ userId }) {
         setIsSaving(true);
 
         try {
-            const API_URL =
+            let API_URL =
                 import.meta.env.VITE_API_URL ||
                 "https://app-gatekepper-production.up.railway.app";
+
+            // Forzar HTTPS si la URL usa HTTP
+            if (API_URL.startsWith("http://")) {
+                API_URL = API_URL.replace("http://", "https://");
+            }
 
             const csrfResponse = await axios.get(`${API_URL}/csrf-token`);
             const csrfToken = csrfResponse.data.token;
@@ -87,7 +76,7 @@ export default function QRGenerator({ userId }) {
                         "X-Requested-With": "XMLHttpRequest",
                         "X-CSRF-TOKEN": csrfToken,
                     },
-                    withCredentials: true, // Importante para cookies de sesión
+                    withCredentials: true,
                 }
             );
 
@@ -98,6 +87,8 @@ export default function QRGenerator({ userId }) {
             console.error("Error saving QR:", error);
             if (error.response?.status === 401) {
                 toast.error("No estás autenticado. Por favor, inicia sesión.");
+            } else if (error.response?.status === 419) {
+                toast.error("Token de seguridad expirado. Recarga la página.");
             } else if (error.response?.data?.errors) {
                 const errorMessages = Object.values(
                     error.response.data.errors
@@ -130,20 +121,31 @@ export default function QRGenerator({ userId }) {
     };
 
     const downloadQR = () => {
-        const canvas = qrRef.current.querySelector("canvas");
-        const url = canvas.toDataURL("image/png");
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = `qr_${savedQrData.visitor_name.replace(
-            /\s+/g,
-            "_"
-        )}.png`;
-        link.click();
+        try {
+            const canvas = qrRef.current.querySelector("canvas");
+            const url = canvas.toDataURL("image/png");
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = `qr_${savedQrData.visitor_name.replace(
+                /\s+/g,
+                "_"
+            )}.png`;
+            link.click();
+            toast.success("QR descargado correctamente");
+        } catch (error) {
+            console.error("Error downloading QR:", error);
+            toast.error("Error al descargar el QR");
+        }
     };
 
     const sendWhatsApp = async () => {
         try {
+            toast.loading("Preparando QR para WhatsApp...");
+
             const qrURL = await uploadQRToCloudinary(qrRef);
+
+            toast.dismiss();
+
             if (!qrURL) {
                 toast.error("Error al subir el QR a la nube");
                 return;
@@ -153,15 +155,92 @@ export default function QRGenerator({ userId }) {
                 savedQrData.visitor_name
             }\n🆔 *Documento:* ${savedQrData.document_id}\n🚗 *Placa:* ${
                 savedQrData.vehicle_plate || "No registrado"
-            }\n📎 *QR:* ${qrURL}`;
+            }\n\n📎 *Código QR:* ${qrURL}\n\n✅ *Tipo:* ${
+                qrOptions.type === "single_use"
+                    ? "Uso único"
+                    : qrOptions.type === "time_limited"
+                    ? `Válido por ${qrOptions.duration} horas`
+                    : `Recurrente - ${qrOptions.duration} horas, máximo ${qrOptions.maxUses} usos`
+            }\n\n🏢 *Sistema GateKeeper*`;
 
             const whatsappURL = `https://api.whatsapp.com/send?text=${encodeURIComponent(
                 message
             )}`;
+
             window.open(whatsappURL, "_blank");
+
+            toast.success("¡QR enviado a WhatsApp!");
         } catch (error) {
+            toast.dismiss();
             console.error("Error al enviar por WhatsApp:", error);
-            toast.error("Error al enviar por WhatsApp");
+
+            if (error.message.includes("Failed to fetch")) {
+                toast.error("Error de conexión. Verifica tu internet.");
+            } else if (error.message.includes("Cloudinary")) {
+                toast.error("Error al subir imagen. Intenta de nuevo.");
+            } else {
+                toast.error("Error al enviar por WhatsApp. Intenta de nuevo.");
+            }
+        }
+    };
+
+    const uploadQRToCloudinary = async (qrRef) => {
+        try {
+            if (!qrRef.current) {
+                throw new Error("No se encontró el QR para subir");
+            }
+
+            const canvas = qrRef.current.querySelector("canvas");
+            if (!canvas) {
+                throw new Error("No se pudo obtener el canvas del QR");
+            }
+
+            const qrBlob = await new Promise((resolve) => {
+                canvas.toBlob(resolve, "image/png", 1.0);
+            });
+
+            if (!qrBlob) {
+                throw new Error("No se pudo generar la imagen del QR");
+            }
+
+            const formData = new FormData();
+            formData.append("file", qrBlob);
+            formData.append("upload_preset", UPLOAD_PRESET);
+            formData.append("folder", "qr-codes"); // Organizar en carpeta
+
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 30000);
+
+            const response = await fetch(
+                `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
+                {
+                    method: "POST",
+                    body: formData,
+                    signal: controller.signal,
+                }
+            );
+
+            clearTimeout(timeoutId);
+
+            if (!response.ok) {
+                throw new Error(`Error de Cloudinary: ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            if (!data.secure_url) {
+                throw new Error("No se recibió URL de Cloudinary");
+            }
+
+            return data.secure_url;
+        } catch (error) {
+            console.error("Error en uploadQRToCloudinary:", error);
+
+            if (error.name === "AbortError") {
+                throw new Error("Timeout: La subida tardó demasiado");
+            }
+
+            throw error;
         }
     };
 

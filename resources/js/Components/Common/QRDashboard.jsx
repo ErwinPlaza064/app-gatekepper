@@ -13,10 +13,15 @@ export default function QRDashboard({ userId }) {
 
     const fetchQrCodes = async () => {
         try {
-            // Usar URL directa temporalmente
-            const API_URL =
+            // Usar URL con fallback y forzar HTTPS
+            let API_URL =
                 import.meta.env.VITE_API_URL ||
                 "https://app-gatekepper-production.up.railway.app";
+
+            // Forzar HTTPS si la URL usa HTTP
+            if (API_URL.startsWith("http://")) {
+                API_URL = API_URL.replace("http://", "https://");
+            }
 
             const response = await fetch(`${API_URL}/api/user/qr-codes`, {
                 method: "GET",
@@ -59,9 +64,16 @@ export default function QRDashboard({ userId }) {
         // Si aún no hay token, intentar obtenerlo del endpoint
         if (!metaToken) {
             try {
-                const response = await fetch(
-                    `${import.meta.env.VITE_API_URL}/csrf-token`
-                );
+                let API_URL =
+                    import.meta.env.VITE_API_URL ||
+                    "https://app-gatekepper-production.up.railway.app";
+
+                // Forzar HTTPS si la URL usa HTTP
+                if (API_URL.startsWith("http://")) {
+                    API_URL = API_URL.replace("http://", "https://");
+                }
+
+                const response = await fetch(`${API_URL}/csrf-token`);
                 if (response.ok) {
                     const data = await response.json();
                     return data.token;
@@ -87,9 +99,16 @@ export default function QRDashboard({ userId }) {
 
     const handleDeactivate = async (qrId) => {
         try {
-            const API_URL =
+            let API_URL =
                 import.meta.env.VITE_API_URL ||
                 "https://app-gatekepper-production.up.railway.app";
+
+            // Forzar HTTPS si la URL usa HTTP
+            if (API_URL.startsWith("http://")) {
+                API_URL = API_URL.replace("http://", "https://");
+            }
+
+            console.log("Deactivating QR with URL:", API_URL); // Debug
 
             const response = await fetch(
                 `${API_URL}/api/qr-codes/${qrId}/deactivate`,
@@ -102,18 +121,44 @@ export default function QRDashboard({ userId }) {
                     credentials: "same-origin",
                 }
             );
-            // ... resto del código igual
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || "Error al desactivar QR");
+            }
+
+            const data = await response.json();
+            toast.success(data.message || "QR desactivado correctamente");
+
+            // Actualizar el estado local inmediatamente para mejor UX
+            setQrCodes((prevCodes) =>
+                prevCodes.map((qr) =>
+                    qr.id === qrId
+                        ? { ...qr, status: "inactive", is_active: false }
+                        : qr
+                )
+            );
+
+            // Refrescar los datos del servidor para asegurar sincronización
+            await fetchQrCodes();
         } catch (error) {
-            console.error("Error:", error);
+            console.error("Error deactivating QR:", error);
             toast.error(error.message || "Error al desactivar QR");
         }
     };
 
     const handleReactivate = async (qrId) => {
         try {
-            const API_URL =
+            let API_URL =
                 import.meta.env.VITE_API_URL ||
                 "https://app-gatekepper-production.up.railway.app";
+
+            // Forzar HTTPS si la URL usa HTTP
+            if (API_URL.startsWith("http://")) {
+                API_URL = API_URL.replace("http://", "https://");
+            }
+
+            console.log("Reactivating QR with URL:", API_URL); // Debug
 
             const response = await fetch(
                 `${API_URL}/api/qr-codes/${qrId}/reactivate`,
@@ -126,9 +171,28 @@ export default function QRDashboard({ userId }) {
                     credentials: "same-origin",
                 }
             );
-            // ... resto del código igual
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || "Error al reactivar QR");
+            }
+
+            const data = await response.json();
+            toast.success(data.message || "QR reactivado correctamente");
+
+            // Actualizar el estado local inmediatamente para mejor UX
+            setQrCodes((prevCodes) =>
+                prevCodes.map((qr) =>
+                    qr.id === qrId
+                        ? { ...qr, status: "active", is_active: true }
+                        : qr
+                )
+            );
+
+            // Refrescar los datos del servidor para asegurar sincronización
+            await fetchQrCodes();
         } catch (error) {
-            console.error("Error:", error);
+            console.error("Error reactivating QR:", error);
             toast.error(error.message || "Error al reactivar QR");
         }
     };

@@ -53,6 +53,13 @@ export default function QRGenerator({ userId }) {
         setIsSaving(true);
 
         try {
+            const API_URL =
+                import.meta.env.VITE_API_URL ||
+                "https://app-gatekepper-production.up.railway.app";
+
+            const csrfResponse = await axios.get(`${API_URL}/csrf-token`);
+            const csrfToken = csrfResponse.data.token;
+
             const qrData = {
                 visitor_name: visitorInfo.name,
                 document_id: visitorInfo.id_document,
@@ -72,13 +79,15 @@ export default function QRGenerator({ userId }) {
             }
 
             const response = await axios.post(
-                `${import.meta.env.VITE_API_URL}/api/qr-codes`,
+                `${API_URL}/api/qr-codes`,
                 qrData,
                 {
                     headers: {
                         "Content-Type": "application/json",
                         "X-Requested-With": "XMLHttpRequest",
+                        "X-CSRF-TOKEN": csrfToken,
                     },
+                    withCredentials: true, // Importante para cookies de sesión
                 }
             );
 
@@ -87,7 +96,9 @@ export default function QRGenerator({ userId }) {
             toast.success("QR guardado correctamente");
         } catch (error) {
             console.error("Error saving QR:", error);
-            if (error.response?.data?.errors) {
+            if (error.response?.status === 401) {
+                toast.error("No estás autenticado. Por favor, inicia sesión.");
+            } else if (error.response?.data?.errors) {
                 const errorMessages = Object.values(
                     error.response.data.errors
                 ).flat();

@@ -20,7 +20,8 @@
         "tightenco/ziggy": "^2.0",
         "ext-intl": "*",
         "ext-zip": "*",
-        "ext-bcmath": "*"
+        "ext-bcmath": "*",
+        "openspout/openspout": "^4.22"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",

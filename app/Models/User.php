@@ -4,12 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable; // Importar el trait Notifiable
+use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
 
-class User extends Authenticatable
+class User extends Authenticatable implements FilamentUser
 {
-    use HasApiTokens, HasFactory, Notifiable; // Añadir el trait Notifiable
+    use HasApiTokens, HasFactory, Notifiable;
 
     const ROLE_ADMIN = 'ADMIN';
     const ROLE_EDITOR = 'EDITOR';
@@ -29,6 +31,15 @@ class User extends Authenticatable
             self::ROLE_EDITOR => route('home'),
             default => route('home'),
         };
+    }
+
+    /**
+     * Determina si el usuario puede acceder al panel de Filament
+     */
+    public function canAccessPanel(Panel $panel): bool
+    {
+        // Permitir acceso si tiene rol de administrador, portero o admin residencial
+        return in_array($this->rol, ['administrador', 'adminresidencial', 'portero']);
     }
 
     /**

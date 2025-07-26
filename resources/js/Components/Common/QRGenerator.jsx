@@ -71,12 +71,16 @@ export default function QRGenerator({ userId }) {
                 ).toISOString();
             }
 
-            const response = await axios.post("/api/qr-codes", qrData, {
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-Requested-With": "XMLHttpRequest",
-                },
-            });
+            const response = await axios.post(
+                `${import.meta.env.VITE_API_URL}/api/qr-codes`,
+                qrData,
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-Requested-With": "XMLHttpRequest",
+                    },
+                }
+            );
 
             setSavedQrData(response.data.qr_code);
             setIsQrSaved(true);

@@ -13,14 +13,17 @@ export default function QRDashboard({ userId }) {
 
     const fetchQrCodes = async () => {
         try {
-            const response = await fetch("/api/user/qr-codes", {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-Requested-With": "XMLHttpRequest",
-                },
-                credentials: "same-origin",
-            });
+            const response = await fetch(
+                `${import.meta.env.VITE_API_URL}/api/user/qr-codes`,
+                {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-Requested-With": "XMLHttpRequest",
+                    },
+                    credentials: "same-origin",
+                }
+            );
 
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
@@ -54,7 +57,9 @@ export default function QRDashboard({ userId }) {
         // Si aún no hay token, intentar obtenerlo del endpoint
         if (!metaToken) {
             try {
-                const response = await fetch("/csrf-token");
+                const response = await fetch(
+                    `${import.meta.env.VITE_API_URL}/csrf-token`
+                );
                 if (response.ok) {
                     const data = await response.json();
                     return data.token;
@@ -80,14 +85,19 @@ export default function QRDashboard({ userId }) {
 
     const handleDeactivate = async (qrId) => {
         try {
-            const response = await fetch(`/api/qr-codes/${qrId}/deactivate`, {
-                method: "PATCH",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-Requested-With": "XMLHttpRequest",
-                },
-                credentials: "same-origin",
-            });
+            const response = await fetch(
+                `${
+                    import.meta.env.VITE_API_URL
+                }/api/qr-codes/${qrId}/deactivate`,
+                {
+                    method: "PATCH",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-Requested-With": "XMLHttpRequest",
+                    },
+                    credentials: "same-origin",
+                }
+            );
 
             if (!response.ok) {
                 const errorData = await response.json();
@@ -116,14 +126,19 @@ export default function QRDashboard({ userId }) {
 
     const handleReactivate = async (qrId) => {
         try {
-            const response = await fetch(`/api/qr-codes/${qrId}/reactivate`, {
-                method: "PATCH",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-Requested-With": "XMLHttpRequest",
-                },
-                credentials: "same-origin",
-            });
+            const response = await fetch(
+                `${
+                    import.meta.env.VITE_API_URL
+                }/api/qr-codes/${qrId}/reactivate`,
+                {
+                    method: "PATCH",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-Requested-With": "XMLHttpRequest",
+                    },
+                    credentials: "same-origin",
+                }
+            );
 
             if (!response.ok) {
                 const errorData = await response.json();

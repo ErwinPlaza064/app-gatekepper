@@ -95,7 +95,7 @@ export default function QRScanner({ onScanSuccess }) {
                         };
 
                         const response = await axios.post(
-                            "http://127.0.0.1:8000/api/scan-qr",
+                            `${import.meta.env.VITE_API_URL}/api/scan-qr`,
                             formattedData
                         );
 
@@ -181,7 +181,7 @@ export default function QRScanner({ onScanSuccess }) {
                 };
 
                 const response = await axios.post(
-                    "http://127.0.0.1:8000/api/scan-qr",
+                    `${import.meta.env.VITE_API_URL}/api/scan-qr`,
                     formattedData
                 );
 

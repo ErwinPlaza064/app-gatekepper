@@ -18,18 +18,21 @@ export default function VisitorHistory({ userId }) {
     const fetchVisitors = async () => {
         try {
             const params = new URLSearchParams(filters);
-            const response = await fetch(`/api/user/visitors?${params}`, {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-Requested-With": "XMLHttpRequest",
-                    "X-CSRF-TOKEN":
-                        document
-                            .querySelector('meta[name="csrf-token"]')
-                            ?.getAttribute("content") || "",
-                },
-                credentials: "same-origin",
-            });
+            const response = await fetch(
+                `${import.meta.env.VITE_API_URL}/api/user/visitors?${params}`,
+                {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-Requested-With": "XMLHttpRequest",
+                        "X-CSRF-TOKEN":
+                            document
+                                .querySelector('meta[name="csrf-token"]')
+                                ?.getAttribute("content") || "",
+                    },
+                    credentials: "same-origin",
+                }
+            );
 
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);

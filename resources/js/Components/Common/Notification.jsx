@@ -25,7 +25,9 @@ export default function Notification({ notifications, setNotifications }) {
 
     const markAllAsRead = async () => {
         try {
-            await axios.post("/notifications/mark-all-read");
+            await axios.post(
+                `${import.meta.env.VITE_API_URL}/notifications/mark-all-read`
+            );
             setNotifications((prev) =>
                 prev.map((n) => ({
                     ...n,

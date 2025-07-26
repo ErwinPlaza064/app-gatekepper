@@ -12,6 +12,7 @@
         "ext-bcmath": "*",
         "ext-intl": "*",
         "ext-zip": "*",
+        "ext-pdo_mysql": "*",
         "beyondcode/laravel-websockets": "*",
         "filament/filament": "3.2",
         "guzzlehttp/guzzle": "^7.2",

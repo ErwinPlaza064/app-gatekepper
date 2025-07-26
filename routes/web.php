@@ -14,6 +14,13 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Artisan;
 
 
+Route::get('/check-auth', function () {
+    if (Auth::check()) {
+        $user = Auth::user();
+        return "Autenticado: {$user->email}, Rol: {$user->rol}";
+    }
+    return 'No autenticado';
+});
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [

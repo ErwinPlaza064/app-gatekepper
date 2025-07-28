@@ -77,7 +77,7 @@ export default function MobileNav({ showingNavigationDropdown, userSession }) {
                         })}
 
                         <Link
-                            className="block px-4 py-2 rounded-md hover:bg-gray-100"
+                            className="block px-4 py-2 text-white bg-black rounded-md hover:bg-gray-100"
                             href={route("login")}
                         >
                             Ingresa

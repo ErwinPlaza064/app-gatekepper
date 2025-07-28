@@ -96,6 +96,12 @@ export default function Login({ status }) {
                                 Recuérdame
                             </span>
                         </label>
+                        <Link
+                            href="/welcome"
+                            className="ml-2 text-sm text-gray-600"
+                        >
+                            Volver a inicio{" "}
+                        </Link>
                     </div>
 
                     <div className="flex flex-col items-center justify-end mt-4 md:flex-row">

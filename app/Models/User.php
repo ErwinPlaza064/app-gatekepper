@@ -47,11 +47,13 @@ class User extends Authenticatable implements FilamentUser
      *
      * @var array<int, string>
      */
-    protected $fillable = [
+     protected $fillable = [
         'name',
         'email',
         'password',
         'address',
+        'phone',
+        'whatsapp_notifications',
         'rol',
         'remember_token',
     ];
@@ -78,5 +80,6 @@ class User extends Authenticatable implements FilamentUser
     protected $casts = [
         'email_verified_at' => 'datetime',
         'remember_token' => 'string',
+        'whatsapp_notifications' => 'boolean',
     ];
 }

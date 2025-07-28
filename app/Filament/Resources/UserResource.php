@@ -14,7 +14,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
-
 class UserResource extends Resource
 {
     public static function getModelLabel(): string
@@ -42,6 +41,7 @@ class UserResource extends Resource
         $user = auth()->user();
         return in_array($user?->rol, ['administrador', 'adminresidencial']);
     }
+
     public static function canCreate(): bool
     {
         $user = auth()->user();
@@ -65,6 +65,18 @@ class UserResource extends Resource
                     ->label('Dirección')
                     ->required(),
 
+                Forms\Components\TextInput::make('phone')
+                    ->label('Teléfono WhatsApp')
+                    ->tel()
+                    ->placeholder('+521234567890')
+                    ->helperText('Formato: +521234567890 (incluir código de país para México)')
+                    ->rule('regex:/^\+52[0-9]{10}$/'),
+
+                Forms\Components\Toggle::make('whatsapp_notifications')
+                    ->label('Recibir notificaciones por WhatsApp')
+                    ->default(true)
+                    ->helperText('Si está habilitado, recibirá notificaciones de visitantes por WhatsApp'),
+
                 Forms\Components\TextInput::make('password')
                     ->label('Contraseña')
                     ->password()
@@ -87,6 +99,14 @@ class UserResource extends Resource
                 Tables\Columns\TextColumn::make('email')
                     ->label('Correo Electrónico')
                     ->searchable(),
+                Tables\Columns\TextColumn::make('phone')
+                    ->label('Teléfono WhatsApp')
+                    ->placeholder('Sin teléfono')
+                    ->searchable(),
+                Tables\Columns\IconColumn::make('whatsapp_notifications')
+                    ->label('WhatsApp')
+                    ->boolean()
+                    ->tooltip('Notificaciones WhatsApp habilitadas'),
                 Tables\Columns\TextColumn::make('address')
                     ->label('Dirección')
                     ->searchable(),

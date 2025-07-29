@@ -1,11 +1,11 @@
 <?php
 
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class QrCode extends Model
 {
@@ -79,6 +79,23 @@ class QrCode extends Model
     {
         $this->increment('current_uses');
 
+        // 📱 NUEVO: Enviar WhatsApp cuando se use el QR
+        if ($this->user && $this->user->phone && $this->user->whatsapp_notifications) {
+            \App\Jobs\EnviarWhatsAppJob::dispatch(
+                $this->user->phone,
+                'qr_usado',
+                ['qr_code' => $this]
+            );
+
+            Log::info('WhatsApp QR usado programado para envío', [
+                'usuario' => $this->user->name,
+                'telefono' => $this->user->phone,
+                'qr_id' => $this->qr_id,
+                'visitor_name' => $this->visitor_name
+            ]);
+        }
+
+        // Desactivar si es de uso único
         if ($this->qr_type === 'single_use') {
             $this->update(['is_active' => false]);
         }

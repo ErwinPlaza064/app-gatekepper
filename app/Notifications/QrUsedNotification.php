@@ -24,24 +24,9 @@ class QrUsedNotification extends Notification implements ShouldQueue
 
     public function via($notifiable)
     {
-    $channels = ['mail', 'database'];
-
-    if ($notifiable->phone && $notifiable->whatsapp_notifications) {
-        $channels[] = 'whatsapp';
+    return ['mail', 'database'];
     }
 
-    return $channels;
-    }
-
-    public function toWhatsApp($notifiable)
-    {
-    EnviarWhatsAppJob::dispatch(
-        $notifiable->phone,
-        'qr_usado',
-        ['qr_code' => $this->qrCode]
-    );
-    return true;
-    }
 
     public function toMail($notifiable)
     {

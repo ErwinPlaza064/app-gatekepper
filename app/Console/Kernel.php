@@ -21,11 +21,11 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        $schedule->command('qr:notify-expiring --hours=2')
+        $schedule->command('app:notify-expiring-qr-codes --hours=2') // ✅ CORREGIDO
                  ->hourly()
                  ->withoutOverlapping();
 
-        $schedule->command('qr:notify-expiring --hours=24')
+        $schedule->command('app:notify-expiring-qr-codes --hours=24') // ✅ CORREGIDO
                  ->dailyAt('09:00')
                  ->withoutOverlapping();
     }

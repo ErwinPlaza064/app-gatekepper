@@ -22,6 +22,15 @@ Route::get('/check-auth', function () {
     return 'No autenticado';
 });
 
+Route::get('/test-whatsapp', function() {
+    $whatsapp = new \App\Services\WhatsAppService();
+
+    // CAMBIA ESTE NÚMERO POR TU NÚMERO DE TELÉFONO
+    $resultado = $whatsapp->enviarMensaje('+524641226304', '🎉 ¡Prueba de WhatsApp desde Gatekeeper! 🎉');
+
+    return response()->json($resultado);
+});
+
 Route::get('/', function () {
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),

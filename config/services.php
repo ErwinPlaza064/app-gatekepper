@@ -40,5 +40,9 @@ return [
         'token' => env('TWILIO_TOKEN'),
         'whatsapp_from' => env('TWILIO_WHATSAPP_FROM', 'whatsapp:+14155238886'),
     ],
-
+    'maytapi' => [
+    'api_key' => env('MAYTAPI_API_KEY'),
+    'product_id' => env('MAYTAPI_PRODUCT_ID'),
+    'phone_id' => env('MAYTAPI_PHONE_ID'),
+    ],
 ];

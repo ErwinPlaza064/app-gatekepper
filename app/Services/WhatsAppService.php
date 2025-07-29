@@ -3,25 +3,26 @@
 
 namespace App\Services;
 
-use Twilio\Rest\Client;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class WhatsAppService
 {
-    private $twilio;
-    private $from;
+    private $apiKey;
+    private $productId;
+    private $phoneId;
+    private $baseUrl;
 
     public function __construct()
     {
-        $this->twilio = new Client(
-            config('services.twilio.sid'),
-            config('services.twilio.token')
-        );
-        $this->from = config('services.twilio.whatsapp_from');
+        $this->apiKey = config('services.maytapi.api_key');
+        $this->productId = config('services.maytapi.product_id');
+        $this->phoneId = config('services.maytapi.phone_id');
+        $this->baseUrl = 'https://api.maytapi.com/api';
     }
 
     /**
-     * Enviar mensaje de WhatsApp
+     * Enviar mensaje de WhatsApp usando Maytapi
      */
     public function enviarMensaje($numero, $mensaje)
     {
@@ -29,25 +30,39 @@ class WhatsAppService
             // Formatear número para WhatsApp
             $numeroFormateado = $this->formatearNumero($numero);
 
-            $message = $this->twilio->messages->create(
-                "whatsapp:{$numeroFormateado}",
-                [
-                    'from' => $this->from,
-                    'body' => $mensaje
-                ]
-            );
-
-            Log::info("WhatsApp enviado exitosamente", [
-                'sid' => $message->sid,
-                'numero' => $numeroFormateado,
-                'mensaje' => substr($mensaje, 0, 50) . '...'
+            $response = Http::withHeaders([
+                'x-maytapi-key' => $this->apiKey
+            ])->post("{$this->baseUrl}/{$this->productId}/{$this->phoneId}/sendMessage", [
+                'to_number' => $numeroFormateado,
+                'type' => 'text',
+                'message' => $mensaje
             ]);
 
-            return [
-                'success' => true,
-                'sid' => $message->sid,
-                'mensaje' => 'Mensaje enviado correctamente'
-            ];
+            if ($response->successful()) {
+                $data = $response->json();
+
+                Log::info("WhatsApp enviado exitosamente", [
+                    'numero' => $numeroFormateado,
+                    'mensaje' => substr($mensaje, 0, 50) . '...',
+                    'response' => $data
+                ]);
+
+                return [
+                    'success' => true,
+                    'data' => $data,
+                    'mensaje' => 'Mensaje enviado correctamente'
+                ];
+            } else {
+                Log::error("Error en respuesta de Maytapi", [
+                    'status' => $response->status(),
+                    'response' => $response->body()
+                ]);
+
+                return [
+                    'success' => false,
+                    'error' => 'Error en la API: ' . $response->body()
+                ];
+            }
 
         } catch (\Exception $e) {
             Log::error("Error enviando WhatsApp", [
@@ -63,7 +78,7 @@ class WhatsAppService
     }
 
     /**
-     * Notificación de nuevo visitante
+     * Notificación de nuevo visitante (igual que tu versión actual)
      */
     public function nuevoVisitante($numero, $visitante)
     {
@@ -88,7 +103,7 @@ class WhatsAppService
     }
 
     /**
-     * Notificación de QR usado
+     * Notificación de QR usado (igual que tu versión)
      */
     public function qrUsado($numero, $qrCode)
     {

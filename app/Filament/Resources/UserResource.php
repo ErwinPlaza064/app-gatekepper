@@ -68,9 +68,7 @@ class UserResource extends Resource
                 Forms\Components\TextInput::make('phone')
                     ->label('Teléfono WhatsApp')
                     ->tel()
-                    ->placeholder('+521234567890')
-                    ->helperText('Formato: +521234567890 (incluir código de país para México)')
-                    ->rule('regex:/^\+52[0-9]{10}$/'),
+                    ->placeholder('4641123632'),
 
                 Forms\Components\Toggle::make('whatsapp_notifications')
                     ->label('Recibir notificaciones por WhatsApp')

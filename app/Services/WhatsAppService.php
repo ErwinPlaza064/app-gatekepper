@@ -82,7 +82,7 @@ class WhatsAppService
      */
     public function nuevoVisitante($numero, $visitante)
     {
-        $mensaje = "🏠 *Nuevo Visitante* 🏠\n\n" .
+        $mensaje = "🏠 *Nuevo Visitante para tu domicilio* 🏠\n\n" .
                   "👤 Visitante: {$visitante->name}\n" .
                   "🆔 Documento: {$visitante->id_document}\n" .
                   "🕐 Hora de entrada: " . $visitante->entry_time->format('H:i d/m/Y') . "\n";

@@ -97,8 +97,6 @@ class WhatsAppService
             $mensaje .= "📱 Acceso: Manual\n";
         }
 
-        $mensaje .= "\n🏘️ Sistema: Gatekeeper";
-
         return $this->enviarMensaje($numero, $mensaje);
     }
 

@@ -6,6 +6,8 @@ use Illuminate\Console\Command;
 use App\Models\QrCode;
 use App\Notifications\QrExpiringNotification;
 use Carbon\Carbon;
+use App\Jobs\EnviarWhatsAppJob;
+
 
 class NotifyExpiringQrCodes extends Command
 {
@@ -47,6 +49,18 @@ class NotifyExpiringQrCodes extends Command
             } catch (\Exception $e) {
                 $this->error("Error enviando notificación para QR {$qrCode->qr_id}: {$e->getMessage()}");
             }
+            if ($qrCode->user->phone && $qrCode->user->whatsapp_notifications) {
+            $horasRestantes = Carbon::now()->diffInHours($qrCode->valid_until);
+
+            EnviarWhatsAppJob::dispatch(
+                $qrCode->user->phone,
+                'qr_por_expirar',
+                [
+                    'qr_code' => $qrCode,
+                    'horas_restantes' => $horasRestantes
+                ]
+            );
+        }
         }
 
         $this->info('Proceso completado');

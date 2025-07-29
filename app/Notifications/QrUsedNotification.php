@@ -7,6 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use App\Models\QrCode;
+use App\Jobs\EnviarWhatsAppJob;
 
 class QrUsedNotification extends Notification implements ShouldQueue
 {
@@ -23,7 +24,23 @@ class QrUsedNotification extends Notification implements ShouldQueue
 
     public function via($notifiable)
     {
-        return ['mail', 'database'];
+    $channels = ['mail', 'database'];
+
+    if ($notifiable->phone && $notifiable->whatsapp_notifications) {
+        $channels[] = 'whatsapp';
+    }
+
+    return $channels;
+    }
+
+    public function toWhatsApp($notifiable)
+    {
+    EnviarWhatsAppJob::dispatch(
+        $notifiable->phone,
+        'qr_usado',
+        ['qr_code' => $this->qrCode]
+    );
+    return true;
     }
 
     public function toMail($notifiable)

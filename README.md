@@ -89,3 +89,21 @@ A continuación se documentan los endpoints clave del proyecto, útiles para la 
     }
 }
 ```
+
+## Herramientas y bibliotecas para visualización
+
+Para la visualización de datos en este proyecto se eligieron las siguientes herramientas y bibliotecas:
+
+-   **Chart.js** y **react-chartjs-2**:  
+    Chart.js es una de las bibliotecas de gráficos más populares y flexibles para JavaScript, permitiendo crear gráficos interactivos y personalizables. Se utiliza junto con react-chartjs-2 para integrarse fácilmente en aplicaciones React, facilitando la creación de dashboards y reportes visuales de manera eficiente y con buen rendimiento.
+
+-   **Lucide React** y **react-icons**:  
+    Estas bibliotecas proporcionan iconografía moderna y personalizable, útil para enriquecer visualmente los dashboards y reportes, facilitando la interpretación de la información.
+
+La elección de estas herramientas se basa en su amplia documentación, comunidad activa, facilidad de integración con React y su capacidad para crear visualizaciones claras, responsivas y atractivas, lo que contribuye a una mejor experiencia de usuario y una presentación efectiva de datos.
+
+## Integración de APIs externas y autenticación segura
+
+El proyecto cumple con la integración de servicios propios y APIs externas mediante endpoints RESTful, protegidos con autenticación segura usando Laravel Sanctum. Esto permite gestionar el acceso a recursos sensibles a través de tokens y middleware, asegurando que solo usuarios autenticados puedan interactuar con las rutas protegidas (por ejemplo, `/api/notifications`, `/api/user`, y otras rutas bajo el middleware `auth:sanctum`).
+
+La elección de Sanctum se debe a su facilidad de integración con SPA y aplicaciones móviles, soporte para autenticación basada en tokens y su compatibilidad con Laravel, lo que garantiza una implementación robusta y segura de autenticación para APIs REST.

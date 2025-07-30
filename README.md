@@ -106,4 +106,14 @@ La elección de estas herramientas se basa en su amplia documentación, comunida
 
 El proyecto cumple con la integración de servicios propios y APIs externas mediante endpoints RESTful, protegidos con autenticación segura usando Laravel Sanctum. Esto permite gestionar el acceso a recursos sensibles a través de tokens y middleware, asegurando que solo usuarios autenticados puedan interactuar con las rutas protegidas (por ejemplo, `/api/notifications`, `/api/user`, y otras rutas bajo el middleware `auth:sanctum`).
 
-La elección de Sanctum se debe a su facilidad de integración con SPA y aplicaciones móviles, soporte para autenticación basada en tokens y su compatibilidad con Laravel, lo que garantiza una implementación robusta y segura de autenticación para APIs REST.
+## Principios de codificación segura
+
+El proyecto aplica principios de codificación segura en varios aspectos:
+
+-   **Validación de entradas:** Se utilizan Form Requests y validaciones en los controladores para asegurar que los datos recibidos cumplen con los requisitos esperados antes de ser procesados o almacenados (por ejemplo, en `ProfileUpdateRequest`, `LoginRequest`, y validaciones en endpoints de QR y visitantes).
+-   **Protección CSRF:** El middleware `VerifyCsrfToken` protege contra ataques de falsificación de solicitudes entre sitios, excluyendo solo rutas API específicas que requieren acceso externo controlado.
+-   **Manejo seguro de sesiones:** La configuración de sesiones en Laravel permite el uso de cookies seguras (`http_only`, `same_site`, y opción de forzar `secure` para HTTPS), y el cifrado de datos sensibles.
+-   **Uso de HTTPS:** El frontend fuerza el uso de HTTPS en todas las peticiones mediante configuración de Axios, asegurando la transmisión cifrada de datos.
+-   **Gestión de autenticación y tokens:** Se emplea Laravel Sanctum para la autenticación basada en tokens, restringiendo el acceso a rutas protegidas solo a usuarios autenticados.
+
+Estas prácticas contribuyen a la protección de los datos y la integridad de la aplicación frente a ataques comunes como inyección, XSS, CSRF y robo de sesiones.

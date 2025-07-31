@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Log;
 
 class QrCode extends Model
 {
@@ -14,6 +13,10 @@ class QrCode extends Model
     protected $fillable = [
         'qr_id',
         'user_id',
+        'visitor_profile_id', // NUEVO
+        'vehicle_id', // NUEVO
+        'qr_type_id', // NUEVO
+        // Mantener campos antiguos por compatibilidad
         'visitor_name',
         'document_id',
         'vehicle_plate',
@@ -31,6 +34,23 @@ class QrCode extends Model
         'is_active' => 'boolean'
     ];
 
+    // Relaciones nuevas
+    public function visitorProfile()
+    {
+        return $this->belongsTo(VisitorProfile::class);
+    }
+
+    public function vehicle()
+    {
+        return $this->belongsTo(Vehicle::class);
+    }
+
+    public function qrType()
+    {
+        return $this->belongsTo(QrType::class);
+    }
+
+    // Relaciones existentes
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -41,6 +61,12 @@ class QrCode extends Model
         return $this->hasMany(Visitor::class, 'qr_code_id');
     }
 
+    public function visitLogs()
+    {
+        return $this->hasMany(VisitLog::class);
+    }
+
+    // Métodos existentes (mantener compatibilidad)
     public function isValid(): bool
     {
         if (!$this->is_active) {
@@ -58,46 +84,19 @@ class QrCode extends Model
         return true;
     }
 
-    public function canBeUsed(): array
+    // Accessor para compatibilidad con código existente
+    public function getVisitorNameAttribute($value)
     {
-        if (!$this->is_active) {
-            return ['valid' => false, 'message' => 'El código QR ha sido desactivado'];
-        }
-
-        if ($this->valid_until && Carbon::now()->isAfter($this->valid_until)) {
-            return ['valid' => false, 'message' => 'El código QR ha expirado'];
-        }
-
-        if ($this->current_uses >= $this->max_uses) {
-            return ['valid' => false, 'message' => 'El código QR ha alcanzado el límite de usos'];
-        }
-
-        return ['valid' => true, 'message' => 'Código QR válido'];
+        return $value ?? $this->visitorProfile?->name;
     }
 
-    public function incrementUsage(): void
+    public function getDocumentIdAttribute($value)
     {
-        $this->increment('current_uses');
+        return $value ?? $this->visitorProfile?->documentType?->code;
+    }
 
-        // 📱 NUEVO: Enviar WhatsApp cuando se use el QR
-        if ($this->user && $this->user->phone && $this->user->whatsapp_notifications) {
-            \App\Jobs\EnviarWhatsAppJob::dispatch(
-                $this->user->phone,
-                'qr_usado',
-                ['qr_code' => $this]
-            );
-
-            Log::info('WhatsApp QR usado programado para envío', [
-                'usuario' => $this->user->name,
-                'telefono' => $this->user->phone,
-                'qr_id' => $this->qr_id,
-                'visitor_name' => $this->visitor_name
-            ]);
-        }
-
-        // Desactivar si es de uso único
-        if ($this->qr_type === 'single_use') {
-            $this->update(['is_active' => false]);
-        }
+    public function getVehiclePlateAttribute($value)
+    {
+        return $value ?? $this->vehicle?->plate;
     }
 }

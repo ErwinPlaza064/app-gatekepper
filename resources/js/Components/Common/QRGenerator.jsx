@@ -41,7 +41,6 @@ export default function QRGenerator({ userId }) {
                 import.meta.env.VITE_API_URL ||
                 "https://app-gatekepper-production.up.railway.app";
 
-            // Forzar HTTPS si la URL usa HTTP
             if (API_URL.startsWith("http://")) {
                 API_URL = API_URL.replace("http://", "https://");
             }
@@ -389,7 +388,7 @@ export default function QRGenerator({ userId }) {
                             !visitorInfo.id_document ||
                             isSaving
                         }
-                        className={`w-full px-4 py-3 text-white font-medium rounded transition duration-200 ${
+                        className={`w-full px-4 mx-auto py-3 text-white font-medium rounded transition duration-200 ${
                             !visitorInfo.name ||
                             !visitorInfo.id_document ||
                             isSaving

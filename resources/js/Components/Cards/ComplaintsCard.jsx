@@ -53,7 +53,7 @@ export default function ComplaintsCard() {
                 <button
                     type="submit"
                     disabled={processing}
-                    className="px-3 py-1 mt-1 text-sm text-white transition-all duration-300 ease-in-out bg-black rounded hover:bg-blue-700"
+                    className="w-full py-2 mx-auto mt-1 text-sm text-white transition-all duration-300 ease-in-out bg-black rounded-lg hover:bg-blue-700"
                 >
                     Enviar Queja
                 </button>

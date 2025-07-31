@@ -55,9 +55,6 @@ export default function Hero() {
                         Contáctanos ahora
                         <ChevronRight className="w-5 h-5 ml-2 transition-transform group-hover:translate-x-1" />
                     </Link>
-                    <button className="inline-flex items-center px-8 py-4 font-semibold transition-all duration-300 bg-gray-800 border-2 border-gray-300 text-wite rounded-xl hover:border-blue-600 hover:text-blue-600">
-                        Ver demo
-                    </button>
                 </div>
             </div>
         </div>

@@ -43,10 +43,7 @@ export default function Footer() {
                 </div>
                 <div className="pt-8 mt-12 border-t border-gray-700">
                     <div className="text-center text-gray-400">
-                        <p>
-                            © 2025 Registrador de visitantes. Todos los derechos
-                            reservados.
-                        </p>
+                        <p>© 2025 Gatekepper. Todos los derechos reservados.</p>
                     </div>
                 </div>
             </div>

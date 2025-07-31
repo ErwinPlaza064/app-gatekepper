@@ -16,7 +16,7 @@ export default function DesktopNav({
                 <div className="flex gap-8">
                     <div className="flex items-center shrink-0">
                         <Link href="/">
-                            <strong>Registrador</strong>
+                            <strong>Gatekepper</strong>
                         </Link>
                     </div>
 
@@ -85,7 +85,7 @@ export default function DesktopNav({
                             </Dropdown>
                         ) : (
                             <Link
-                                className="px-6 py-2 text-white transition-all duration-300 ease-in-out bg-black rounded-xl hover:bg-gray-700"
+                                className="px-6 py-2 text-white transition-all duration-300 ease-in-out bg-black rounded-xl hover:bg-gray-700 "
                                 href={"/login"}
                             >
                                 Ingresa

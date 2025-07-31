@@ -197,6 +197,41 @@ export default function QRDashboard({ userId }) {
         }
     };
 
+    // Función para obtener las clases de fondo según el estado
+    const getCardBackgroundClasses = (status) => {
+        const backgrounds = {
+            active: "bg-green-50 border-green-200 hover:bg-green-100",
+            expired: "bg-red-50 border-red-200 hover:bg-red-100",
+            exhausted: "bg-orange-50 border-orange-200 hover:bg-orange-100",
+            inactive: "bg-gray-50 border-gray-200 hover:bg-gray-100",
+        };
+        return (
+            backgrounds[status] || "bg-white border-gray-200 hover:bg-gray-50"
+        );
+    };
+
+    // Función para obtener las clases de texto según el estado
+    const getTextClasses = (status) => {
+        const textColors = {
+            active: "text-green-900",
+            expired: "text-red-900",
+            exhausted: "text-orange-900",
+            inactive: "text-gray-900",
+        };
+        return textColors[status] || "text-gray-900";
+    };
+
+    // Función para obtener las clases de texto secundario según el estado
+    const getSecondaryTextClasses = (status) => {
+        const textColors = {
+            active: "text-green-700",
+            expired: "text-red-700",
+            exhausted: "text-orange-700",
+            inactive: "text-gray-600",
+        };
+        return textColors[status] || "text-gray-600";
+    };
+
     const getStatusBadge = (status) => {
         const styles = {
             active: "bg-green-100 text-green-800",
@@ -264,14 +299,24 @@ export default function QRDashboard({ userId }) {
                     {qrCodes.map((qr) => (
                         <div
                             key={qr.id}
-                            className="p-4 transition-colors border border-gray-200 rounded-lg hover:bg-gray-50"
+                            className={`p-4 transition-colors border rounded-lg ${getCardBackgroundClasses(
+                                qr.status
+                            )}`}
                         >
                             <div className="flex items-start justify-between mb-3">
                                 <div className="flex-1">
-                                    <h5 className="font-medium text-gray-900">
+                                    <h5
+                                        className={`font-medium ${getTextClasses(
+                                            qr.status
+                                        )}`}
+                                    >
                                         {qr.visitor_name}
                                     </h5>
-                                    <p className="text-sm text-gray-600">
+                                    <p
+                                        className={`text-sm ${getSecondaryTextClasses(
+                                            qr.status
+                                        )}`}
+                                    >
                                         Doc: {qr.document_id} | Placa:{" "}
                                         {qr.vehicle_plate || "N/A"}
                                     </p>
@@ -283,23 +328,51 @@ export default function QRDashboard({ userId }) {
 
                             <div className="grid grid-cols-2 gap-4 mb-3 text-sm md:grid-cols-4">
                                 <div>
-                                    <span className="text-gray-500">Tipo:</span>
-                                    <p className="font-medium">
+                                    <span
+                                        className={getSecondaryTextClasses(
+                                            qr.status
+                                        )}
+                                    >
+                                        Tipo:
+                                    </span>
+                                    <p
+                                        className={`font-medium ${getTextClasses(
+                                            qr.status
+                                        )}`}
+                                    >
                                         {getTypeLabel(qr.qr_type)}
                                     </p>
                                 </div>
                                 <div>
-                                    <span className="text-gray-500">Usos:</span>
-                                    <p className="font-medium">
+                                    <span
+                                        className={getSecondaryTextClasses(
+                                            qr.status
+                                        )}
+                                    >
+                                        Usos:
+                                    </span>
+                                    <p
+                                        className={`font-medium ${getTextClasses(
+                                            qr.status
+                                        )}`}
+                                    >
                                         {qr.current_uses}/{qr.max_uses}
                                     </p>
                                 </div>
                                 {qr.valid_until && (
                                     <div>
-                                        <span className="text-gray-500">
+                                        <span
+                                            className={getSecondaryTextClasses(
+                                                qr.status
+                                            )}
+                                        >
                                             Expira:
                                         </span>
-                                        <p className="font-medium">
+                                        <p
+                                            className={`font-medium ${getTextClasses(
+                                                qr.status
+                                            )}`}
+                                        >
                                             {new Date(
                                                 qr.valid_until
                                             ).toLocaleDateString()}
@@ -308,18 +381,42 @@ export default function QRDashboard({ userId }) {
                                 )}
                                 {qr.time_remaining && (
                                     <div>
-                                        <span className="text-gray-500">
+                                        <span
+                                            className={getSecondaryTextClasses(
+                                                qr.status
+                                            )}
+                                        >
                                             Tiempo restante:
                                         </span>
-                                        <p className="font-medium text-blue-600">
+                                        <p
+                                            className={`font-medium ${
+                                                qr.status === "active"
+                                                    ? "text-blue-600"
+                                                    : getTextClasses(qr.status)
+                                            }`}
+                                        >
                                             {qr.time_remaining.human}
                                         </p>
                                     </div>
                                 )}
                             </div>
 
-                            <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-                                <span className="text-xs text-gray-500">
+                            <div
+                                className={`flex items-center justify-between pt-3 border-t ${
+                                    qr.status === "expired"
+                                        ? "border-red-200"
+                                        : qr.status === "active"
+                                        ? "border-green-200"
+                                        : qr.status === "exhausted"
+                                        ? "border-orange-200"
+                                        : "border-gray-200"
+                                }`}
+                            >
+                                <span
+                                    className={`text-xs ${getSecondaryTextClasses(
+                                        qr.status
+                                    )}`}
+                                >
                                     Creado:{" "}
                                     {new Date(
                                         qr.created_at

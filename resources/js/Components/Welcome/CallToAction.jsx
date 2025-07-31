@@ -29,7 +29,7 @@ export default function CallToAction() {
                         </Link>
                         <div className="flex items-center space-x-2 text-gray-600">
                             <Phone className="w-5 h-5" />
-                            <span className="font-medium">464-112-3632</span>
+                            <span className="font-medium">464-122-6304</span>
                         </div>
                     </div>
                 </div>

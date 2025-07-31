@@ -156,7 +156,7 @@ export default function Contact({ auth }) {
                                     <div className="pt-4">
                                         <button
                                             type="submit"
-                                            className="w-full bg-black hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-blue-300"
+                                            className="w-full mx-auto bg-black hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-blue-300"
                                         >
                                             <span className="flex items-center justify-center">
                                                 Enviar Mensaje

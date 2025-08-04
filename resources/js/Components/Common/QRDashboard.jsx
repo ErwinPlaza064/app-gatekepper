@@ -2,6 +2,19 @@ import { useState, useEffect } from "react";
 import { router } from "@inertiajs/react";
 import Typography from "@/Components/UI/Typography";
 import { toast } from "react-hot-toast";
+import {
+    FaQrcode,
+    FaUser,
+    FaIdCard,
+    FaCar,
+    FaClock,
+    FaCheck,
+    FaTimes,
+    FaRedo,
+    FaBullseye,
+    FaRedoAlt,
+    FaCalendarAlt,
+} from "react-icons/fa";
 
 export default function QRDashboard({ userId }) {
     const [qrCodes, setQrCodes] = useState([]);
@@ -200,44 +213,51 @@ export default function QRDashboard({ userId }) {
     // Función para obtener las clases de fondo según el estado
     const getCardBackgroundClasses = (status) => {
         const backgrounds = {
-            active: "bg-green-50 border-green-200 hover:bg-green-100",
-            expired: "bg-red-50 border-red-200 hover:bg-red-100",
-            exhausted: "bg-orange-50 border-orange-200 hover:bg-orange-100",
-            inactive: "bg-gray-50 border-gray-200 hover:bg-gray-100",
+            active: "bg-green-50/80 dark:bg-green-900/20 border-green-200/50 dark:border-green-700/50 hover:bg-green-100/80 dark:hover:bg-green-900/30",
+            expired:
+                "bg-red-50/80 dark:bg-red-900/20 border-red-200/50 dark:border-red-700/50 hover:bg-red-100/80 dark:hover:bg-red-900/30",
+            exhausted:
+                "bg-orange-50/80 dark:bg-orange-900/20 border-orange-200/50 dark:border-orange-700/50 hover:bg-orange-100/80 dark:hover:bg-orange-900/30",
+            inactive:
+                "bg-gray-50/80 dark:bg-gray-800/50 border-gray-200/50 dark:border-gray-700/50 hover:bg-gray-100/80 dark:hover:bg-gray-800/70",
         };
         return (
-            backgrounds[status] || "bg-white border-gray-200 hover:bg-gray-50"
+            backgrounds[status] ||
+            "bg-white/80 dark:bg-gray-800/80 border-gray-200/50 dark:border-gray-700/50 hover:bg-gray-50/80 dark:hover:bg-gray-700/80"
         );
     };
 
     // Función para obtener las clases de texto según el estado
     const getTextClasses = (status) => {
         const textColors = {
-            active: "text-green-900",
-            expired: "text-red-900",
-            exhausted: "text-orange-900",
-            inactive: "text-gray-900",
+            active: "text-green-900 dark:text-green-100",
+            expired: "text-red-900 dark:text-red-100",
+            exhausted: "text-orange-900 dark:text-orange-100",
+            inactive: "text-gray-900 dark:text-gray-100",
         };
-        return textColors[status] || "text-gray-900";
+        return textColors[status] || "text-gray-900 dark:text-gray-100";
     };
 
     // Función para obtener las clases de texto secundario según el estado
     const getSecondaryTextClasses = (status) => {
         const textColors = {
-            active: "text-green-700",
-            expired: "text-red-700",
-            exhausted: "text-orange-700",
-            inactive: "text-gray-600",
+            active: "text-green-700 dark:text-green-300",
+            expired: "text-red-700 dark:text-red-300",
+            exhausted: "text-orange-700 dark:text-orange-300",
+            inactive: "text-gray-600 dark:text-gray-400",
         };
-        return textColors[status] || "text-gray-600";
+        return textColors[status] || "text-gray-600 dark:text-gray-400";
     };
 
     const getStatusBadge = (status) => {
         const styles = {
-            active: "bg-green-100 text-green-800",
-            expired: "bg-red-100 text-red-800",
-            exhausted: "bg-orange-100 text-orange-800",
-            inactive: "bg-gray-100 text-gray-800",
+            active: "bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-200 border border-green-200 dark:border-green-700",
+            expired:
+                "bg-red-100 dark:bg-red-900/50 text-red-800 dark:text-red-200 border border-red-200 dark:border-red-700",
+            exhausted:
+                "bg-orange-100 dark:bg-orange-900/50 text-orange-800 dark:text-orange-200 border border-orange-200 dark:border-orange-700",
+            inactive:
+                "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-gray-700",
         };
 
         const labels = {
@@ -247,12 +267,42 @@ export default function QRDashboard({ userId }) {
             inactive: "Inactivo",
         };
 
+        const icons = {
+            active: <FaCheck className="w-3 h-3" />,
+            expired: <FaTimes className="w-3 h-3" />,
+            exhausted: <FaClock className="w-3 h-3" />,
+            inactive: <FaTimes className="w-3 h-3" />,
+        };
+
         return (
             <span
-                className={`px-2 py-1 text-xs font-medium rounded-full ${styles[status]}`}
+                className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl backdrop-blur-sm ${styles[status]}`}
             >
+                {icons[status]}
                 {labels[status]}
             </span>
+        );
+    };
+
+    const getTypeIcon = (type) => {
+        const icons = {
+            single_use: (
+                <FaBullseye className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+            ),
+            time_limited: (
+                <FaClock className="w-4 h-4 text-orange-600 dark:text-orange-400" />
+            ),
+            recurring: (
+                <FaRedoAlt className="w-4 h-4 text-green-600 dark:text-green-400" />
+            ),
+        };
+
+        return (
+            <div className="flex items-center justify-center w-8 h-8 bg-white/50 dark:bg-gray-800/50 rounded-xl backdrop-blur-sm">
+                {icons[type] || (
+                    <FaQrcode className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                )}
+            </div>
         );
     };
 
@@ -267,12 +317,35 @@ export default function QRDashboard({ userId }) {
 
     if (loading) {
         return (
-            <div className="p-5 bg-white rounded-lg shadow-md">
-                <div className="animate-pulse">
-                    <div className="h-4 mb-4 bg-gray-200 rounded"></div>
-                    <div className="space-y-3">
-                        <div className="h-16 bg-gray-200 rounded"></div>
-                        <div className="h-16 bg-gray-200 rounded"></div>
+            <div className="relative overflow-hidden border shadow-2xl bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl border-white/20 dark:border-gray-700/30">
+                <div className="relative px-8 py-6 overflow-hidden bg-gradient-to-br from-black via-gray-900 to-black">
+                    <div className="absolute inset-0 bg-black/20"></div>
+                    <div className="relative z-10 flex items-center gap-4">
+                        <div className="flex items-center justify-center w-12 h-12 bg-white/10 backdrop-blur-sm rounded-2xl">
+                            <FaQrcode className="w-6 h-6 text-white animate-pulse" />
+                        </div>
+                        <div>
+                            <Typography
+                                as="h4"
+                                variant="h4"
+                                className="text-2xl font-bold text-white drop-shadow-lg"
+                            >
+                                Mis Códigos QR
+                            </Typography>
+                            <p className="mt-1 text-sm text-white/80">
+                                Cargando tus códigos QR...
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div className="p-8">
+                    <div className="space-y-4 animate-pulse">
+                        {[1, 2, 3].map((i) => (
+                            <div
+                                key={i}
+                                className="h-24 bg-gray-200/50 dark:bg-gray-700/50 rounded-2xl backdrop-blur-sm"
+                            ></div>
+                        ))}
                     </div>
                 </div>
             </div>
@@ -280,178 +353,255 @@ export default function QRDashboard({ userId }) {
     }
 
     return (
-        <div className="p-5 bg-white rounded-lg shadow-md">
-            <Typography
-                as={"h4"}
-                variant={"h4"}
-                color={"black"}
-                className="mb-4 text-lg font-semibold"
-            >
-                Mis Códigos QR
-            </Typography>
-
-            {qrCodes.length === 0 ? (
-                <div className="py-8 text-center text-gray-500">
-                    <p>No has generado ningún código QR aún</p>
-                </div>
-            ) : (
-                <div className="space-y-4">
-                    {qrCodes.map((qr) => (
-                        <div
-                            key={qr.id}
-                            className={`p-4 transition-colors border rounded-lg ${getCardBackgroundClasses(
-                                qr.status
-                            )}`}
+        <div className="relative overflow-hidden border shadow-2xl bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl border-white/20 dark:border-gray-700/30">
+            {/* Header con gradiente negro */}
+            <div className="relative px-8 py-6 overflow-hidden bg-gradient-to-br from-black via-gray-900 to-black">
+                <div className="absolute inset-0 bg-black/20"></div>
+                <div className="relative z-10 flex items-center gap-4">
+                    <div className="flex items-center justify-center w-12 h-12 bg-white/10 backdrop-blur-sm rounded-2xl">
+                        <FaQrcode className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                        <Typography
+                            as="h4"
+                            variant="h4"
+                            className="text-2xl font-bold text-white drop-shadow-lg"
                         >
-                            <div className="flex items-start justify-between mb-3">
-                                <div className="flex-1">
-                                    <h5
-                                        className={`font-medium ${getTextClasses(
-                                            qr.status
-                                        )}`}
-                                    >
-                                        {qr.visitor_name}
-                                    </h5>
-                                    <p
-                                        className={`text-sm ${getSecondaryTextClasses(
-                                            qr.status
-                                        )}`}
-                                    >
-                                        Doc: {qr.document_id} | Placa:{" "}
-                                        {qr.vehicle_plate || "N/A"}
-                                    </p>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                    {getStatusBadge(qr.status)}
-                                </div>
-                            </div>
+                            Mis Códigos QR
+                        </Typography>
+                        <p className="mt-1 text-sm text-white/80">
+                            Gestiona todos tus códigos QR
+                        </p>
+                    </div>
+                </div>
+                <div className="absolute top-0 right-0 w-32 h-32 -mt-16 -mr-16 rounded-full bg-white/5"></div>
+                <div className="absolute bottom-0 left-0 w-24 h-24 -mb-12 -ml-12 rounded-full bg-white/10"></div>
+            </div>
 
-                            <div className="grid grid-cols-2 gap-4 mb-3 text-sm md:grid-cols-4">
-                                <div>
-                                    <span
-                                        className={getSecondaryTextClasses(
-                                            qr.status
-                                        )}
-                                    >
-                                        Tipo:
-                                    </span>
-                                    <p
-                                        className={`font-medium ${getTextClasses(
-                                            qr.status
-                                        )}`}
-                                    >
-                                        {getTypeLabel(qr.qr_type)}
-                                    </p>
+            {/* Contenido */}
+            <div className="p-8">
+                {qrCodes.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-16 text-center">
+                        <div className="flex items-center justify-center w-20 h-20 mb-6 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 rounded-3xl">
+                            <FaQrcode className="w-8 h-8 text-gray-400" />
+                        </div>
+                        <Typography
+                            as="p"
+                            variant="p"
+                            className="mb-2 text-lg font-medium text-gray-600 dark:text-gray-400"
+                        >
+                            Sin códigos QR
+                        </Typography>
+                        <Typography
+                            as="p"
+                            variant="p"
+                            className="text-sm text-gray-500 dark:text-gray-500"
+                        >
+                            Genera tu primer código QR para visitantes
+                        </Typography>
+                    </div>
+                ) : (
+                    <div className="space-y-4">
+                        {qrCodes.map((qr) => (
+                            <div
+                                key={qr.id}
+                                className={`group relative p-6 rounded-3xl border transition-all duration-300 hover:shadow-lg hover:scale-[1.01] backdrop-blur-sm ${getCardBackgroundClasses(
+                                    qr.status
+                                )}`}
+                            >
+                                {/* Header de la card */}
+                                <div className="flex items-start justify-between mb-4">
+                                    <div className="flex items-center gap-4">
+                                        <div className="flex items-center justify-center flex-shrink-0 w-12 h-12 bg-gradient-to-br from-gray-600 to-gray-800 rounded-2xl">
+                                            <span className="text-lg font-bold text-white">
+                                                {qr.visitor_name
+                                                    .charAt(0)
+                                                    .toUpperCase()}
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <h5
+                                                className={`text-lg font-bold ${getTextClasses(
+                                                    qr.status
+                                                )}`}
+                                            >
+                                                {qr.visitor_name}
+                                            </h5>
+                                            <div className="flex items-center gap-4 mt-1">
+                                                <span
+                                                    className={`text-sm flex items-center gap-1 ${getSecondaryTextClasses(
+                                                        qr.status
+                                                    )}`}
+                                                >
+                                                    <FaIdCard className="w-3 h-3" />
+                                                    {qr.document_id}
+                                                </span>
+                                                <span
+                                                    className={`text-sm flex items-center gap-1 ${getSecondaryTextClasses(
+                                                        qr.status
+                                                    )}`}
+                                                >
+                                                    <FaCar className="w-3 h-3" />
+                                                    {qr.vehicle_plate ||
+                                                        "Sin vehículo"}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center space-x-3">
+                                        {getStatusBadge(qr.status)}
+                                        {getTypeIcon(qr.qr_type)}
+                                    </div>
                                 </div>
-                                <div>
-                                    <span
-                                        className={getSecondaryTextClasses(
-                                            qr.status
-                                        )}
-                                    >
-                                        Usos:
-                                    </span>
-                                    <p
-                                        className={`font-medium ${getTextClasses(
-                                            qr.status
-                                        )}`}
-                                    >
-                                        {qr.current_uses}/{qr.max_uses}
-                                    </p>
-                                </div>
-                                {qr.valid_until && (
-                                    <div>
+
+                                {/* Grid de información */}
+                                <div className="grid grid-cols-2 gap-6 mb-4 md:grid-cols-4">
+                                    <div className="p-3 text-center bg-white/50 dark:bg-gray-800/50 rounded-2xl backdrop-blur-sm">
                                         <span
-                                            className={getSecondaryTextClasses(
-                                                qr.status
-                                            )}
-                                        >
-                                            Expira:
-                                        </span>
-                                        <p
-                                            className={`font-medium ${getTextClasses(
+                                            className={`text-xs font-medium ${getSecondaryTextClasses(
                                                 qr.status
                                             )}`}
                                         >
-                                            {new Date(
-                                                qr.valid_until
-                                            ).toLocaleDateString()}
-                                        </p>
-                                    </div>
-                                )}
-                                {qr.time_remaining && (
-                                    <div>
-                                        <span
-                                            className={getSecondaryTextClasses(
-                                                qr.status
-                                            )}
-                                        >
-                                            Tiempo restante:
+                                            Tipo
                                         </span>
                                         <p
-                                            className={`font-medium ${
-                                                qr.status === "active"
-                                                    ? "text-blue-600"
-                                                    : getTextClasses(qr.status)
-                                            }`}
+                                            className={`font-bold text-sm mt-1 ${getTextClasses(
+                                                qr.status
+                                            )}`}
                                         >
-                                            {qr.time_remaining.human}
+                                            {getTypeLabel(qr.qr_type)}
                                         </p>
                                     </div>
-                                )}
-                            </div>
+                                    <div className="p-3 text-center bg-white/50 dark:bg-gray-800/50 rounded-2xl backdrop-blur-sm">
+                                        <span
+                                            className={`text-xs font-medium ${getSecondaryTextClasses(
+                                                qr.status
+                                            )}`}
+                                        >
+                                            Usos
+                                        </span>
+                                        <p
+                                            className={`font-bold text-sm mt-1 ${getTextClasses(
+                                                qr.status
+                                            )}`}
+                                        >
+                                            {qr.current_uses}/{qr.max_uses}
+                                        </p>
+                                    </div>
+                                    {qr.valid_until && (
+                                        <div className="p-3 text-center bg-white/50 dark:bg-gray-800/50 rounded-2xl backdrop-blur-sm">
+                                            <span
+                                                className={`text-xs font-medium ${getSecondaryTextClasses(
+                                                    qr.status
+                                                )}`}
+                                            >
+                                                Expira
+                                            </span>
+                                            <p
+                                                className={`font-bold text-xs mt-1 ${getTextClasses(
+                                                    qr.status
+                                                )}`}
+                                            >
+                                                {new Date(
+                                                    qr.valid_until
+                                                ).toLocaleDateString("es-ES", {
+                                                    day: "2-digit",
+                                                    month: "2-digit",
+                                                    year: "2-digit",
+                                                })}
+                                            </p>
+                                        </div>
+                                    )}
+                                    {qr.time_remaining && (
+                                        <div className="p-3 text-center bg-white/50 dark:bg-gray-800/50 rounded-2xl backdrop-blur-sm">
+                                            <span
+                                                className={`text-xs font-medium ${getSecondaryTextClasses(
+                                                    qr.status
+                                                )}`}
+                                            >
+                                                Restante
+                                            </span>
+                                            <p
+                                                className={`font-bold text-xs mt-1 ${
+                                                    qr.status === "active"
+                                                        ? "text-blue-600 dark:text-blue-400"
+                                                        : getTextClasses(
+                                                              qr.status
+                                                          )
+                                                }`}
+                                            >
+                                                {qr.time_remaining.human}
+                                            </p>
+                                        </div>
+                                    )}
+                                </div>
 
-                            <div
-                                className={`flex items-center justify-between pt-3 border-t ${
-                                    qr.status === "expired"
-                                        ? "border-red-200"
-                                        : qr.status === "active"
-                                        ? "border-green-200"
-                                        : qr.status === "exhausted"
-                                        ? "border-orange-200"
-                                        : "border-gray-200"
-                                }`}
-                            >
-                                <span
-                                    className={`text-xs ${getSecondaryTextClasses(
-                                        qr.status
-                                    )}`}
+                                {/* Footer con acciones */}
+                                <div
+                                    className={`flex items-center justify-between pt-4 border-t ${
+                                        qr.status === "expired"
+                                            ? "border-red-200/50 dark:border-red-700/50"
+                                            : qr.status === "active"
+                                            ? "border-green-200/50 dark:border-green-700/50"
+                                            : qr.status === "exhausted"
+                                            ? "border-orange-200/50 dark:border-orange-700/50"
+                                            : "border-gray-200/50 dark:border-gray-700/50"
+                                    }`}
                                 >
-                                    Creado:{" "}
-                                    {new Date(
-                                        qr.created_at
-                                    ).toLocaleDateString()}
-                                </span>
-                                <div className="space-x-2">
-                                    {qr.status === "active" ? (
-                                        <button
-                                            onClick={() =>
-                                                handleDeactivate(qr.id)
-                                            }
-                                            className="px-3 py-1 text-xs font-medium text-red-600 transition-colors rounded bg-red-50 hover:bg-red-100"
+                                    <div className="flex items-center gap-2">
+                                        <FaCalendarAlt
+                                            className={`w-3 h-3 ${getSecondaryTextClasses(
+                                                qr.status
+                                            )}`}
+                                        />
+                                        <span
+                                            className={`text-xs ${getSecondaryTextClasses(
+                                                qr.status
+                                            )}`}
                                         >
-                                            Desactivar
-                                        </button>
-                                    ) : qr.status === "inactive" &&
-                                      qr.current_uses < qr.max_uses &&
-                                      (!qr.valid_until ||
-                                          new Date() <
-                                              new Date(qr.valid_until)) ? (
-                                        <button
-                                            onClick={() =>
-                                                handleReactivate(qr.id)
-                                            }
-                                            className="px-3 py-1 text-xs font-medium text-green-600 transition-colors rounded bg-green-50 hover:bg-green-100"
-                                        >
-                                            Reactivar
-                                        </button>
-                                    ) : null}
+                                            Creado:{" "}
+                                            {new Date(
+                                                qr.created_at
+                                            ).toLocaleDateString("es-ES", {
+                                                day: "2-digit",
+                                                month: "2-digit",
+                                                year: "2-digit",
+                                            })}
+                                        </span>
+                                    </div>
+                                    <div className="flex items-center space-x-2">
+                                        {qr.status === "active" ? (
+                                            <button
+                                                onClick={() =>
+                                                    handleDeactivate(qr.id)
+                                                }
+                                                className="flex items-center gap-2 px-4 py-2 text-xs font-semibold text-red-700 transition-all duration-300 bg-red-100 border border-red-200 group dark:bg-red-900/30 dark:text-red-300 rounded-xl dark:border-red-800/50 hover:bg-red-200 dark:hover:bg-red-900/50 hover:scale-105"
+                                            >
+                                                <FaTimes className="w-3 h-3 transition-transform group-hover:scale-110" />
+                                                Desactivar
+                                            </button>
+                                        ) : qr.status === "inactive" &&
+                                          qr.current_uses < qr.max_uses &&
+                                          (!qr.valid_until ||
+                                              new Date() <
+                                                  new Date(qr.valid_until)) ? (
+                                            <button
+                                                onClick={() =>
+                                                    handleReactivate(qr.id)
+                                                }
+                                                className="flex items-center gap-2 px-4 py-2 text-xs font-semibold text-green-700 transition-all duration-300 bg-green-100 border border-green-200 group dark:bg-green-900/30 dark:text-green-300 rounded-xl dark:border-green-800/50 hover:bg-green-200 dark:hover:bg-green-900/50 hover:scale-105"
+                                            >
+                                                <FaRedo className="w-3 h-3 transition-transform group-hover:scale-110" />
+                                                Reactivar
+                                            </button>
+                                        ) : null}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    ))}
-                </div>
-            )}
+                        ))}
+                    </div>
+                )}
+            </div>
         </div>
     );
 }

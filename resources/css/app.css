@@ -15,17 +15,116 @@
         U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
+@layer base {
+    /* Configuración base para modo oscuro */
+    html {
+        scroll-behavior: smooth;
+    }
+
+    body {
+        margin: 0;
+        font-family: "Inter", sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        @apply transition-colors duration-300;
+    }
+
+    /* Modo oscuro global */
+    .dark {
+        color-scheme: dark;
+    }
+}
+
+@layer components {
+    /* Clases personalizadas para el dashboard */
+    .dashboard-card {
+        @apply bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 dark:border-gray-700/30 transition-all duration-300;
+    }
+
+    .dashboard-card:hover {
+        @apply shadow-2xl transform scale-[1.01];
+    }
+
+    .dashboard-gradient {
+        @apply bg-gradient-to-br from-indigo-50 via-white to-cyan-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 min-h-screen;
+    }
+
+    .sidebar-glass {
+        @apply backdrop-blur-xl bg-white/70 dark:bg-gray-900/80 border-r border-white/20 dark:border-gray-700/50;
+    }
+
+    .sidebar-item {
+        @apply text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800/50 hover:bg-white/50 dark:hover:bg-gray-700/50;
+    }
+
+    .sidebar-item-active {
+        @apply bg-black dark:bg-gray-800 text-white shadow-xl;
+    }
+
+    .header-glass {
+        @apply bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-white/20 dark:border-gray-700/50;
+    }
+
+    .text-primary {
+        @apply text-gray-900 dark:text-gray-100;
+    }
+
+    .text-secondary {
+        @apply text-gray-600 dark:text-gray-400;
+    }
+
+    .border-primary {
+        @apply border-gray-200 dark:border-gray-700;
+    }
+
+    .btn-primary {
+        @apply bg-gradient-to-r from-black via-gray-900 to-black hover:from-gray-900 hover:via-black hover:to-gray-900 text-white;
+        @apply border border-white/10 rounded-2xl px-6 py-3 font-semibold transition-all duration-300 shadow-xl backdrop-blur-sm;
+    }
+
+    .btn-secondary {
+        @apply bg-white/80 dark:bg-gray-800/80 hover:bg-white dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300;
+        @apply border border-gray-200/50 dark:border-gray-700/50 rounded-2xl px-6 py-3 font-semibold transition-all duration-300 backdrop-blur-sm;
+    }
+
+    .input-field {
+        @apply bg-white/80 dark:bg-gray-800/80 border border-gray-200/50 dark:border-gray-700/50 rounded-2xl px-4 py-3;
+        @apply text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400;
+        @apply focus:ring-2 focus:ring-black/20 dark:focus:ring-white/20 focus:border-transparent backdrop-blur-sm;
+        @apply transition-all duration-300 hover:bg-white dark:hover:bg-gray-800;
+    }
+
+    .modal-overlay {
+        @apply fixed inset-0 bg-black/50 dark:bg-black/70 backdrop-blur-sm z-50;
+    }
+
+    .modal-content {
+        @apply bg-white dark:bg-gray-800 rounded-xl shadow-2xl dark:shadow-gray-900/70;
+        @apply border border-gray-200 dark:border-gray-700;
+    }
+}
+
 @layer utilities {
     .container {
         @apply max-w-7xl mx-auto px-6 sm:px-6 lg:px-8;
     }
-}
 
-body {
-    margin: 0;
-    font-family: "Inter", sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+    .glass-effect {
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+    }
+
+    .text-gradient {
+        @apply bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 bg-clip-text text-transparent;
+    }
+
+    .shadow-glow {
+        box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+    }
+
+    .dark .shadow-glow {
+        box-shadow: 0 0 20px rgba(129, 140, 248, 0.4);
+    }
 }
 
 [class^="number-slide"],

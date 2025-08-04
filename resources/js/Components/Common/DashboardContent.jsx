@@ -9,16 +9,16 @@ import QuickStatsChart from "@/Components/Common/QuickStatsChart";
 
 export default function DashboardContent({ activeTab, auth, visits, stats }) {
     return (
-        <div className="space-y-2">
+        <div className="min-h-full space-y-2">
             {activeTab === "escritorio" && (
-                <>
+                <div className="space-y-6">
                     <div className="flex justify-center">
                         <div className="w-full max-w-2xl">
                             <QuickStatsChart stats={stats} />
                         </div>
                     </div>
                     <StatsCard stats={stats} />
-                </>
+                </div>
             )}
 
             {activeTab === "generate" && (

@@ -43,7 +43,6 @@ export default function DesktopNav({
                     </ul>
                 </div>
 
-                {/* Menú de usuario */}
                 <div className="hidden md:flex md:ms-6 md:items-center">
                     <div className="relative ms-3">
                         {userSession != null ? (

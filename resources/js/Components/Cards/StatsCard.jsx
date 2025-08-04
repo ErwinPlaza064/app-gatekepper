@@ -9,10 +9,10 @@ const icons = [
 ];
 
 const colors = [
-    "bg-indigo-100 text-indigo-700 border-indigo-300",
-    "bg-red-100 text-red-700 border-red-300",
-    "bg-green-100 text-green-700 border-green-300",
-    "bg-yellow-100 text-yellow-700 border-yellow-300",
+    "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 border-indigo-300 dark:border-indigo-700",
+    "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 border-red-300 dark:border-red-700",
+    "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 border-green-300 dark:border-green-700",
+    "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300 border-yellow-300 dark:border-yellow-700",
 ];
 
 export default function StatsCard({ stats = {} }) {
@@ -42,7 +42,7 @@ export default function StatsCard({ stats = {} }) {
             {items.map((item, idx) => (
                 <div
                     key={item.label}
-                    className={`border rounded-xl shadow p-6 flex flex-col items-center ${item.color} transition-transform hover:scale-105`}
+                    className={`dashboard-card p-6 flex flex-col items-center ${item.color}`}
                 >
                     <div className="mb-2">{item.icon}</div>
                     <span className="text-3xl font-bold">{item.value}</span>

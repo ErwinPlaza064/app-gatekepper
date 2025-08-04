@@ -8,7 +8,7 @@ export default function SidebarMenuItem({ item, activeTab, setActiveTab }) {
             <Link
                 key={item.id}
                 href={route(item.route)}
-                className="flex items-center w-full px-4 py-4 space-x-4 font-medium text-gray-700 transition-all duration-300 group rounded-2xl hover:bg-white/50 hover:shadow-lg hover:scale-102"
+                className="flex items-center w-full px-4 py-4 space-x-4 font-medium text-gray-700 dark:text-gray-300 transition-all duration-300 group rounded-2xl hover:bg-white/50 dark:hover:bg-gray-700/50 hover:shadow-lg hover:scale-102"
             >
                 <div className="text-2xl transition-transform group-hover:scale-110 grayscale">
                     {item.icon}
@@ -24,8 +24,8 @@ export default function SidebarMenuItem({ item, activeTab, setActiveTab }) {
             onClick={() => setActiveTab(item.id)}
             className={`group w-full flex items-center space-x-4 px-4 py-4 rounded-2xl font-medium transition-all duration-300 ${
                 activeTab === item.id
-                    ? "bg-black text-white shadow-xl transform scale-105"
-                    : "text-gray-700 bg-white hover:bg-white/50 hover:shadow-lg hover:scale-102"
+                    ? "sidebar-item-active transform scale-105"
+                    : "sidebar-item hover:shadow-lg hover:scale-102"
             }`}
         >
             <div

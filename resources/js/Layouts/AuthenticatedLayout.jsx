@@ -14,10 +14,10 @@ export default function Authenticated({ user, children }) {
 
     return (
         <div>
-            <div className="min-h-screen bg-gray-50">
+            <div className="min-h-screen bg-gradient-to-br from-gray-100 via-white to-gray-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
                 <Toaster position="top-right" />
                 <div className="relative">
-                    <nav className="fixed top-0 left-0 right-0 z-10 bg-white border-b border-gray-100 shadow">
+                    <nav className="fixed top-0 left-0 right-0 z-10 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-b border-white/20 dark:border-gray-700/50 shadow-lg">
                         <DesktopNav
                             userSession={userSession}
                             handleOnClick={handleOnClick}
@@ -34,7 +34,7 @@ export default function Authenticated({ user, children }) {
                         />
                     </nav>
                 </div>
-                <main className="min-h-screen">{children}</main>
+                <main className="min-h-screen pt-16">{children}</main>
             </div>
         </div>
     );

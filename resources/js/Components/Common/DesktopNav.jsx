@@ -16,7 +16,7 @@ export default function DesktopNav({
                 <div className="flex gap-8">
                     <div className="flex items-center shrink-0">
                         <Link href="/">
-                            <strong>Gatekepper</strong>
+                            <strong>Registrador</strong>
                         </Link>
                     </div>
 

@@ -8,9 +8,7 @@ import axios from "axios";
 window.axios = axios;
 
 // Configurar base URL con HTTPS forzado
-const baseURL =
-    import.meta.env.VITE_API_URL ||
-    "https://app-gatekepper-production.up.railway.app";
+const baseURL = import.meta.env.VITE_API_URL || "https://gatekepper.com";
 
 // Asegurar que siempre use HTTPS
 axios.defaults.baseURL = baseURL.replace("http://", "https://");

@@ -17,7 +17,13 @@ return [
 
 'paths' => ['api/*', 'sanctum/csrf-cookie'],
 'allowed_methods' => ['*'],
-'allowed_origins' => ['http://localhost:8000'],
+'allowed_origins' => [
+    'https://gatekepper.com',
+    'https://www.gatekepper.com',
+    'http://localhost:8000',
+    'http://localhost:5173',
+    'https://localhost:5173'
+],
 'allowed_headers' => ['*'],
 'supports_credentials' => true,
 

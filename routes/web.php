@@ -106,8 +106,14 @@ Route::get('/clear-cache', function () {
 
 
 Route::get('/csrf-token', function() {
-    return response()->json(['token' => csrf_token()]);
-})->middleware('web');
+    return response()->json([
+        'csrf_token' => csrf_token(),
+        'app_url' => config('app.url'),
+        'session_domain' => config('session.domain'),
+        'session_secure' => config('session.secure'),
+        'cors_origins' => config('cors.allowed_origins'),
+    ]);
+});
 
 
 require __DIR__.'/auth.php';

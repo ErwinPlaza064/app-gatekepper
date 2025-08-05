@@ -15,49 +15,102 @@ class DashboardController extends Controller
 {
     public function index(Request $request)
     {
-        $user = $request->user();
+        try {
+            $user = $request->user();
 
-        // Estadísticas rápidas
-        $visitsCount = Visitor::where('user_id', $user->id)->count();
-        $complaintsCount = Complaint::where('user_id', $user->id)->count();
-        $usersCount = \App\Models\User::count();
-        $qrCount = \App\Models\QrCode::where('user_id', $user->id)->count();
+            // Verificar que el usuario existe
+            if (!$user) {
+                Log::error('[DASHBOARD] Usuario no autenticado');
+                return redirect()->route('login');
+            }
 
-        // Datos para la gráfica de visitas por día (últimos 7 días)
-        $visitsByDay = Visitor::where('user_id', $user->id)
-            ->selectRaw('DATE(entry_time) as day, COUNT(*) as count')
-            ->groupBy('day')
-            ->orderBy('day', 'desc')
-            ->limit(7)
-            ->get();
+            Log::info('[DASHBOARD] Cargando dashboard para usuario', ['id' => $user->id, 'email' => $user->email]);
 
-        $chartLabels = $visitsByDay->pluck('day')->map(function($date) {
-            return date('D', strtotime($date));
-        });
-        $chartValues = $visitsByDay->pluck('count');
+            // Estadísticas rápidas con manejo de errores
+            $visitsCount = Visitor::where('user_id', $user->id)->count();
+            $complaintsCount = Complaint::where('user_id', $user->id)->count();
+            $usersCount = \App\Models\User::count();
+            $qrCount = \App\Models\QrCode::where('user_id', $user->id)->count();
 
-        return Inertia::render('Dashboard', [
-            'auth' => [
-                'user' => $user,
-                'notifications' => $user->notifications,
-            ],
-            'visits' => Visitor::where('user_id', $user->id)
+            // Datos para la gráfica de visitas por día (últimos 7 días)
+            $visitsByDay = Visitor::where('user_id', $user->id)
+                ->selectRaw('DATE(entry_time) as day, COUNT(*) as count')
+                ->groupBy('day')
+                ->orderBy('day', 'desc')
+                ->limit(7)
+                ->get();
+
+            $chartLabels = $visitsByDay->pluck('day')->map(function($date) {
+                return date('D', strtotime($date));
+            });
+            $chartValues = $visitsByDay->pluck('count');
+
+            // Obtener visitas recientes
+            $visits = Visitor::where('user_id', $user->id)
                 ->orderBy('entry_time', 'desc')
-                ->get(['name', 'id_document', 'vehicle_plate', 'entry_time', 'created_at']),
-            'stats' => [
-                'visitas' => $visitsCount,
-                'quejas' => $complaintsCount,
-                'qrs' => $qrCount,
-            ],
-            'visitsChartData' => [
-                'labels' => $chartLabels,
-                'values' => $chartValues,
-            ],
-            // Historial de quejas del usuario autenticado
-            'complaints' => Complaint::where('user_id', $user->id)
+                ->limit(10) // Limitar para mejorar performance
+                ->get(['name', 'id_document', 'vehicle_plate', 'entry_time', 'created_at']);
+
+            // Obtener notificaciones del usuario
+            $notifications = $user->notifications()->limit(20)->get();
+
+            // Obtener quejas del usuario
+            $complaints = Complaint::where('user_id', $user->id)
                 ->orderBy('created_at', 'desc')
-                ->get(['id', 'message', 'created_at']),
-        ]);
+                ->limit(10) // Limitar para mejorar performance
+                ->get(['id', 'message', 'created_at']);
+
+            Log::info('[DASHBOARD] Dashboard cargado exitosamente', [
+                'user_id' => $user->id,
+                'visits_count' => $visitsCount,
+                'complaints_count' => $complaintsCount
+            ]);
+
+            return Inertia::render('Dashboard', [
+                'auth' => [
+                    'user' => $user,
+                    'notifications' => $notifications,
+                ],
+                'visits' => $visits,
+                'stats' => [
+                    'visitas' => $visitsCount,
+                    'quejas' => $complaintsCount,
+                    'qrs' => $qrCount,
+                ],
+                'visitsChartData' => [
+                    'labels' => $chartLabels,
+                    'values' => $chartValues,
+                ],
+                'complaints' => $complaints,
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('[DASHBOARD] Error cargando dashboard', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'user_id' => $request->user() ? $request->user()->id : 'no-user'
+            ]);
+
+            // En caso de error, retornar una versión mínima del dashboard
+            return Inertia::render('Dashboard', [
+                'auth' => [
+                    'user' => $request->user(),
+                    'notifications' => [],
+                ],
+                'visits' => [],
+                'stats' => [
+                    'visitas' => 0,
+                    'quejas' => 0,
+                    'qrs' => 0,
+                ],
+                'visitsChartData' => [
+                    'labels' => [],
+                    'values' => [],
+                ],
+                'complaints' => [],
+                'error' => 'Error cargando datos del dashboard'
+            ]);
+        }
     }
 
     public function misVisitas(Request $request){

@@ -24,26 +24,53 @@ const QuickLoader = memo(() => (
     <div className="w-8 h-8 border-2 border-gray-300 rounded-full border-t-gray-600 animate-spin"></div>
 ));
 
-const Dashboard = memo(({ auth, visits, stats, visitsChartData }) => {
+const Dashboard = memo(({ auth, visits, stats, visitsChartData, error }) => {
     const {
         activeTab,
         sidebarOpen,
         setActiveTab,
-        closeSidebar,
+        setSidebarOpen,
         toggleSidebar,
+        closeSidebar,
     } = useDashboardOptimization();
     const { notifications, setNotifications } = useNotificationOptimization(
-        auth.user.notifications || []
+        auth?.user?.notifications || []
     );
 
+    // Mostrar error si hay problemas cargando datos
     useEffect(() => {
-        if (auth.user.rol === "administrador" || auth.user.rol === "admin") {
+        if (error) {
+            toast.error(error);
+        }
+    }, [error]);
+
+    useEffect(() => {
+        if (
+            auth?.user?.rol === "administrador" ||
+            auth?.user?.rol === "admin"
+        ) {
             const timeout = setTimeout(() => {
                 router.visit("/admin");
             }, 1500); // Reducir tiempo de espera
             return () => clearTimeout(timeout);
         }
-    }, [auth.user.rol]);
+    }, [auth?.user?.rol]);
+
+    // Verificar que auth y user existen
+    if (!auth || !auth.user) {
+        return (
+            <ThemeProvider>
+                <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-indigo-50 to-white dark:from-gray-900 dark:to-gray-800">
+                    <div className="text-center">
+                        <QuickLoader />
+                        <p className="mt-4 text-lg text-gray-600 dark:text-gray-400">
+                            Cargando...
+                        </p>
+                    </div>
+                </div>
+            </ThemeProvider>
+        );
+    }
 
     // Renderizado optimizado para admin redirect
     if (auth.user.rol === "administrador" || auth.user.rol === "admin") {

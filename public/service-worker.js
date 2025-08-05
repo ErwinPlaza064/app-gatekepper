@@ -1,5 +1,5 @@
-const CACHE_NAME = "gatekeeper-v2";
-const STATIC_CACHE = "gatekeeper-static-v2";
+const CACHE_NAME = "gatekeeper-v3";
+const STATIC_CACHE = "gatekeeper-static-v3";
 
 const STATIC_ASSETS = ["/", "/favicon.ico"];
 
@@ -50,6 +50,7 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
     const url = new URL(event.request.url);
 
+    // Ignorar requests de extensiones del navegador
     if (
         url.protocol === "chrome-extension:" ||
         url.protocol === "moz-extension:"
@@ -57,29 +58,44 @@ self.addEventListener("fetch", (event) => {
         return;
     }
 
+    // Solo cachear requests GET
+    if (event.request.method !== "GET") {
+        return;
+    }
+
+    // Cache First para assets estáticos
     if (isStaticAsset(event.request.url)) {
         event.respondWith(
             caches.match(event.request).then((response) => {
                 return (
                     response ||
-                    fetch(event.request).then((fetchResponse) => {
-                        const responseClone = fetchResponse.clone();
-                        caches.open(STATIC_CACHE).then((cache) => {
-                            cache.put(event.request, responseClone);
-                        });
-                        return fetchResponse;
-                    })
+                    fetch(event.request)
+                        .then((fetchResponse) => {
+                            // Solo cachear respuestas exitosas
+                            if (fetchResponse.status === 200) {
+                                const responseClone = fetchResponse.clone();
+                                caches.open(STATIC_CACHE).then((cache) => {
+                                    cache.put(event.request, responseClone);
+                                });
+                            }
+                            return fetchResponse;
+                        })
+                        .catch(() => {
+                            // Fallback al cache si falla
+                            return caches.match(event.request);
+                        })
                 );
             })
         );
         return;
     }
 
+    // Network First para rutas de la aplicación (solo GET)
     event.respondWith(
         fetch(event.request)
             .then((response) => {
-                // Solo cachear respuestas exitosas
-                if (response.status === 200) {
+                // Solo cachear respuestas exitosas GET
+                if (response.status === 200 && event.request.method === "GET") {
                     const responseClone = response.clone();
                     caches.open(CACHE_NAME).then((cache) => {
                         cache.put(event.request, responseClone);
@@ -88,6 +104,7 @@ self.addEventListener("fetch", (event) => {
                 return response;
             })
             .catch(() => {
+                // Fallback al cache si la red falla (solo para GET)
                 return caches.match(event.request);
             })
     );

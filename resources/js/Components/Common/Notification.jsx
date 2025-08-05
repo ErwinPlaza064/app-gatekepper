@@ -106,7 +106,7 @@ export default function Notification({ notifications, setNotifications }) {
             </button>
 
             {showNotifications && (
-                <div className="absolute right-0 left-0 sm:left-auto sm:right-0 z-[9999] mx-2 sm:mx-0 max-w-sm sm:max-w-sm mt-4 overflow-hidden transition-all duration-500 border shadow-2xl w-auto sm:w-80 border-white/20 dark:border-gray-600/20 rounded-3xl backdrop-blur-xl bg-white/80 dark:bg-gray-900/80">
+                <div className="absolute left-1/2 transform -translate-x-1/2 sm:left-auto sm:right-0 sm:transform-none z-50 mt-4 w-80 max-w-[calc(100vw-2rem)] sm:max-w-sm overflow-hidden transition-all duration-500 border shadow-2xl border-white/20 dark:border-gray-600/20 rounded-3xl backdrop-blur-xl bg-white/80 dark:bg-gray-900/80">
                     {/* Header mejorado */}
                     <div className="relative px-6 py-4 overflow-hidden bg-gradient-to-br from-black via-gray-900 to-black">
                         <div className="absolute inset-0 bg-black/20"></div>

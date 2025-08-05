@@ -34,9 +34,9 @@ export default function Dashboard({ auth, visits, stats, visitsChartData }) {
     if (auth.user.rol === "administrador" || auth.user.rol === "admin") {
         return (
             <ThemeProvider>
-                <div className="dashboard-gradient flex items-center justify-center min-h-screen">
+                <div className="flex items-center justify-center min-h-screen dashboard-gradient">
                     <div className="text-center">
-                        <div className="inline-block w-8 h-8 border-4 border-indigo-600 dark:border-indigo-400 border-solid rounded-full animate-spin border-t-transparent"></div>
+                        <div className="inline-block w-8 h-8 border-4 border-indigo-600 border-solid rounded-full dark:border-indigo-400 animate-spin border-t-transparent"></div>
                         <p className="mt-4 text-lg text-secondary">
                             Redirigiendo al panel de administración...
                         </p>
@@ -56,10 +56,10 @@ export default function Dashboard({ auth, visits, stats, visitsChartData }) {
                 }}
             />
             <div className="flex flex-col h-screen dashboard-gradient">
-                <header className="flex items-center w-full gap-4 py-0 header-glass shadow-md dark:shadow-gray-800/50 relative z-[9998]">
+                <header className="relative z-40 flex items-center justify-between w-full px-4 shadow-md header-glass dark:shadow-gray-800/50">
                     <MobileHeader setSidebarOpen={setSidebarOpen} />
 
-                    <div className="flex items-center relative z-[9999]">
+                    <div className="relative z-40 flex items-center gap-4">
                         <Notification
                             notifications={notifications}
                             setNotifications={setNotifications}
@@ -81,13 +81,13 @@ export default function Dashboard({ auth, visits, stats, visitsChartData }) {
 
                     {sidebarOpen && (
                         <div
-                            className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm"
+                            className="fixed inset-0 z-[9998] bg-black/30 backdrop-blur-sm"
                             onClick={() => setSidebarOpen(false)}
                         />
                     )}
 
                     <main className="flex-1 overflow-auto">
-                        <section className="p-6 min-h-full">
+                        <section className="min-h-full p-6">
                             <DashboardContent
                                 activeTab={activeTab}
                                 auth={auth}

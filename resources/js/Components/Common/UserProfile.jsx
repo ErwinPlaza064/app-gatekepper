@@ -56,7 +56,7 @@ export default function UserProfile({ user, showThemeToggle, showLogout }) {
                 </div>
             </div>
             <div
-                className={`absolute right-0 mt-3 min-w-[280px] rounded-3xl shadow-2xl z-[9999] backdrop-blur-xl bg-white/95 dark:bg-gray-900/95 border border-white/20 dark:border-gray-700/30 overflow-hidden transition-all duration-500 ${
+                className={`absolute right-0 mt-3 min-w-[280px] rounded-3xl shadow-2xl z-50 backdrop-blur-xl bg-white/95 dark:bg-gray-900/95 border border-white/20 dark:border-gray-700/30 overflow-hidden transition-all duration-500 ${
                     open
                         ? "opacity-100 translate-y-0 scale-100 pointer-events-auto"
                         : "opacity-0 -translate-y-6 scale-95 pointer-events-none"

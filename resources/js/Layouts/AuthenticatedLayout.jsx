@@ -17,7 +17,7 @@ export default function Authenticated({ user, children }) {
             <div className="min-h-screen bg-gradient-to-br from-gray-100 via-white to-gray-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
                 <Toaster position="top-right" />
                 <div className="relative">
-                    <nav className="fixed top-0 left-0 right-0 z-10 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-b border-white/20 dark:border-gray-700/50 shadow-lg">
+                    <nav className="fixed top-0 left-0 right-0 z-10 border-b shadow-lg bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-white/20 dark:border-gray-700/50">
                         <DesktopNav
                             userSession={userSession}
                             handleOnClick={handleOnClick}

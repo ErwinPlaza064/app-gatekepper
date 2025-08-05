@@ -19,7 +19,7 @@
 
         <!-- Manual CSS loading to prevent preload warnings -->
         <link rel="stylesheet" href="{{ asset('build/assets/style-20429ede.css') }}" media="all">
-        
+
         <!-- Scripts -->
         @routes
         @viteReactRefresh

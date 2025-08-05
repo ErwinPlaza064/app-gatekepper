@@ -10,11 +10,11 @@ export default defineConfig(({ command }) => {
             laravel({
                 input: [
                     "resources/js/app.jsx",
-                    "resources/js/Pages/Dashboard.jsx"
+                    "resources/js/Pages/Dashboard.jsx",
                 ],
                 refresh: !isProduction,
                 // Configurar preloading para CSS
-                buildDirectory: 'build',
+                buildDirectory: "build",
             }),
             react(),
         ],

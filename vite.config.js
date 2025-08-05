@@ -10,6 +10,28 @@ export default defineConfig({
         }),
         react(),
     ],
+    build: {
+        rollupOptions: {
+            external: ["@babel/runtime/helpers/extends"],
+            output: {
+                manualChunks: {
+                    vendor: ["react", "react-dom"],
+                    charts: ["chart.js", "react-chartjs-2"],
+                    utils: ["lodash", "axios"],
+                    qr: ["html5-qrcode", "qrcode.react"],
+                },
+            },
+        },
+        cssCodeSplit: true,
+        sourcemap: false,
+        minify: "terser",
+        terserOptions: {
+            compress: {
+                drop_console: true,
+                drop_debugger: true,
+            },
+        },
+    },
     server: {
         host: process.env.VITE_HOST,
         port: 5173,

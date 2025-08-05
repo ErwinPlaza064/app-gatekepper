@@ -36,33 +36,33 @@
 }
 
 @layer components {
-    /* Clases personalizadas para el dashboard */
+    /* Clases personalizadas para el dashboard - Optimizadas */
     .dashboard-card {
-        @apply bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 dark:border-gray-700/30 transition-all duration-300;
+        @apply bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-lg border border-white/20 dark:border-gray-700/30 transition-all duration-200;
     }
 
     .dashboard-card:hover {
-        @apply shadow-2xl transform scale-[1.01];
+        @apply shadow-xl transform scale-[1.02];
     }
 
     .dashboard-gradient {
-        @apply bg-gradient-to-br from-indigo-50 via-white to-cyan-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 min-h-screen;
+        @apply bg-gradient-to-br from-gray-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 min-h-screen;
     }
 
     .sidebar-glass {
-        @apply backdrop-blur-xl bg-white/70 dark:bg-gray-900/80 border-r border-white/20 dark:border-gray-700/50;
+        @apply backdrop-blur-xl bg-white/80 dark:bg-gray-900/90 border-r border-white/20 dark:border-gray-700/50;
     }
 
     .sidebar-item {
-        @apply text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800/50 hover:bg-white/50 dark:hover:bg-gray-700/50;
+        @apply text-gray-700 dark:text-gray-300 bg-white/70 dark:bg-gray-800/70 hover:bg-white/90 dark:hover:bg-gray-700/90 transition-colors duration-150;
     }
 
     .sidebar-item-active {
-        @apply bg-black dark:bg-gray-800 text-white shadow-xl;
+        @apply bg-gray-900 dark:bg-gray-700 text-white shadow-md;
     }
 
     .header-glass {
-        @apply bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-white/20 dark:border-gray-700/50;
+        @apply bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border-white/20 dark:border-gray-700/50;
     }
 
     .text-primary {
@@ -78,20 +78,19 @@
     }
 
     .btn-primary {
-        @apply bg-gradient-to-r from-black via-gray-900 to-black hover:from-gray-900 hover:via-black hover:to-gray-900 text-white;
-        @apply border border-white/10 rounded-2xl px-6 py-3 font-semibold transition-all duration-300 shadow-xl backdrop-blur-sm;
+        @apply bg-gray-900 hover:bg-black text-white border border-gray-700 rounded-xl px-6 py-3 font-semibold transition-colors duration-200 shadow-md;
     }
 
     .btn-secondary {
-        @apply bg-white/80 dark:bg-gray-800/80 hover:bg-white dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300;
-        @apply border border-gray-200/50 dark:border-gray-700/50 rounded-2xl px-6 py-3 font-semibold transition-all duration-300 backdrop-blur-sm;
+        @apply bg-white/90 dark:bg-gray-800/90 hover:bg-white dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300;
+        @apply border border-gray-200 dark:border-gray-700 rounded-xl px-6 py-3 font-semibold transition-colors duration-200 shadow-sm;
     }
 
     .input-field {
-        @apply bg-white/80 dark:bg-gray-800/80 border border-gray-200/50 dark:border-gray-700/50 rounded-2xl px-4 py-3;
+        @apply bg-white/90 dark:bg-gray-800/90 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3;
         @apply text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400;
-        @apply focus:ring-2 focus:ring-black/20 dark:focus:ring-white/20 focus:border-transparent backdrop-blur-sm;
-        @apply transition-all duration-300 hover:bg-white dark:hover:bg-gray-800;
+        @apply focus:ring-2 focus:ring-gray-500 dark:focus:ring-gray-400 focus:border-transparent;
+        @apply transition-all duration-200 hover:bg-white dark:hover:bg-gray-800;
     }
 
     .modal-overlay {
@@ -99,7 +98,7 @@
     }
 
     .modal-content {
-        @apply bg-white dark:bg-gray-800 rounded-xl shadow-2xl dark:shadow-gray-900/70;
+        @apply bg-white dark:bg-gray-800 rounded-xl shadow-xl dark:shadow-gray-900/50;
         @apply border border-gray-200 dark:border-gray-700;
     }
 }

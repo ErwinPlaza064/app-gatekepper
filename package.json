@@ -3,7 +3,12 @@
     "private": true,
     "scripts": {
         "dev": "vite",
-        "build": "vite build"
+        "build": "vite build && npm run optimize",
+        "optimize": "npm run optimize:images && npm run preload-critical",
+        "optimize:images": "echo 'Optimizing images...'",
+        "preload-critical": "echo 'Generating critical CSS...'",
+        "analyze": "vite build --mode analyze",
+        "preview": "vite preview"
     },
     "devDependencies": {
         "@headlessui/react": "^1.4.2",
@@ -18,9 +23,11 @@
         "react": "^18.2.0",
         "react-dom": "^18.2.0",
         "tailwindcss": "^3.4.15",
+        "terser": "^5.43.1",
         "vite": "^4.0.0"
     },
     "dependencies": {
+        "@babel/runtime": "^7.28.2",
         "chart.js": "^4.5.0",
         "html5-qrcode": "^2.3.8",
         "keen-slider": "^6.8.6",

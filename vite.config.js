@@ -8,7 +8,10 @@ export default defineConfig(({ command }) => {
     return {
         plugins: [
             laravel({
-                input: "resources/js/app.jsx",
+                input: [
+                    "resources/js/app.jsx",
+                    "resources/js/Pages/Dashboard.jsx"
+                ],
                 refresh: !isProduction,
             }),
             react(),

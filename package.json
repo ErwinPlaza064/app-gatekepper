@@ -3,7 +3,8 @@
     "private": true,
     "scripts": {
         "dev": "vite",
-        "build": "vite build && npm run optimize",
+        "build": "vite build",
+        "build:production": "NODE_ENV=production vite build",
         "optimize": "npm run optimize:images && npm run preload-critical",
         "optimize:images": "echo 'Optimizing images...'",
         "preload-critical": "echo 'Generating critical CSS...'",

@@ -1,45 +1,40 @@
 import React, { memo, lazy, Suspense } from "react";
 import { useTheme } from "@/Contexts/ThemeContext";
 
-// Lazy load Chart.js solo cuando sea necesario
-const LazyChart = lazy(() =>
-    import("react-chartjs-2").then((module) => ({ default: module.Bar }))
-);
-
-// Lazy load Chart.js registrations
-const ChartSetup = lazy(() =>
-    import("chart.js").then((module) => {
-        const {
-            Chart,
-            CategoryScale,
-            LinearScale,
-            BarElement,
-            Title,
-            Tooltip,
-            Legend,
-        } = module;
-        Chart.register(
-            CategoryScale,
-            LinearScale,
-            BarElement,
-            Title,
-            Tooltip,
-            Legend
-        );
-        return { default: () => null };
-    })
+// Simplificar el lazy loading para evitar problemas en producción
+const LazyBarChart = lazy(() =>
+    Promise.all([import("react-chartjs-2"), import("chart.js")]).then(
+        ([chartModule, chartJsModule]) => {
+            const {
+                Chart,
+                CategoryScale,
+                LinearScale,
+                BarElement,
+                Title,
+                Tooltip,
+                Legend,
+            } = chartJsModule;
+            Chart.register(
+                CategoryScale,
+                LinearScale,
+                BarElement,
+                Title,
+                Tooltip,
+                Legend
+            );
+            return { default: chartModule.Bar };
+        }
+    )
 );
 
 // Componente simple de fallback
 const ChartSkeleton = () => (
-    <div className="dashboard-card p-6">
-        <div className="animate-pulse">
-            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-32 mb-4"></div>
-            <div className="space-y-3">
-                <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded"></div>
-                <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
-                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
-            </div>
+    <div className="animate-pulse">
+        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-32 mb-4"></div>
+        <div className="space-y-3">
+            <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded"></div>
+            <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
         </div>
     </div>
 );
@@ -101,9 +96,8 @@ const QuickStatsChart = memo(({ stats }) => {
     return (
         <div className="dashboard-card p-6">
             <Suspense fallback={<ChartSkeleton />}>
-                <ChartSetup />
                 <div style={{ height: "200px" }}>
-                    <LazyChart data={data} options={options} />
+                    <LazyBarChart data={data} options={options} />
                 </div>
             </Suspense>
         </div>

@@ -37,12 +37,9 @@ export default defineConfig(({ command }) => {
                 : undefined,
         },
         server: {
-            host: process.env.VITE_HOST || "0.0.0.0",
+            host: "0.0.0.0",
             port: 5173,
             cors: true,
-            headers: {
-                "Access-Control-Allow-Origin": "*",
-            },
         },
     };
 });

@@ -42,11 +42,24 @@ export default function Notification({ notifications, setNotifications }) {
         }
 
         try {
-            let API_URL =
-                import.meta.env.VITE_API_URL ||
-                "https://app-gatekepper-production.up.railway.app";
+            // Usar la URL actual del sitio
+            let API_URL = window.location.origin;
 
-            if (API_URL.startsWith("http://")) {
+            // Fallback para desarrollo
+            if (
+                !API_URL ||
+                API_URL.includes("localhost") ||
+                API_URL.includes("192.168")
+            ) {
+                API_URL =
+                    import.meta.env.VITE_API_URL || "https://gatekepper.com";
+            }
+
+            // Asegurar HTTPS en producción
+            if (
+                API_URL.startsWith("http://") &&
+                !API_URL.includes("localhost")
+            ) {
                 API_URL = API_URL.replace("http://", "https://");
             }
 

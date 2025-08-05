@@ -34,7 +34,7 @@ const Dashboard = memo(({ auth, visits, stats, visitsChartData, error }) => {
         closeSidebar,
     } = useDashboardOptimization();
     const { notifications, setNotifications } = useNotificationOptimization(
-        auth?.user?.notifications || []
+        auth?.notifications || []
     );
 
     // Mostrar error si hay problemas cargando datos

@@ -64,7 +64,7 @@ const Dashboard = memo(({ auth, visits, stats, visitsChartData }) => {
     return (
         <ThemeProvider>
             <Head title="Dashboard" />
-            <Suspense fallback={<LoadingSpinner />}>
+            <Suspense fallback={<QuickLoader />}>
                 <NotificationListener
                     userId={auth.user.id}
                     onNotification={(notification) => {

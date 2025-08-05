@@ -1,23 +1,30 @@
-const CACHE_NAME = "gatekeeper-v1";
-const STATIC_CACHE = "gatekeeper-static-v1";
+const CACHE_NAME = "gatekeeper-v2";
+const STATIC_CACHE = "gatekeeper-static-v2";
 
-// Assets que se deben cachear inmediatamente
-const STATIC_ASSETS = ["/", "/css/app.css", "/js/app.js", "/favicon.ico"];
+const STATIC_ASSETS = ["/", "/favicon.ico"];
 
-// Instalar el service worker y cachear assets críticos
 self.addEventListener("install", (event) => {
     event.waitUntil(
         Promise.all([
             caches.open(STATIC_CACHE).then((cache) => {
-                return cache.addAll(STATIC_ASSETS);
+                return cache.addAll(STATIC_ASSETS).catch((error) => {
+                    console.warn(
+                        "Failed to cache some assets during install:",
+                        error
+                    );
+                    return Promise.resolve();
+                });
             }),
-        ]).then(() => {
-            self.skipWaiting();
-        })
+        ])
+            .then(() => {
+                self.skipWaiting();
+            })
+            .catch((error) => {
+                console.error("Service worker installation failed:", error);
+            })
     );
 });
 
-// Activar y limpiar caches antiguos
 self.addEventListener("activate", (event) => {
     event.waitUntil(
         caches
@@ -40,11 +47,9 @@ self.addEventListener("activate", (event) => {
     );
 });
 
-// Estrategia de cache: Network First para API, Cache First para assets
 self.addEventListener("fetch", (event) => {
     const url = new URL(event.request.url);
 
-    // Ignorar requests de extensiones del navegador
     if (
         url.protocol === "chrome-extension:" ||
         url.protocol === "moz-extension:"
@@ -52,7 +57,6 @@ self.addEventListener("fetch", (event) => {
         return;
     }
 
-    // Cache First para assets estáticos
     if (isStaticAsset(event.request.url)) {
         event.respondWith(
             caches.match(event.request).then((response) => {
@@ -71,7 +75,6 @@ self.addEventListener("fetch", (event) => {
         return;
     }
 
-    // Network First para rutas de la aplicación
     event.respondWith(
         fetch(event.request)
             .then((response) => {
@@ -85,13 +88,11 @@ self.addEventListener("fetch", (event) => {
                 return response;
             })
             .catch(() => {
-                // Fallback al cache si la red falla
                 return caches.match(event.request);
             })
     );
 });
 
-// Manejar notificaciones push
 self.addEventListener("push", function (event) {
     const data = event.data.json();
     const title = data.title || "Nueva notificación";
@@ -113,7 +114,6 @@ self.addEventListener("push", function (event) {
     event.waitUntil(self.registration.showNotification(title, options));
 });
 
-// Manejar clicks en notificaciones
 self.addEventListener("notificationclick", function (event) {
     event.notification.close();
 

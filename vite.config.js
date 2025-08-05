@@ -13,6 +13,8 @@ export default defineConfig(({ command }) => {
                     "resources/js/Pages/Dashboard.jsx"
                 ],
                 refresh: !isProduction,
+                // Configurar preloading para CSS
+                buildDirectory: 'build',
             }),
             react(),
         ],
@@ -27,7 +29,7 @@ export default defineConfig(({ command }) => {
                     },
                 },
             },
-            cssCodeSplit: true,
+            cssCodeSplit: false, // Deshabilitar CSS code splitting
             sourcemap: false,
             minify: isProduction ? "terser" : false,
             terserOptions: isProduction

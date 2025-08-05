@@ -17,36 +17,27 @@
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" media="print" onload="this.media='all';">
         <noscript><link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet"></noscript>
 
+        <!-- Manual CSS loading to prevent preload warnings -->
+        <link rel="stylesheet" href="{{ asset('build/assets/style-20429ede.css') }}" media="all">
+        
         <!-- Scripts -->
         @routes
         @viteReactRefresh
         @vite(['resources/js/app.jsx'])
         @inertiaHead
 
-        <!-- Inline critical CSS if needed -->
-        <style>
-            /* Critical CSS para evitar FOUC */
-            body {
-                font-family: system-ui, -apple-system, sans-serif;
-                margin: 0;
-                background-color: #f8fafc;
-            }
-            .loading-spinner {
-                display: inline-block;
-                width: 20px;
-                height: 20px;
-                border: 3px solid #f3f3f3;
-                border-top: 3px solid #3498db;
-                border-radius: 50%;
-                animation: spin 1s linear infinite;
-            }
-            @keyframes spin {
-                0% { transform: rotate(0deg); }
-                100% { transform: rotate(360deg); }
-            }
-        </style>
+        <!-- Script to ensure CSS is used immediately -->
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Force CSS usage by computing styles
+            const body = document.body;
+            const computedStyle = window.getComputedStyle(body);
+            const backgroundColor = computedStyle.backgroundColor;
+            console.log('CSS ready:', backgroundColor);
+        });
+        </script>
     </head>
-    <body class="font-sans antialiased">
+    <body class="font-sans antialiased bg-gray-50 dark:bg-gray-900">
         @inertia
 
         <!-- Fallback para JavaScript deshabilitado -->

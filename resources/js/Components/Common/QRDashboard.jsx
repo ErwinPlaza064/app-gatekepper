@@ -213,17 +213,17 @@ export default function QRDashboard({ userId }) {
     // Función para obtener las clases de fondo según el estado
     const getCardBackgroundClasses = (status) => {
         const backgrounds = {
-            active: "bg-green-50/80 dark:bg-green-900/20 border-green-200/50 dark:border-green-700/50 hover:bg-green-100/80 dark:hover:bg-green-900/30",
+            active: "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-700 hover:bg-green-100 dark:hover:bg-green-900/30",
             expired:
-                "bg-red-50/80 dark:bg-red-900/20 border-red-200/50 dark:border-red-700/50 hover:bg-red-100/80 dark:hover:bg-red-900/30",
+                "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-700 hover:bg-red-100 dark:hover:bg-red-900/30",
             exhausted:
-                "bg-orange-50/80 dark:bg-orange-900/20 border-orange-200/50 dark:border-orange-700/50 hover:bg-orange-100/80 dark:hover:bg-orange-900/30",
+                "bg-orange-50 dark:bg-orange-900/20 border-orange-200 dark:border-orange-700 hover:bg-orange-100 dark:hover:bg-orange-900/30",
             inactive:
-                "bg-gray-50/80 dark:bg-gray-800/50 border-gray-200/50 dark:border-gray-700/50 hover:bg-gray-100/80 dark:hover:bg-gray-800/70",
+                "bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800/70",
         };
         return (
             backgrounds[status] ||
-            "bg-white/80 dark:bg-gray-800/80 border-gray-200/50 dark:border-gray-700/50 hover:bg-gray-50/80 dark:hover:bg-gray-700/80"
+            "bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/80"
         );
     };
 
@@ -276,7 +276,7 @@ export default function QRDashboard({ userId }) {
 
         return (
             <span
-                className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl backdrop-blur-sm ${styles[status]}`}
+                className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg ${styles[status]}`}
             >
                 {icons[status] && icons[status]}
                 {labels[status]}
@@ -298,7 +298,7 @@ export default function QRDashboard({ userId }) {
         };
 
         return (
-            <div className="flex items-center justify-center w-8 h-8 bg-white/50 dark:bg-gray-800/50 rounded-xl backdrop-blur-sm">
+            <div className="flex items-center justify-center w-8 h-8 bg-white border border-gray-200 rounded-lg dark:bg-gray-800 dark:border-gray-700">
                 {icons[type] || (
                     <FaQrcode className="w-4 h-4 text-gray-600 dark:text-gray-400" />
                 )}
@@ -317,33 +317,32 @@ export default function QRDashboard({ userId }) {
 
     if (loading) {
         return (
-            <div className="relative overflow-hidden border shadow-2xl bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-2xl sm:rounded-3xl border-white/20 dark:border-gray-700/30">
-                <div className="relative px-4 py-4 overflow-hidden sm:px-8 sm:py-6 bg-gradient-to-br from-black via-gray-900 to-black">
-                    <div className="absolute inset-0 bg-black/20"></div>
-                    <div className="relative z-10 flex items-center gap-3 sm:gap-4">
-                        <div className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 bg-white/10 backdrop-blur-sm rounded-2xl">
-                            <FaQrcode className="w-5 h-5 text-white sm:w-6 sm:h-6 animate-pulse" />
+            <div className="overflow-hidden bg-white border border-gray-200 rounded-lg shadow-xl dark:bg-gray-900 dark:border-gray-700">
+                <div className="px-6 py-5 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+                    <div className="flex items-center gap-4">
+                        <div className="flex items-center justify-center w-12 h-12 bg-black rounded-full">
+                            <FaQrcode className="w-6 h-6 text-white animate-pulse" />
                         </div>
                         <div>
                             <Typography
                                 as="h4"
                                 variant="h4"
-                                className="text-xl font-bold text-white sm:text-2xl drop-shadow-lg"
+                                className="text-xl font-semibold text-gray-900 dark:text-white"
                             >
                                 Mis Códigos QR
                             </Typography>
-                            <p className="mt-1 text-xs sm:text-sm text-white/80">
+                            <p className="text-sm text-gray-600 dark:text-gray-400">
                                 Cargando tus códigos QR...
                             </p>
                         </div>
                     </div>
                 </div>
-                <div className="p-4 sm:p-8">
-                    <div className="space-y-3 sm:space-y-4 animate-pulse">
+                <div className="p-6 bg-gray-50 dark:bg-gray-800/50">
+                    <div className="space-y-4 animate-pulse">
                         {[1, 2, 3].map((i) => (
                             <div
                                 key={i}
-                                className="h-20 sm:h-24 bg-gray-200/50 dark:bg-gray-700/50 rounded-xl sm:rounded-2xl backdrop-blur-sm"
+                                className="h-24 bg-gray-200 rounded-lg dark:bg-gray-700"
                             ></div>
                         ))}
                     </div>
@@ -353,49 +352,45 @@ export default function QRDashboard({ userId }) {
     }
 
     return (
-        <div className="relative overflow-hidden border shadow-2xl bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-2xl sm:rounded-3xl border-white/20 dark:border-gray-700/30">
-            {/* Header con gradiente negro */}
-            <div className="relative px-4 py-4 overflow-hidden sm:px-8 sm:py-6 bg-gradient-to-br from-black via-gray-900 to-black">
-                <div className="absolute inset-0 bg-black/20"></div>
-                <div className="relative z-10 flex items-center gap-3 sm:gap-4">
-                    <div className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 bg-white/10 backdrop-blur-sm rounded-2xl">
-                        <FaQrcode className="w-5 h-5 text-white sm:w-6 sm:h-6" />
+        <div className="overflow-hidden bg-white border border-gray-200 rounded-lg shadow-xl dark:bg-gray-900 dark:border-gray-700">
+            {/* Header con estilo Material Design */}
+            <div className="px-6 py-5 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+                <div className="flex items-center gap-4">
+                    <div className="flex items-center justify-center w-12 h-12 bg-black rounded-full">
+                        <FaQrcode className="w-6 h-6 text-white" />
                     </div>
                     <div>
                         <Typography
                             as="h4"
                             variant="h4"
-                            className="text-xl font-bold text-white sm:text-2xl drop-shadow-lg"
+                            className="text-xl font-semibold text-gray-900 dark:text-white"
                         >
                             Mis Códigos QR
                         </Typography>
-                        <p className="mt-1 text-xs sm:text-sm text-white/80">
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
                             Gestiona todos tus códigos QR
                         </p>
                     </div>
                 </div>
-                <div className="absolute top-0 right-0 w-24 h-24 -mt-12 -mr-12 rounded-full sm:w-32 sm:h-32 sm:-mt-16 sm:-mr-16 bg-white/5"></div>
-                <div className="absolute bottom-0 left-0 w-16 h-16 -mb-8 -ml-8 rounded-full sm:w-24 sm:h-24 sm:-mb-12 sm:-ml-12 bg-white/10"></div>
             </div>
 
-            {/* Contenido */}
-            <div className="p-4 sm:p-8">
+            <div className="p-6 bg-gray-50 dark:bg-gray-800/50">
                 {qrCodes.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-12 text-center sm:py-16">
-                        <div className="flex items-center justify-center w-16 h-16 mb-4 sm:w-20 sm:h-20 sm:mb-6 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 rounded-3xl">
-                            <FaQrcode className="w-6 h-6 text-gray-400 sm:w-8 sm:h-8" />
+                    <div className="flex flex-col items-center justify-center py-12 text-center">
+                        <div className="flex items-center justify-center w-16 h-16 mb-6 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700">
+                            <FaQrcode className="w-8 h-8 text-gray-400" />
                         </div>
                         <Typography
                             as="p"
                             variant="p"
-                            className="mb-2 text-base font-medium text-gray-600 sm:text-lg dark:text-gray-400"
+                            className="mb-2 text-lg font-medium text-gray-600 dark:text-gray-400"
                         >
                             Sin códigos QR
                         </Typography>
                         <Typography
                             as="p"
                             variant="p"
-                            className="text-xs text-gray-500 sm:text-sm dark:text-gray-500"
+                            className="text-sm text-gray-500 dark:text-gray-500"
                         >
                             Genera tu primer código QR para visitantes
                         </Typography>
@@ -405,15 +400,15 @@ export default function QRDashboard({ userId }) {
                         {qrCodes.map((qr) => (
                             <div
                                 key={qr.id}
-                                className={`group relative p-4 sm:p-6 rounded-2xl sm:rounded-3xl border transition-all duration-300 hover:shadow-lg hover:scale-[1.01] backdrop-blur-sm ${getCardBackgroundClasses(
+                                className={`p-6 rounded-lg border transition-all duration-200 hover:shadow-md ${getCardBackgroundClasses(
                                     qr.status
                                 )}`}
                             >
                                 {/* Header de la card */}
                                 <div className="flex flex-col justify-between gap-3 mb-4 sm:flex-row sm:items-start sm:gap-0">
-                                    <div className="flex items-center gap-3 sm:gap-4">
-                                        <div className="flex items-center justify-center flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-gray-600 to-gray-800 rounded-xl sm:rounded-2xl">
-                                            <span className="text-sm font-bold text-white sm:text-lg">
+                                    <div className="flex items-center gap-4">
+                                        <div className="flex items-center justify-center flex-shrink-0 w-12 h-12 rounded-lg bg-gradient-to-br from-gray-600 to-gray-800">
+                                            <span className="text-lg font-bold text-white">
                                                 {qr.visitor_name
                                                     .charAt(0)
                                                     .toUpperCase()}
@@ -421,7 +416,7 @@ export default function QRDashboard({ userId }) {
                                         </div>
                                         <div className="flex-1 min-w-0">
                                             <h5
-                                                className={`text-base sm:text-lg font-bold truncate ${getTextClasses(
+                                                className={`text-lg font-bold truncate ${getTextClasses(
                                                     qr.status
                                                 )}`}
                                             >
@@ -429,7 +424,7 @@ export default function QRDashboard({ userId }) {
                                             </h5>
                                             <div className="flex flex-col gap-1 mt-1 sm:flex-row sm:items-center sm:gap-4">
                                                 <span
-                                                    className={`text-xs sm:text-sm flex items-center gap-1 ${getSecondaryTextClasses(
+                                                    className={`text-sm flex items-center gap-1 ${getSecondaryTextClasses(
                                                         qr.status
                                                     )}`}
                                                 >
@@ -437,7 +432,7 @@ export default function QRDashboard({ userId }) {
                                                     {qr.document_id}
                                                 </span>
                                                 <span
-                                                    className={`text-xs sm:text-sm flex items-center gap-1 ${getSecondaryTextClasses(
+                                                    className={`text-sm flex items-center gap-1 ${getSecondaryTextClasses(
                                                         qr.status
                                                     )}`}
                                                 >
@@ -455,8 +450,8 @@ export default function QRDashboard({ userId }) {
                                 </div>
 
                                 {/* Grid de información */}
-                                <div className="grid grid-cols-2 gap-3 mb-4 sm:grid-cols-2 lg:grid-cols-4 sm:gap-6">
-                                    <div className="p-2 text-center sm:p-3 bg-white/50 dark:bg-gray-800/50 rounded-xl sm:rounded-2xl backdrop-blur-sm">
+                                <div className="grid grid-cols-2 gap-3 mb-4 lg:grid-cols-4 sm:gap-4">
+                                    <div className="p-3 text-center bg-white border border-gray-200 rounded-lg dark:bg-gray-800 dark:border-gray-700">
                                         <span
                                             className={`text-xs font-medium ${getSecondaryTextClasses(
                                                 qr.status
@@ -465,14 +460,14 @@ export default function QRDashboard({ userId }) {
                                             Tipo
                                         </span>
                                         <p
-                                            className={`font-bold text-xs sm:text-sm mt-1 ${getTextClasses(
+                                            className={`font-bold text-sm mt-1 ${getTextClasses(
                                                 qr.status
                                             )}`}
                                         >
                                             {getTypeLabel(qr.qr_type)}
                                         </p>
                                     </div>
-                                    <div className="p-2 text-center sm:p-3 bg-white/50 dark:bg-gray-800/50 rounded-xl sm:rounded-2xl backdrop-blur-sm">
+                                    <div className="p-3 text-center bg-white border border-gray-200 rounded-lg dark:bg-gray-800 dark:border-gray-700">
                                         <span
                                             className={`text-xs font-medium ${getSecondaryTextClasses(
                                                 qr.status
@@ -481,7 +476,7 @@ export default function QRDashboard({ userId }) {
                                             Usos
                                         </span>
                                         <p
-                                            className={`font-bold text-xs sm:text-sm mt-1 ${getTextClasses(
+                                            className={`font-bold text-sm mt-1 ${getTextClasses(
                                                 qr.status
                                             )}`}
                                         >
@@ -489,7 +484,7 @@ export default function QRDashboard({ userId }) {
                                         </p>
                                     </div>
                                     {qr.valid_until && (
-                                        <div className="p-2 text-center sm:p-3 bg-white/50 dark:bg-gray-800/50 rounded-xl sm:rounded-2xl backdrop-blur-sm">
+                                        <div className="p-3 text-center bg-white border border-gray-200 rounded-lg dark:bg-gray-800 dark:border-gray-700">
                                             <span
                                                 className={`text-xs font-medium ${getSecondaryTextClasses(
                                                     qr.status
@@ -513,7 +508,7 @@ export default function QRDashboard({ userId }) {
                                         </div>
                                     )}
                                     {qr.time_remaining && (
-                                        <div className="p-2 text-center sm:p-3 bg-white/50 dark:bg-gray-800/50 rounded-xl sm:rounded-2xl backdrop-blur-sm">
+                                        <div className="p-3 text-center bg-white border border-gray-200 rounded-lg dark:bg-gray-800 dark:border-gray-700">
                                             <span
                                                 className={`text-xs font-medium ${getSecondaryTextClasses(
                                                     qr.status
@@ -540,12 +535,12 @@ export default function QRDashboard({ userId }) {
                                 <div
                                     className={`flex flex-col sm:flex-row sm:items-center justify-between pt-4 border-t gap-3 sm:gap-0 ${
                                         qr.status === "expired"
-                                            ? "border-red-200/50 dark:border-red-700/50"
+                                            ? "border-red-200 dark:border-red-700"
                                             : qr.status === "active"
-                                            ? "border-green-200/50 dark:border-green-700/50"
+                                            ? "border-green-200 dark:border-green-700"
                                             : qr.status === "exhausted"
-                                            ? "border-orange-200/50 dark:border-orange-700/50"
-                                            : "border-gray-200/50 dark:border-gray-700/50"
+                                            ? "border-orange-200 dark:border-orange-700"
+                                            : "border-gray-200 dark:border-gray-700"
                                     }`}
                                 >
                                     <div className="flex items-center gap-2">
@@ -575,9 +570,9 @@ export default function QRDashboard({ userId }) {
                                                 onClick={() =>
                                                     handleDeactivate(qr.id)
                                                 }
-                                                className="flex items-center gap-2 px-3 py-2 text-xs font-semibold text-red-700 transition-all duration-300 bg-red-100 border border-red-200 sm:px-4 group dark:bg-red-900/30 dark:text-red-300 rounded-xl dark:border-red-800/50 hover:bg-red-200 dark:hover:bg-red-900/50 hover:scale-105"
+                                                className="flex items-center gap-2 px-4 py-2 text-xs font-semibold text-red-700 transition-all duration-200 bg-red-100 border border-red-200 rounded-lg dark:bg-red-900/30 dark:text-red-300 dark:border-red-800/50 hover:bg-red-200 dark:hover:bg-red-900/50 focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
                                             >
-                                                <FaTimes className="w-3 h-3 transition-transform group-hover:scale-110" />
+                                                <FaTimes className="w-3 h-3" />
                                                 <span className="hidden sm:inline">
                                                     Desactivar
                                                 </span>
@@ -594,9 +589,9 @@ export default function QRDashboard({ userId }) {
                                                 onClick={() =>
                                                     handleReactivate(qr.id)
                                                 }
-                                                className="flex items-center gap-2 px-3 py-2 text-xs font-semibold text-green-700 transition-all duration-300 bg-green-100 border border-green-200 sm:px-4 group dark:bg-green-900/30 dark:text-green-300 rounded-xl dark:border-green-800/50 hover:bg-green-200 dark:hover:bg-green-900/50 hover:scale-105"
+                                                className="flex items-center gap-2 px-4 py-2 text-xs font-semibold text-green-700 transition-all duration-200 bg-green-100 border border-green-200 rounded-lg dark:bg-green-900/30 dark:text-green-300 dark:border-green-800/50 hover:bg-green-200 dark:hover:bg-green-900/50 focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
                                             >
-                                                <FaRedo className="w-3 h-3 transition-transform group-hover:scale-110" />
+                                                <FaRedo className="w-3 h-3" />
                                                 <span className="hidden sm:inline">
                                                     Reactivar
                                                 </span>

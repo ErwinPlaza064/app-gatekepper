@@ -286,46 +286,41 @@ export default function QRGenerator({ userId }) {
     };
 
     return (
-        <div className="relative overflow-hidden border shadow-2xl bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl border-white/20 dark:border-gray-700/30">
-            {/* Header con gradiente negro */}
-            <div className="relative px-8 py-6 overflow-hidden bg-gradient-to-br from-black via-gray-900 to-black">
-                <div className="absolute inset-0 bg-black/20"></div>
-                <div className="relative z-10 flex items-center gap-4">
-                    <div className="flex items-center justify-center w-12 h-12 bg-white/10 backdrop-blur-sm rounded-2xl">
+        <div className="overflow-hidden bg-white border border-gray-200 rounded-lg shadow-xl dark:bg-gray-900 dark:border-gray-700">
+            <div className="px-6 py-5 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+                <div className="flex items-center gap-4">
+                    <div className="flex items-center justify-center w-12 h-12 bg-black rounded-full ">
                         <FaQrcode className="w-6 h-6 text-white" />
                     </div>
                     <div>
                         <Typography
                             as="h4"
                             variant="h4"
-                            className="text-2xl font-bold text-white drop-shadow-lg"
+                            className="text-xl font-semibold text-gray-900 dark:text-white"
                         >
                             Generar Código QR
                         </Typography>
-                        <p className="mt-1 text-sm text-white/80">
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
                             Crea códigos QR para visitantes
                         </p>
                     </div>
                 </div>
-                <div className="absolute top-0 right-0 w-32 h-32 -mt-16 -mr-16 rounded-full bg-white/5"></div>
-                <div className="absolute bottom-0 left-0 w-24 h-24 -mb-12 -ml-12 rounded-full bg-white/10"></div>
             </div>
 
             {!isQrSaved ? (
-                <div className="p-8 bg-gradient-to-r from-gray-50/50 to-white/50 dark:from-gray-800/50 dark:to-gray-900/50 backdrop-blur-sm">
-                    {/* Tipo de acceso */}
+                <div className="p-6 bg-gray-50 dark:bg-gray-800/50">
                     <div className="mb-6">
-                        <label className="flex items-center gap-2 mb-3 text-sm font-semibold text-gray-900 dark:text-gray-100">
+                        <label className="flex items-center gap-2 mb-3 text-sm font-medium text-gray-900 dark:text-white">
                             {qrOptions.type === "single_use" && (
-                                <FaBullseye className="w-4 h-4 text-blue-600" />
+                                <FaBullseye className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                             )}
                             {qrOptions.type === "time_limited" && (
-                                <FaClock className="w-4 h-4 text-orange-600" />
+                                <FaClock className="w-4 h-4 text-orange-600 dark:text-orange-400" />
                             )}
                             {qrOptions.type === "recurring" && (
-                                <FaRedoAlt className="w-4 h-4 text-green-600" />
+                                <FaRedoAlt className="w-4 h-4 text-green-600 dark:text-green-400" />
                             )}
-                            Tipo de acceso:
+                            Tipo de acceso
                         </label>
                         <select
                             value={qrOptions.type}
@@ -335,7 +330,7 @@ export default function QRGenerator({ userId }) {
                                     type: e.target.value,
                                 })
                             }
-                            className="w-full px-4 py-3 text-gray-900 transition-all duration-300 border bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-gray-200/50 dark:border-gray-700/50 rounded-2xl dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-black/20 dark:focus:ring-white/20 focus:border-transparent hover:bg-white dark:hover:bg-gray-800"
+                            className="w-full px-4 py-3 text-gray-900 transition-colors duration-200 bg-white border border-gray-200 rounded-lg dark:text-gray-100 dark:bg-gray-800 dark:border-gray-700 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
                         >
                             <option value="single_use">Uso único</option>
                             <option value="time_limited">
@@ -345,13 +340,12 @@ export default function QRGenerator({ userId }) {
                         </select>
                     </div>
 
-                    {/* Duración */}
                     {(qrOptions.type === "time_limited" ||
                         qrOptions.type === "recurring") && (
                         <div className="mb-6">
-                            <label className="flex items-center gap-2 mb-3 text-sm font-semibold text-gray-900 dark:text-gray-100">
-                                <FaClock className="w-4 h-4" />
-                                Duración:
+                            <label className="flex items-center gap-2 mb-3 text-sm font-medium text-gray-900 dark:text-white">
+                                <FaClock className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                                Duración
                             </label>
                             <select
                                 value={qrOptions.duration}
@@ -361,7 +355,7 @@ export default function QRGenerator({ userId }) {
                                         duration: parseInt(e.target.value),
                                     })
                                 }
-                                className="w-full px-4 py-3 text-gray-900 transition-all duration-300 border bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-gray-200/50 dark:border-gray-700/50 rounded-2xl dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-black/20 dark:focus:ring-white/20 focus:border-transparent hover:bg-white dark:hover:bg-gray-800"
+                                className="w-full px-4 py-3 text-gray-900 transition-colors duration-200 bg-white border border-gray-200 rounded-lg dark:text-gray-100 dark:bg-gray-800 dark:border-gray-700 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
                             >
                                 <option value={1}>1 hora</option>
                                 <option value={2}>2 horas</option>
@@ -374,12 +368,11 @@ export default function QRGenerator({ userId }) {
                         </div>
                     )}
 
-                    {/* Máximo usos */}
                     {qrOptions.type === "recurring" && (
                         <div className="mb-6">
-                            <label className="flex items-center gap-2 mb-3 text-sm font-semibold text-gray-900 dark:text-gray-100">
-                                <FaQrcode className="w-4 h-4" />
-                                Máximo de usos:
+                            <label className="flex items-center gap-2 mb-3 text-sm font-medium text-gray-900 dark:text-white">
+                                <FaQrcode className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                                Máximo de usos
                             </label>
                             <input
                                 type="number"
@@ -392,17 +385,15 @@ export default function QRGenerator({ userId }) {
                                         maxUses: parseInt(e.target.value),
                                     })
                                 }
-                                className="w-full px-4 py-3 text-gray-900 transition-all duration-300 border bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-gray-200/50 dark:border-gray-700/50 rounded-2xl dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-black/20 dark:focus:ring-white/20 focus:border-transparent hover:bg-white dark:hover:bg-gray-800"
+                                className="w-full px-4 py-3 text-gray-900 transition-colors duration-200 bg-white border border-gray-200 rounded-lg dark:text-gray-100 dark:bg-gray-800 dark:border-gray-700 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
                             />
                         </div>
                     )}
 
-                    {/* Información del visitante */}
                     <div className="mb-6 space-y-4">
-                        {/* Nombre */}
-                        <div className="relative group">
-                            <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
-                                <FaUser className="w-5 h-5 text-gray-400 transition-colors group-focus-within:text-gray-600 dark:group-focus-within:text-gray-300" />
+                        <div className="relative">
+                            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                <FaUser className="w-4 h-4 text-gray-400" />
                             </div>
                             <input
                                 type="text"
@@ -414,14 +405,13 @@ export default function QRGenerator({ userId }) {
                                         name: e.target.value,
                                     })
                                 }
-                                className="w-full py-3 pr-4 text-gray-900 placeholder-gray-500 transition-all duration-300 border pl-14 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-gray-200/50 dark:border-gray-700/50 rounded-2xl dark:text-gray-100 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black/20 dark:focus:ring-white/20 focus:border-transparent hover:bg-white dark:hover:bg-gray-800"
+                                className="w-full py-3 pl-10 pr-4 text-gray-900 placeholder-gray-500 transition-colors duration-200 bg-white border border-gray-200 rounded-lg dark:text-gray-100 dark:bg-gray-800 dark:border-gray-700 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent dark:placeholder-gray-400"
                             />
                         </div>
 
-                        {/* Documento */}
-                        <div className="relative group">
-                            <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
-                                <FaIdCard className="w-5 h-5 text-gray-400 transition-colors group-focus-within:text-gray-600 dark:group-focus-within:text-gray-300" />
+                        <div className="relative">
+                            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                <FaIdCard className="w-4 h-4 text-gray-400" />
                             </div>
                             <input
                                 type="text"
@@ -433,14 +423,13 @@ export default function QRGenerator({ userId }) {
                                         id_document: e.target.value,
                                     })
                                 }
-                                className="w-full py-3 pr-4 text-gray-900 placeholder-gray-500 transition-all duration-300 border pl-14 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-gray-200/50 dark:border-gray-700/50 rounded-2xl dark:text-gray-100 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black/20 dark:focus:ring-white/20 focus:border-transparent hover:bg-white dark:hover:bg-gray-800"
+                                className="w-full py-3 pl-10 pr-4 text-gray-900 placeholder-gray-500 transition-colors duration-200 bg-white border border-gray-200 rounded-lg dark:text-gray-100 dark:bg-gray-800 dark:border-gray-700 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent dark:placeholder-gray-400"
                             />
                         </div>
 
-                        {/* Placa */}
-                        <div className="relative group">
-                            <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
-                                <FaCar className="w-5 h-5 text-gray-400 transition-colors group-focus-within:text-gray-600 dark:group-focus-within:text-gray-300" />
+                        <div className="relative">
+                            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                <FaCar className="w-4 h-4 text-gray-400" />
                             </div>
                             <input
                                 type="text"
@@ -452,12 +441,11 @@ export default function QRGenerator({ userId }) {
                                         vehicle_plate: e.target.value,
                                     })
                                 }
-                                className="w-full py-3 pr-4 text-gray-900 placeholder-gray-500 transition-all duration-300 border pl-14 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-gray-200/50 dark:border-gray-700/50 rounded-2xl dark:text-gray-100 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black/20 dark:focus:ring-white/20 focus:border-transparent hover:bg-white dark:hover:bg-gray-800"
+                                className="w-full py-3 pl-10 pr-4 text-gray-900 placeholder-gray-500 transition-colors duration-200 bg-white border border-gray-200 rounded-lg dark:text-gray-100 dark:bg-gray-800 dark:border-gray-700 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent dark:placeholder-gray-400"
                             />
                         </div>
                     </div>
 
-                    {/* Botón guardar */}
                     <button
                         onClick={saveQrToDatabase}
                         disabled={
@@ -465,49 +453,38 @@ export default function QRGenerator({ userId }) {
                             !visitorInfo.id_document ||
                             isSaving
                         }
-                        className={`group relative w-full flex items-center justify-center gap-3 px-6 py-4 font-semibold rounded-2xl shadow-xl border transition-all duration-300 backdrop-blur-sm ${
+                        className={`w-full flex items-center justify-center gap-3 px-6 py-3 font-medium rounded-lg transition-all duration-200 ${
                             !visitorInfo.name ||
                             !visitorInfo.id_document ||
                             isSaving
-                                ? "bg-gray-400 dark:bg-gray-600 text-gray-200 border-gray-300 dark:border-gray-700 cursor-not-allowed"
-                                : "bg-gradient-to-r from-black via-gray-900 to-black text-white border-white/10 hover:from-gray-900 hover:via-black hover:to-gray-900 hover:shadow-2xl hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-white/20"
+                                ? "bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed"
+                                : "bg-blue-600 hover:bg-blue-700 text-white focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 shadow-sm"
                         }`}
                     >
                         {isSaving ? (
                             <>
-                                <div className="w-5 h-5 border-2 rounded-full animate-spin border-white/30 border-t-white"></div>
-                                <span className="drop-shadow-sm">
-                                    Guardando QR...
-                                </span>
+                                <div className="w-4 h-4 border-2 rounded-full animate-spin border-white/30 border-t-white"></div>
+                                <span>Guardando QR...</span>
                             </>
                         ) : (
                             <>
-                                <FaSave className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" />
-                                <span className="drop-shadow-sm">
-                                    Guardar Código QR
-                                </span>
+                                <FaSave className="w-4 h-4" />
+                                <span>Guardar Código QR</span>
                             </>
                         )}
-                        {!isSaving &&
-                            !(
-                                !visitorInfo.name || !visitorInfo.id_document
-                            ) && (
-                                <div className="absolute inset-0 transition-opacity duration-500 opacity-0 rounded-2xl bg-gradient-to-r from-transparent via-white/5 to-transparent group-hover:opacity-100"></div>
-                            )}
                     </button>
                 </div>
             ) : (
-                <div className="p-8">
-                    {/* Mensaje de éxito */}
-                    <div className="flex items-center gap-3 p-4 mb-6 border bg-green-50/80 dark:bg-green-900/20 border-green-200/50 dark:border-green-800/50 rounded-2xl backdrop-blur-sm">
-                        <div className="flex items-center justify-center flex-shrink-0 w-10 h-10 bg-green-100 dark:bg-green-800/50 rounded-xl">
-                            <FaCheck className="w-5 h-5 text-green-600 dark:text-green-300" />
+                <div className="p-6">
+                    <div className="flex items-center gap-3 p-4 mb-6 border border-green-200 rounded-lg bg-green-50 dark:bg-green-900/20 dark:border-green-800">
+                        <div className="flex items-center justify-center flex-shrink-0 w-8 h-8 bg-green-100 rounded-full dark:bg-green-800">
+                            <FaCheck className="w-4 h-4 text-green-600 dark:text-green-300" />
                         </div>
                         <div>
                             <Typography
                                 as="p"
                                 variant="p"
-                                className="font-semibold text-green-800 dark:text-green-200"
+                                className="font-medium text-green-900 dark:text-green-100"
                             >
                                 QR guardado exitosamente
                             </Typography>
@@ -522,24 +499,21 @@ export default function QRGenerator({ userId }) {
                     </div>
 
                     <div className="flex flex-col items-center">
-                        {/* QR Code Display */}
-                        <div className="relative p-6 mb-6 border-4 shadow-inner bg-gradient-to-br from-white to-gray-50 dark:from-gray-100 dark:to-white rounded-3xl border-gray-200/50">
+                        <div className="relative p-4 mb-6 bg-white border-2 border-gray-200 rounded-lg shadow-sm dark:bg-gray-100 dark:border-gray-300">
                             <div ref={qrRef} className="relative">
                                 <QRCodeCanvas
                                     value={generateQRDataForDisplay()}
-                                    size={320}
+                                    size={280}
                                     level="H"
                                     includeMargin={true}
                                 />
                             </div>
-                            <div className="absolute w-6 h-6 bg-green-500 border-2 border-white rounded-full -top-2 -right-2 animate-pulse"></div>
                         </div>
 
-                        {/* Información del visitante */}
-                        <div className="w-full p-6 mb-6 border bg-gradient-to-r from-gray-50/50 to-white/50 dark:from-gray-800/50 dark:to-gray-900/50 backdrop-blur-sm rounded-2xl border-gray-200/50 dark:border-gray-700/50">
-                            <div className="mb-4 text-center">
-                                <div className="flex items-center justify-center w-12 h-12 mx-auto mb-3 bg-gradient-to-br from-gray-600 to-gray-800 rounded-2xl">
-                                    <span className="text-lg font-bold text-white">
+                        <div className="w-full p-4 mb-6 border border-gray-200 rounded-lg bg-gray-50 dark:bg-gray-800/50 dark:border-gray-700">
+                            <div className="text-center">
+                                <div className="flex items-center justify-center w-10 h-10 mx-auto mb-3 rounded-full bg-gradient-to-br from-blue-600 to-blue-700">
+                                    <span className="text-sm font-semibold text-white">
                                         {savedQrData.visitor_name
                                             .charAt(0)
                                             .toUpperCase()}
@@ -548,7 +522,7 @@ export default function QRGenerator({ userId }) {
                                 <Typography
                                     as="h5"
                                     variant="h5"
-                                    className="text-xl font-bold text-gray-900 dark:text-gray-100"
+                                    className="text-lg font-semibold text-gray-900 dark:text-gray-100"
                                 >
                                     {savedQrData.visitor_name}
                                 </Typography>
@@ -582,41 +556,31 @@ export default function QRGenerator({ userId }) {
                             </div>
                         </div>
 
-                        {/* Botones de acción */}
                         <div className="w-full space-y-3">
                             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                                 <button
                                     onClick={downloadQR}
-                                    className="group flex items-center justify-center gap-3 px-6 py-3 bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 text-white font-semibold rounded-2xl shadow-xl border border-blue-500/20 hover:from-blue-700 hover:via-blue-800 hover:to-blue-900 hover:shadow-2xl hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-blue-400/50 transition-all duration-300 backdrop-blur-sm"
+                                    className="flex items-center justify-center gap-2 px-4 py-3 text-white transition-colors duration-200 bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                                 >
-                                    <FaDownload className="w-4 h-4 transition-transform duration-300 group-hover:scale-110" />
-                                    <span className="drop-shadow-sm">
-                                        Descargar
-                                    </span>
-                                    <div className="absolute inset-0 transition-opacity duration-500 opacity-0 rounded-2xl bg-gradient-to-r from-transparent via-white/10 to-transparent group-hover:opacity-100"></div>
+                                    <FaDownload className="w-4 h-4" />
+                                    <span>Descargar</span>
                                 </button>
 
                                 <button
                                     onClick={sendWhatsApp}
-                                    className="group flex items-center justify-center gap-3 px-6 py-3 bg-gradient-to-r from-green-600 via-green-700 to-green-800 text-white font-semibold rounded-2xl shadow-xl border border-green-500/20 hover:from-green-700 hover:via-green-800 hover:to-green-900 hover:shadow-2xl hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-green-400/50 transition-all duration-300 backdrop-blur-sm"
+                                    className="flex items-center justify-center gap-2 px-4 py-3 text-white transition-colors duration-200 bg-green-600 rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
                                 >
-                                    <FaWhatsapp className="w-4 h-4 transition-transform duration-300 group-hover:scale-110" />
-                                    <span className="drop-shadow-sm">
-                                        WhatsApp
-                                    </span>
-                                    <div className="absolute inset-0 transition-opacity duration-500 opacity-0 rounded-2xl bg-gradient-to-r from-transparent via-white/10 to-transparent group-hover:opacity-100"></div>
+                                    <FaWhatsapp className="w-4 h-4" />
+                                    <span>WhatsApp</span>
                                 </button>
                             </div>
 
                             <button
                                 onClick={resetForm}
-                                className="group relative w-full flex items-center justify-center gap-3 px-6 py-4 bg-gradient-to-r from-black via-gray-900 to-black text-white font-semibold rounded-2xl shadow-xl border border-white/10 hover:from-gray-900 hover:via-black hover:to-gray-900 hover:shadow-2xl hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-white/20 transition-all duration-300 backdrop-blur-sm"
+                                className="flex items-center justify-center w-full gap-2 px-4 py-3 text-gray-700 transition-colors duration-200 bg-gray-100 rounded-lg dark:text-gray-300 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
                             >
-                                <FaPlus className="w-4 h-4 transition-transform duration-300 group-hover:scale-110" />
-                                <span className="mx-auto drop-shadow-sm">
-                                    Crear Nuevo QR
-                                </span>
-                                <div className="absolute inset-0 transition-opacity duration-500 opacity-0 rounded-2xl bg-gradient-to-r from-transparent via-white/5 to-transparent group-hover:opacity-100"></div>
+                                <FaPlus className="w-4 h-4" />
+                                <span>Crear Nuevo QR</span>
                             </button>
                         </div>
                     </div>

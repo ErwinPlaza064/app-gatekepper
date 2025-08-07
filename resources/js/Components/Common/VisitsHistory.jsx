@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Typography from "@/Components/UI/Typography";
 import {
     FaSearch,
@@ -7,126 +7,255 @@ import {
     FaUser,
     FaIdCard,
     FaCar,
+    FaTimes,
+    FaFilter,
 } from "react-icons/fa";
 
 export default function VisitsHistory({ visits }) {
-    const [search, setSearch] = useState("");
-    const [dateFrom, setDateFrom] = useState("");
-    const [dateTo, setDateTo] = useState("");
-    const [filters, setFilters] = useState({
-        search: "",
-        dateFrom: "",
-        dateTo: "",
-    });
+    const [globalSearch, setGlobalSearch] = useState("");
+    const [vehicleFilter, setVehicleFilter] = useState("all"); // all, with, without
+    const [dateRange, setDateRange] = useState("all"); // all, today, week, month, custom
+    const [customDateFrom, setCustomDateFrom] = useState("");
+    const [customDateTo, setCustomDateTo] = useState("");
+    const [showDatePicker, setShowDatePicker] = useState(false);
 
-    const filteredVisits = (visits || []).filter((visit) => {
-        const name = (visit.visitor_name || visit.name || "").toLowerCase();
-        const created = visit.created_at ? new Date(visit.created_at) : null;
-        const matchesName = name.includes(filters.search.toLowerCase());
-        const matchesFrom = filters.dateFrom
-            ? created >= new Date(filters.dateFrom)
-            : true;
-        const matchesTo = filters.dateTo
-            ? created <= new Date(filters.dateTo)
-            : true;
-        return matchesName && matchesFrom && matchesTo;
-    });
+    // Función para obtener el rango de fechas basado en la selección
+    const getDateRange = () => {
+        const now = new Date();
+        const today = new Date(
+            now.getFullYear(),
+            now.getMonth(),
+            now.getDate()
+        );
 
-    const handleSearch = (e) => {
-        e.preventDefault();
-        setFilters({ search, dateFrom, dateTo });
+        switch (dateRange) {
+            case "today":
+                return {
+                    from: today,
+                    to: new Date(today.getTime() + 24 * 60 * 60 * 1000 - 1),
+                };
+            case "week":
+                const weekStart = new Date(today);
+                weekStart.setDate(today.getDate() - today.getDay());
+                const weekEnd = new Date(weekStart);
+                weekEnd.setDate(weekStart.getDate() + 6);
+                weekEnd.setHours(23, 59, 59, 999);
+                return { from: weekStart, to: weekEnd };
+            case "month":
+                const monthStart = new Date(
+                    today.getFullYear(),
+                    today.getMonth(),
+                    1
+                );
+                const monthEnd = new Date(
+                    today.getFullYear(),
+                    today.getMonth() + 1,
+                    0
+                );
+                monthEnd.setHours(23, 59, 59, 999);
+                return { from: monthStart, to: monthEnd };
+            case "custom":
+                return {
+                    from: customDateFrom ? new Date(customDateFrom) : null,
+                    to: customDateTo ? new Date(customDateTo) : null,
+                };
+            default:
+                return { from: null, to: null };
+        }
     };
 
+    // Filtrado en tiempo real
+    const filteredVisits = (visits || []).filter((visit) => {
+        // Búsqueda global en nombre, documento y placa
+        const searchTerm = globalSearch.toLowerCase();
+        const name = (visit.visitor_name || visit.name || "").toLowerCase();
+        const document = (
+            visit.document_id ||
+            visit.id_document ||
+            ""
+        ).toLowerCase();
+        const plate = (visit.vehicle_plate || "").toLowerCase();
+
+        const matchesSearch =
+            !searchTerm ||
+            name.includes(searchTerm) ||
+            document.includes(searchTerm) ||
+            plate.includes(searchTerm);
+
+        // Filtro de vehículo
+        const hasVehicle =
+            visit.vehicle_plate && visit.vehicle_plate.trim() !== "";
+        const matchesVehicle =
+            vehicleFilter === "all" ||
+            (vehicleFilter === "with" && hasVehicle) ||
+            (vehicleFilter === "without" && !hasVehicle);
+
+        // Filtro de fecha
+        const visitDate = visit.created_at ? new Date(visit.created_at) : null;
+        const { from, to } = getDateRange();
+        const matchesDate =
+            !from ||
+            !to ||
+            !visitDate ||
+            (visitDate >= from && visitDate <= to);
+
+        return matchesSearch && matchesVehicle && matchesDate;
+    });
+
+    // Detectar cuando se selecciona "custom" para mostrar los date pickers
+    useEffect(() => {
+        setShowDatePicker(dateRange === "custom");
+    }, [dateRange]);
+
     return (
-        <div className="relative overflow-hidden bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 dark:border-gray-700/30">
-            {/* Header con gradiente negro */}
-            <div className="relative px-8 py-6 bg-gradient-to-br from-black via-gray-900 to-black overflow-hidden">
-                <div className="absolute inset-0 bg-black/20"></div>
-                <div className="relative z-10 flex items-center gap-4">
-                    <div className="flex items-center justify-center w-12 h-12 bg-white/10 backdrop-blur-sm rounded-2xl">
+        <div className="overflow-hidden bg-white border border-gray-200 rounded-lg shadow-xl dark:bg-gray-900 dark:border-gray-700">
+            <div className="px-6 py-5 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+                <div className="flex items-center gap-4">
+                    <div className="flex items-center justify-center w-12 h-12 bg-black rounded-full">
                         <FaHistory className="w-6 h-6 text-white" />
                     </div>
                     <div>
                         <Typography
                             as="h4"
                             variant="h4"
-                            className="text-2xl font-bold text-white drop-shadow-lg"
+                            className="text-xl font-semibold text-gray-900 dark:text-white"
                         >
                             Historial de Visitas
                         </Typography>
-                        <p className="text-sm text-white/80 mt-1">
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
                             Registro completo de visitantes
                         </p>
                     </div>
                 </div>
-                <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-16 -mt-16"></div>
-                <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full -ml-12 -mb-12"></div>
             </div>
 
-            {/* Formulario de búsqueda mejorado */}
-            <div className="p-8 bg-gradient-to-r from-gray-50/50 to-white/50 dark:from-gray-800/50 dark:to-gray-900/50 backdrop-blur-sm">
-                <form
-                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
-                    onSubmit={handleSearch}
-                >
-                    <div className="relative group">
-                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                            <FaSearch className="h-4 w-4 text-gray-400 group-focus-within:text-gray-600 dark:group-focus-within:text-gray-300 transition-colors" />
+            <div className="p-6 bg-gray-50 dark:bg-gray-800/50">
+                {/* Barra de búsqueda principal */}
+                <div className="mb-6">
+                    <div className="relative">
+                        <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
+                            <FaSearch className="w-5 h-5 text-gray-400" />
                         </div>
                         <input
                             type="text"
-                            placeholder="Buscar por nombre..."
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                            className="w-full pl-12 pr-4 py-3 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 rounded-2xl text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black/20 dark:focus:ring-white/20 focus:border-transparent transition-all duration-300 hover:bg-white dark:hover:bg-gray-800"
+                            placeholder="Buscar visitante por nombre, documento o placa..."
+                            value={globalSearch}
+                            onChange={(e) => setGlobalSearch(e.target.value)}
+                            className="w-full py-4 pl-12 pr-4 text-lg text-gray-900 placeholder-gray-500 transition-colors duration-200 bg-white border-2 border-gray-200 rounded-lg shadow-sm dark:text-gray-100 dark:bg-gray-800 dark:border-gray-700 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:placeholder-gray-400"
                         />
+                        {globalSearch && (
+                            <button
+                                onClick={() => setGlobalSearch("")}
+                                className="absolute inset-y-0 right-0 flex items-center justify-end pr-4 text-gray-400 bg-transparent hover:text-gray-600 dark:hover:text-gray-300"
+                            >
+                                <FaTimes className="w-4 h-4" />
+                            </button>
+                        )}
                     </div>
+                </div>
 
-                    <div className="relative group">
-                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                            <FaCalendarAlt className="h-4 w-4 text-gray-400 group-focus-within:text-gray-600 dark:group-focus-within:text-gray-300 transition-colors" />
+                {/* Filtros rápidos */}
+                <div className="space-y-4">
+                    {/* Filtro de fecha */}
+                    <div>
+                        <label className="flex items-center gap-2 mb-3 text-sm font-medium text-gray-700 dark:text-gray-300">
+                            <FaCalendarAlt className="w-4 h-4" />
+                            Período
+                        </label>
+                        <div className="flex flex-wrap gap-2 mb-4">
+                            {[
+                                { key: "all", label: "Todos los registros" },
+                                { key: "today", label: "Hoy" },
+                                { key: "week", label: "Esta semana" },
+                                { key: "month", label: "Este mes" },
+                                { key: "custom", label: "Rango personalizado" },
+                            ].map((option) => (
+                                <button
+                                    key={option.key}
+                                    onClick={() => setDateRange(option.key)}
+                                    className={`px-4 py-2 text-sm font-medium rounded-lg border transition-colors duration-200 ${
+                                        dateRange === option.key
+                                            ? "bg-blue-600 text-white border-blue-600"
+                                            : "bg-white text-gray-700 border-gray-200 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700 dark:hover:bg-gray-700"
+                                    }`}
+                                >
+                                    {option.label}
+                                </button>
+                            ))}
                         </div>
-                        <input
-                            type="date"
-                            value={dateFrom}
-                            onChange={(e) => setDateFrom(e.target.value)}
-                            className="w-full pl-12 pr-4 py-3 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 rounded-2xl text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-black/20 dark:focus:ring-white/20 focus:border-transparent transition-all duration-300 hover:bg-white dark:hover:bg-gray-800"
-                        />
+
+                        {/* Date pickers para rango personalizado */}
+                        {showDatePicker && (
+                            <div className="p-4 bg-white border border-gray-200 rounded-lg dark:bg-gray-800 dark:border-gray-700">
+                                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                    <div>
+                                        <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                                            Fecha desde
+                                        </label>
+                                        <input
+                                            type="date"
+                                            value={customDateFrom}
+                                            onChange={(e) =>
+                                                setCustomDateFrom(
+                                                    e.target.value
+                                                )
+                                            }
+                                            className="w-full px-3 py-2 text-gray-900 transition-colors duration-200 bg-white border border-gray-200 rounded-lg dark:text-gray-100 dark:bg-gray-700 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                                            Fecha hasta
+                                        </label>
+                                        <input
+                                            type="date"
+                                            value={customDateTo}
+                                            onChange={(e) =>
+                                                setCustomDateTo(e.target.value)
+                                            }
+                                            className="w-full px-3 py-2 text-gray-900 transition-colors duration-200 bg-white border border-gray-200 rounded-lg dark:text-gray-100 dark:bg-gray-700 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                     </div>
 
-                    <div className="relative group">
-                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                            <FaCalendarAlt className="h-4 w-4 text-gray-400 group-focus-within:text-gray-600 dark:group-focus-within:text-gray-300 transition-colors" />
-                        </div>
-                        <input
-                            type="date"
-                            value={dateTo}
-                            onChange={(e) => setDateTo(e.target.value)}
-                            className="w-full pl-12 pr-4 py-3 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 rounded-2xl text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-black/20 dark:focus:ring-white/20 focus:border-transparent transition-all duration-300 hover:bg-white dark:hover:bg-gray-800"
-                        />
+                    <div className="flex items-center justify-between p-3 bg-white border border-gray-200 rounded-lg dark:bg-gray-800 dark:border-gray-700">
+                        <span className="text-sm text-gray-600 dark:text-gray-400">
+                            {filteredVisits.length} de {visits?.length || 0}{" "}
+                            registros encontrados
+                        </span>
+                        {(globalSearch ||
+                            vehicleFilter !== "all" ||
+                            dateRange !== "all") && (
+                            <button
+                                onClick={() => {
+                                    setGlobalSearch("");
+                                    setVehicleFilter("all");
+                                    setDateRange("all");
+                                    setCustomDateFrom("");
+                                    setCustomDateTo("");
+                                }}
+                                className="flex items-center gap-2 px-3 py-1 text-sm text-black bg-transparent hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"
+                            >
+                                <FaTimes className="w-3 h-3 " />
+                                Limpiar filtros
+                            </button>
+                        )}
                     </div>
-
-                    <button
-                        type="submit"
-                        className="group flex items-center justify-center gap-3 px-6 py-3 bg-gradient-to-r from-black via-gray-900 to-black text-white font-semibold rounded-2xl shadow-xl border border-white/10 hover:from-gray-900 hover:via-black hover:to-gray-900 hover:shadow-2xl hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-white/20 transition-all duration-300 backdrop-blur-sm"
-                    >
-                        <FaSearch className="w-4 h-4 group-hover:scale-110 transition-transform duration-300" />
-                        <span className="drop-shadow-sm">Buscar</span>
-                        <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                    </button>
-                </form>
+                </div>
             </div>
-            {/* Contenido de la tabla */}
-            <div className="p-8">
+            <div className="p-6">
                 {filteredVisits.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-16 text-center">
-                        <div className="flex items-center justify-center w-20 h-20 mb-6 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 rounded-3xl">
+                    <div className="flex flex-col items-center justify-center py-12 text-center">
+                        <div className="flex items-center justify-center w-16 h-16 mb-6 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700">
                             <FaHistory className="w-8 h-8 text-gray-400" />
                         </div>
                         <Typography
                             as="p"
                             variant="p"
-                            className="text-lg font-medium text-gray-600 dark:text-gray-400 mb-2"
+                            className="mb-2 text-lg font-medium text-gray-600 dark:text-gray-400"
                         >
                             Sin registros de visitas
                         </Typography>
@@ -140,54 +269,46 @@ export default function VisitsHistory({ visits }) {
                         </Typography>
                     </div>
                 ) : (
-                    <div className="overflow-hidden rounded-3xl border border-gray-200/50 dark:border-gray-700/50 backdrop-blur-sm">
+                    <div className="overflow-hidden border border-gray-200 rounded-lg dark:border-gray-700">
                         <div className="overflow-x-auto">
                             <table className="min-w-full">
-                                <thead className="bg-gradient-to-r from-gray-900/90 via-black to-gray-900/90 backdrop-blur-sm">
+                                <thead className="bg-gray-50 dark:bg-gray-800">
                                     <tr>
                                         <th className="px-6 py-4 text-left">
-                                            <div className="flex items-center gap-2 text-xs font-bold text-white/90 uppercase tracking-wider">
+                                            <div className="flex items-center gap-2 text-xs font-bold tracking-wider text-gray-700 uppercase dark:text-gray-300">
                                                 <FaUser className="w-3 h-3" />
-                                                <span className="drop-shadow-sm">
-                                                    Nombre
-                                                </span>
+                                                <span>Nombre</span>
                                             </div>
                                         </th>
                                         <th className="px-6 py-4 text-left">
-                                            <div className="flex items-center gap-2 text-xs font-bold text-white/90 uppercase tracking-wider">
+                                            <div className="flex items-center gap-2 text-xs font-bold tracking-wider text-gray-700 uppercase dark:text-gray-300">
                                                 <FaIdCard className="w-3 h-3" />
-                                                <span className="drop-shadow-sm">
-                                                    Documento
-                                                </span>
+                                                <span>Documento</span>
                                             </div>
                                         </th>
                                         <th className="px-6 py-4 text-left">
-                                            <div className="flex items-center gap-2 text-xs font-bold text-white/90 uppercase tracking-wider">
+                                            <div className="flex items-center gap-2 text-xs font-bold tracking-wider text-gray-700 uppercase dark:text-gray-300">
                                                 <FaCalendarAlt className="w-3 h-3" />
-                                                <span className="drop-shadow-sm">
-                                                    Fecha
-                                                </span>
+                                                <span>Fecha</span>
                                             </div>
                                         </th>
                                         <th className="px-6 py-4 text-left">
-                                            <div className="flex items-center gap-2 text-xs font-bold text-white/90 uppercase tracking-wider">
+                                            <div className="flex items-center gap-2 text-xs font-bold tracking-wider text-gray-700 uppercase dark:text-gray-300">
                                                 <FaCar className="w-3 h-3" />
-                                                <span className="drop-shadow-sm">
-                                                    Placa
-                                                </span>
+                                                <span>Placa</span>
                                             </div>
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm divide-y divide-gray-200/50 dark:divide-gray-700/50">
+                                <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-900 dark:divide-gray-700">
                                     {filteredVisits.map((visit, idx) => (
                                         <tr
                                             key={visit.id || visit.qr_id || idx}
-                                            className="group hover:bg-white/80 dark:hover:bg-gray-800/80 transition-all duration-300 hover:shadow-lg"
+                                            className="transition-colors duration-200 hover:bg-gray-50 dark:hover:bg-gray-800"
                                         >
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div className="flex items-center gap-3">
-                                                    <div className="flex items-center justify-center w-8 h-8 bg-gradient-to-br from-gray-600 to-gray-800 rounded-xl flex-shrink-0">
+                                                    <div className="flex items-center justify-center flex-shrink-0 w-8 h-8 rounded-lg bg-gradient-to-br from-gray-600 to-gray-800">
                                                         <span className="text-xs font-bold text-white">
                                                             {(
                                                                 visit.visitor_name ||
@@ -198,14 +319,14 @@ export default function VisitsHistory({ visits }) {
                                                                 .toUpperCase()}
                                                         </span>
                                                     </div>
-                                                    <span className="font-semibold text-gray-900 dark:text-gray-100 group-hover:text-black dark:group-hover:text-white transition-colors">
+                                                    <span className="font-semibold text-gray-900 dark:text-gray-100">
                                                         {visit.visitor_name ||
                                                             visit.name}
                                                     </span>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
-                                                <span className="text-gray-700 dark:text-gray-300 font-medium">
+                                                <span className="font-medium text-gray-700 dark:text-gray-300">
                                                     {visit.document_id ||
                                                         visit.id_document}
                                                 </span>
@@ -230,7 +351,7 @@ export default function VisitsHistory({ visits }) {
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <span
-                                                    className={`inline-flex items-center px-3 py-1 rounded-xl text-xs font-medium ${
+                                                    className={`inline-flex items-center px-3 py-1 rounded-lg text-xs font-medium ${
                                                         visit.vehicle_plate
                                                             ? "bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-800"
                                                             : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400"

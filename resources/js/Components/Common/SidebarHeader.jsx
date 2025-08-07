@@ -15,9 +15,10 @@ export default function SidebarHeader({ setSidebarOpen }) {
             </div>
             <button
                 onClick={() => setSidebarOpen(false)}
-                className="p-2 text-gray-600 transition-colors rounded-xl hover:bg-white/30 dark:hover:bg-gray-700/50 dark:text-gray-300"
+                className="group relative p-2 transition-all duration-500 bg-black rounded-xl shadow-xl backdrop-blur-sm border border-white/10 dark:border-gray-700/30 hover:from-black hover:via-gray-800 hover:to-black hover:shadow-2xl hover:scale-[1.05] focus:outline-none focus:ring-2 focus:ring-white/20"
             >
-                <FaTimes className="w-4 h-4 mx-auto text-white" />
+                <FaTimes className="w-4 h-4 mx-auto text-white transition-all duration-300 group-hover:text-gray-200 drop-shadow-lg" />
+                <div className="absolute inset-0 transition-opacity duration-500 opacity-0 rounded-xl bg-gradient-to-r from-transparent via-white/5 to-transparent group-hover:opacity-100"></div>
             </button>
         </div>
     );

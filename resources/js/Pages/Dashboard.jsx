@@ -1,16 +1,13 @@
 import React, { useEffect, lazy, Suspense, memo } from "react";
 import { Head, router } from "@inertiajs/react";
-import { ThemeProvider } from "@/Contexts/ThemeContext";
 import toast from "react-hot-toast";
 import {
     useDashboardOptimization,
     useNotificationOptimization,
 } from "@/Hooks/useDashboardOptimization";
 
-// Importar directamente componentes ligeros y críticos
 import DashboardContent from "@/Components/Common/DashboardContent";
 
-// Lazy loading solo para componentes no críticos
 const Sidebar = lazy(() => import("@/Components/Common/Sidebar"));
 const MobileHeader = lazy(() => import("@/Components/Common/MobileHeader"));
 const UserProfile = lazy(() => import("@/Components/Common/UserProfile"));
@@ -19,7 +16,6 @@ const NotificationListener = lazy(() =>
     import("@/Components/Common/NotificationListener")
 );
 
-// Componente de loading más simple y rápido
 const QuickLoader = memo(() => (
     <div className="w-8 h-8 border-2 border-gray-300 rounded-full border-t-gray-600 animate-spin"></div>
 ));
@@ -37,7 +33,6 @@ const Dashboard = memo(({ auth, visits, stats, visitsChartData, error }) => {
         auth?.notifications || []
     );
 
-    // Mostrar error si hay problemas cargando datos
     useEffect(() => {
         if (error) {
             toast.error(error);
@@ -51,45 +46,39 @@ const Dashboard = memo(({ auth, visits, stats, visitsChartData, error }) => {
         ) {
             const timeout = setTimeout(() => {
                 router.visit("/admin");
-            }, 1500); // Reducir tiempo de espera
+            }, 1500);
             return () => clearTimeout(timeout);
         }
     }, [auth?.user?.rol]);
 
-    // Verificar que auth y user existen
     if (!auth || !auth.user) {
         return (
-            <ThemeProvider>
-                <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-indigo-50 to-white dark:from-gray-900 dark:to-gray-800">
-                    <div className="text-center">
-                        <QuickLoader />
-                        <p className="mt-4 text-lg text-gray-600 dark:text-gray-400">
-                            Cargando...
-                        </p>
-                    </div>
+            <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-indigo-50 to-white dark:from-gray-900 dark:to-gray-800">
+                <div className="text-center">
+                    <QuickLoader />
+                    <p className="mt-4 text-lg text-gray-600 dark:text-gray-400">
+                        Cargando...
+                    </p>
                 </div>
-            </ThemeProvider>
+            </div>
         );
     }
 
-    // Renderizado optimizado para admin redirect
     if (auth.user.rol === "administrador" || auth.user.rol === "admin") {
         return (
-            <ThemeProvider>
-                <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-indigo-50 to-white dark:from-gray-900 dark:to-gray-800">
-                    <div className="text-center">
-                        <QuickLoader />
-                        <p className="mt-4 text-lg text-gray-600 dark:text-gray-400">
-                            Redirigiendo al panel de administración...
-                        </p>
-                    </div>
+            <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-indigo-50 to-white dark:from-gray-900 dark:to-gray-800">
+                <div className="text-center">
+                    <QuickLoader />
+                    <p className="mt-4 text-lg text-gray-600 dark:text-gray-400">
+                        Redirigiendo al panel de administración...
+                    </p>
                 </div>
-            </ThemeProvider>
+            </div>
         );
     }
 
     return (
-        <ThemeProvider>
+        <div>
             <Head title="Dashboard" />
             <Suspense fallback={<QuickLoader />}>
                 <NotificationListener
@@ -141,14 +130,13 @@ const Dashboard = memo(({ auth, visits, stats, visitsChartData, error }) => {
 
                     {sidebarOpen && (
                         <div
-                            className="fixed inset-0 z-[9998] bg-black/30 backdrop-blur-sm"
+                            className="fixed inset-0 z-[9998] bg-black/50 transition-opacity duration-300"
                             onClick={() => setSidebarOpen(false)}
                         />
                     )}
 
                     <main className="flex-1 overflow-auto">
                         <section className="min-h-full p-6">
-                            {/* DashboardContent sin Suspense - ya maneja su propio lazy loading */}
                             <DashboardContent
                                 activeTab={activeTab}
                                 auth={auth}
@@ -159,7 +147,7 @@ const Dashboard = memo(({ auth, visits, stats, visitsChartData, error }) => {
                     </main>
                 </div>
             </div>
-        </ThemeProvider>
+        </div>
     );
 });
 

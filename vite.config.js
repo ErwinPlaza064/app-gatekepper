@@ -1,6 +1,7 @@
 import { defineConfig } from "vite";
 import laravel from "laravel-vite-plugin";
 import react from "@vitejs/plugin-react";
+import fs from "fs";
 
 export default defineConfig(({ command }) => {
     const isProduction = command === "build";
@@ -43,8 +44,12 @@ export default defineConfig(({ command }) => {
         },
         server: {
             host: process.env.VITE_HOST || "0.0.0.0",
-            port: 5173,
+            port: process.env.VITE_PORT || 5173,
             cors: true,
+            https: {
+                key: fs.readFileSync("./ssl/server.key"),
+                cert: fs.readFileSync("./ssl/server.crt"),
+            },
             headers: {
                 "Access-Control-Allow-Origin": "*",
             },

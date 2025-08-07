@@ -24,7 +24,6 @@ export default function Notification({ notifications, setNotifications }) {
         };
     }, [showNotifications]);
 
-    // Función para mostrar toast
     const showToast = (message, type = "info") => {
         setToast({ message, type });
         setTimeout(() => {
@@ -33,7 +32,6 @@ export default function Notification({ notifications, setNotifications }) {
     };
 
     const markAllAsRead = async () => {
-        // Verificar si hay notificaciones no leídas
         const unreadNotifications = notifications.filter((n) => !n.read_at);
 
         if (unreadNotifications.length === 0) {
@@ -42,10 +40,8 @@ export default function Notification({ notifications, setNotifications }) {
         }
 
         try {
-            // Usar la URL actual del sitio
             let API_URL = window.location.origin;
 
-            // Fallback para desarrollo
             if (
                 !API_URL ||
                 API_URL.includes("localhost") ||
@@ -55,7 +51,6 @@ export default function Notification({ notifications, setNotifications }) {
                     import.meta.env.VITE_API_URL || "https://gatekepper.com";
             }
 
-            // Asegurar HTTPS en producción
             if (
                 API_URL.startsWith("http://") &&
                 !API_URL.includes("localhost")
@@ -104,7 +99,7 @@ export default function Notification({ notifications, setNotifications }) {
     return (
         <div className="relative" ref={dropdownRef}>
             <button
-                className="group relative p-3 transition-all duration-500 bg-gradient-to-br from-black/80 via-gray-900/80 to-black/80 rounded-2xl shadow-xl backdrop-blur-sm border border-white/10 dark:border-gray-700/30 hover:from-black hover:via-gray-800 hover:to-black hover:shadow-2xl hover:scale-[1.05] focus:outline-none focus:ring-2 focus:ring-white/20"
+                className="group relative p-3 transition-all duration-500 bg-black rounded-xl shadow-xl backdrop-blur-sm border border-white/10 dark:border-gray-700/30 hover:from-black hover:via-gray-800 hover:to-black hover:shadow-2xl hover:scale-[1.05] focus:outline-none focus:ring-2 focus:ring-white/20"
                 onClick={() => setShowNotifications((v) => !v)}
             >
                 <span className="sr-only">Ver notificaciones</span>
@@ -114,71 +109,69 @@ export default function Notification({ notifications, setNotifications }) {
                         {unreadCount > 99 ? "99+" : unreadCount}
                     </span>
                 )}
-                {/* Efecto de brillo en hover */}
                 <div className="absolute inset-0 transition-opacity duration-500 opacity-0 rounded-2xl bg-gradient-to-r from-transparent via-white/5 to-transparent group-hover:opacity-100"></div>
             </button>
 
             {showNotifications && (
-                <div className="absolute left-1/2 transform -translate-x-1/2 sm:left-auto sm:right-0 sm:transform-none z-50 mt-4 w-80 max-w-[calc(100vw-2rem)] sm:max-w-sm overflow-hidden transition-all duration-500 border shadow-2xl border-white/20 dark:border-gray-600/20 rounded-3xl backdrop-blur-xl bg-white/80 dark:bg-gray-900/80">
-                    {/* Header mejorado */}
-                    <div className="relative px-6 py-4 overflow-hidden bg-gradient-to-br from-black via-gray-900 to-black">
-                        <div className="absolute inset-0 bg-black/20"></div>
-                        <div className="relative z-10 flex items-center justify-between">
+                <div className="absolute left-1/2 transform -translate-x-1/2 sm:left-auto sm:right-0 sm:transform-none z-50 mt-4 w-80 max-w-[calc(100vw-2rem)] sm:max-w-sm overflow-hidden transition-all duration-300 border border-gray-200 dark:border-gray-700 shadow-2xl rounded-lg bg-white dark:bg-gray-900">
+                    <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+                        <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
-                                <div className="flex items-center justify-center w-8 h-8 bg-white/10 backdrop-blur-sm rounded-xl">
-                                    <FaBell className="w-4 h-4 text-white" />
+                                <div className="flex items-center justify-center w-8 h-8 bg-blue-100 rounded-full dark:bg-blue-600/20">
+                                    <FaBell className="w-4 h-4 text-black dark:text-blue-400" />
                                 </div>
-                                <span className="text-lg font-bold text-white drop-shadow-lg">
-                                    Notificaciones
-                                </span>
+                                <div>
+                                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                                        Notificaciones
+                                    </h3>
+                                    {unreadCount > 0 && (
+                                        <p className="text-xs text-gray-600 dark:text-gray-400">
+                                            {unreadCount} sin leer
+                                        </p>
+                                    )}
+                                </div>
                             </div>
-                            <button
-                                className="group px-3 py-1.5 text-xs font-semibold text-white/90 transition-all duration-300 rounded-xl backdrop-blur-sm bg-white/10 hover:bg-white/20 border border-white/20 hover:border-white/30 hover:text-white"
-                                onClick={markAllAsRead}
-                            >
-                                <span className="drop-shadow-sm">
+                            {unreadCount > 0 && (
+                                <button
+                                    className="px-3 py-1.5 text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-600/10 rounded-md hover:bg-blue-100 dark:hover:bg-blue-600/20 transition-colors duration-200"
+                                    onClick={markAllAsRead}
+                                >
                                     Marcar leídas
-                                </span>
-                            </button>
+                                </button>
+                            )}
                         </div>
-                        <div className="absolute top-0 right-0 w-24 h-24 -mt-12 -mr-12 rounded-full bg-white/5"></div>
-                        <div className="absolute bottom-0 left-0 w-16 h-16 -mb-8 -ml-8 rounded-full bg-white/10"></div>
                     </div>
 
-                    {/* Lista de notificaciones mejorada */}
                     <div className="overflow-y-auto max-h-80 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent">
                         {notifications.length === 0 ? (
                             <div className="flex flex-col items-center justify-center px-6 py-12 text-center">
-                                <div className="flex items-center justify-center w-16 h-16 mb-4 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 rounded-2xl">
+                                <div className="flex items-center justify-center w-16 h-16 mb-4 bg-gray-100 rounded-full dark:bg-gray-800">
                                     <FaBell className="w-6 h-6 text-gray-400" />
                                 </div>
-                                <p className="mb-1 text-sm font-medium text-gray-600 dark:text-gray-400">
+                                <p className="mb-1 text-sm font-medium text-gray-900 dark:text-gray-100">
                                     Sin notificaciones
                                 </p>
-                                <p className="text-xs text-gray-500 dark:text-gray-500">
+                                <p className="text-xs text-gray-600 dark:text-gray-400">
                                     Cuando tengas notificaciones aparecerán aquí
                                 </p>
                             </div>
                         ) : (
-                            <div className="p-2 space-y-1">
+                            <div className="p-2 space-y-2">
                                 {notifications.map((n, index) => (
                                     <div
                                         key={n.id}
-                                        className={`group relative px-4 py-3 text-sm cursor-pointer transition-all duration-300 rounded-2xl border ${
+                                        className={`group relative px-4 py-3 text-sm cursor-pointer transition-all duration-200 rounded-lg border ${
                                             n.read_at
-                                                ? "bg-white/50 dark:bg-gray-800/50 text-gray-600 dark:text-gray-400 hover:bg-white/80 dark:hover:bg-gray-800/80 border-transparent hover:border-gray-200/50 dark:hover:border-gray-700/50"
-                                                : "bg-gradient-to-r from-blue-50/80 to-indigo-50/80 dark:from-blue-900/20 dark:to-indigo-900/20 text-gray-800 dark:text-gray-200 hover:from-blue-100/90 hover:to-indigo-100/90 dark:hover:from-blue-900/30 dark:hover:to-indigo-900/30 border-blue-200/30 dark:border-blue-800/30 shadow-sm"
-                                        } hover:shadow-md hover:scale-[1.01]`}
+                                                ? "bg-gray-50 dark:bg-gray-800/50 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 border-gray-200 dark:border-gray-700"
+                                                : "bg-blue-50 dark:bg-blue-900/20 text-gray-900 dark:text-gray-100 hover:bg-blue-100 dark:hover:bg-blue-900/30 border-blue-200 dark:border-blue-800"
+                                        } hover:shadow-sm`}
                                     >
-                                        {!n.read_at && (
-                                            <div className="absolute w-2 h-2 bg-blue-500 rounded-full top-3 right-3 animate-pulse"></div>
-                                        )}
                                         <div className="flex items-start gap-3">
                                             <div
-                                                className={`flex items-center justify-center w-8 h-8 rounded-xl flex-shrink-0 ${
+                                                className={`flex items-center justify-center w-8 h-8 rounded-full flex-shrink-0 ${
                                                     n.read_at
                                                         ? "bg-gray-200 dark:bg-gray-700"
-                                                        : "bg-blue-100 dark:bg-blue-900/50"
+                                                        : "bg-blue-100 dark:bg-blue-800"
                                                 }`}
                                             >
                                                 <FaBell
@@ -218,6 +211,9 @@ export default function Notification({ notifications, setNotifications }) {
                                                         : ""}
                                                 </p>
                                             </div>
+                                            {!n.read_at && (
+                                                <div className="flex-shrink-0 w-2 h-2 mt-2 bg-blue-500 rounded-full"></div>
+                                            )}
                                         </div>
                                     </div>
                                 ))}
@@ -227,68 +223,71 @@ export default function Notification({ notifications, setNotifications }) {
                 </div>
             )}
 
-            {/* Toast Notification */}
             {toast && (
                 <div
-                    className={`fixed top-4 right-4 z-[10000] transform transition-all duration-500 ${
+                    className={`fixed top-4 right-4 z-[10000] transform transition-all duration-300 ${
                         toast
                             ? "translate-x-0 opacity-100 scale-100"
                             : "translate-x-full opacity-0 scale-95"
                     }`}
                 >
-                    <div
-                        className={`flex items-center gap-3 px-4 py-3 rounded-2xl shadow-2xl backdrop-blur-xl border max-w-sm ${
-                            toast.type === "success"
-                                ? "bg-green-50/95 dark:bg-green-900/95 border-green-200/50 dark:border-green-800/50 text-green-800 dark:text-green-200"
-                                : toast.type === "error"
-                                ? "bg-red-50/95 dark:bg-red-900/95 border-red-200/50 dark:border-red-800/50 text-red-800 dark:text-red-200"
-                                : "bg-blue-50/95 dark:bg-blue-900/95 border-blue-200/50 dark:border-blue-800/50 text-blue-800 dark:text-blue-200"
-                        }`}
-                    >
+                    <div className="max-w-sm overflow-hidden bg-white border border-gray-200 rounded-lg shadow-lg dark:bg-gray-900 dark:border-gray-700">
                         <div
-                            className={`flex items-center justify-center w-8 h-8 rounded-xl flex-shrink-0 ${
+                            className={`flex items-center gap-3 px-4 py-3 ${
                                 toast.type === "success"
-                                    ? "bg-green-100 dark:bg-green-800"
+                                    ? "bg-green-50 dark:bg-green-900/20 border-l-4 border-l-green-500"
                                     : toast.type === "error"
-                                    ? "bg-red-100 dark:bg-red-800"
-                                    : "bg-blue-100 dark:bg-blue-800"
+                                    ? "bg-red-50 dark:bg-red-900/20 border-l-4 border-l-red-500"
+                                    : "bg-blue-50 dark:bg-blue-900/20 border-l-4 border-l-blue-500"
                             }`}
                         >
-                            {toast.type === "success" ? (
-                                <FaCheck
-                                    className={`w-4 h-4 ${
+                            <div
+                                className={`flex items-center justify-center w-8 h-8 rounded-full flex-shrink-0 ${
+                                    toast.type === "success"
+                                        ? "bg-green-100 dark:bg-green-800"
+                                        : toast.type === "error"
+                                        ? "bg-red-100 dark:bg-red-800"
+                                        : "bg-blue-100 dark:bg-blue-800"
+                                }`}
+                            >
+                                {toast.type === "success" ? (
+                                    <FaCheck className="w-4 h-4 text-green-600 dark:text-green-300" />
+                                ) : (
+                                    <FaInfoCircle
+                                        className={`w-4 h-4 ${
+                                            toast.type === "error"
+                                                ? "text-red-600 dark:text-red-300"
+                                                : "text-blue-600 dark:text-blue-300"
+                                        }`}
+                                    />
+                                )}
+                            </div>
+                            <div className="flex-1">
+                                <p
+                                    className={`text-sm font-medium leading-snug ${
                                         toast.type === "success"
-                                            ? "text-green-600 dark:text-green-300"
-                                            : ""
+                                            ? "text-green-900 dark:text-green-100"
+                                            : toast.type === "error"
+                                            ? "text-red-900 dark:text-red-100"
+                                            : "text-blue-900 dark:text-blue-100"
                                     }`}
-                                />
-                            ) : (
-                                <FaInfoCircle
-                                    className={`w-4 h-4 ${
-                                        toast.type === "error"
-                                            ? "text-red-600 dark:text-red-300"
-                                            : "text-blue-600 dark:text-blue-300"
-                                    }`}
-                                />
-                            )}
+                                >
+                                    {toast.message}
+                                </p>
+                            </div>
+                            <button
+                                onClick={() => setToast(null)}
+                                className={`flex items-center justify-center w-6 h-6 rounded-lg transition-all duration-200 hover:bg-black/5 dark:hover:bg-white/5 ${
+                                    toast.type === "success"
+                                        ? "text-green-600 dark:text-green-400"
+                                        : toast.type === "error"
+                                        ? "text-red-600 dark:text-red-400"
+                                        : "text-blue-600 dark:text-blue-400"
+                                }`}
+                            >
+                                <span className="text-lg leading-none">×</span>
+                            </button>
                         </div>
-                        <div className="flex-1">
-                            <p className="text-sm font-medium leading-snug">
-                                {toast.message}
-                            </p>
-                        </div>
-                        <button
-                            onClick={() => setToast(null)}
-                            className={`flex items-center justify-center w-6 h-6 rounded-lg transition-all duration-200 hover:bg-black/10 dark:hover:bg-white/10 ${
-                                toast.type === "success"
-                                    ? "text-green-600 dark:text-green-400"
-                                    : toast.type === "error"
-                                    ? "text-red-600 dark:text-red-400"
-                                    : "text-blue-600 dark:text-blue-400"
-                            }`}
-                        >
-                            <span className="text-lg leading-none">×</span>
-                        </button>
                     </div>
                 </div>
             )}

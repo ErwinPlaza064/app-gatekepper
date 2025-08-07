@@ -1,19 +1,16 @@
 import React, { memo, lazy, Suspense } from "react";
 
-// Lazy load solo los componentes pesados que no se usan en escritorio
 const QRGenerator = lazy(() => import("@/Components/Common/QRGenerator"));
 const QRDashboard = lazy(() => import("@/Components/Common/QRDashboard"));
 const VisitsHistory = lazy(() => import("@/Components/Common/VisitsHistory"));
 const ComplaintsCard = lazy(() => import("@/Components/Cards/ComplaintsCard"));
 
-// Importar directamente los componentes del escritorio (son ligeros)
 import StatsCard from "@/Components/Cards/StatsCard";
 import QuickStatsChart from "@/Components/Common/QuickStatsChart";
 
-// Loading optimizado
 const ContentLoader = () => (
     <div className="flex items-center justify-center p-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+        <div className="w-8 h-8 border-b-2 border-indigo-600 rounded-full animate-spin"></div>
         <span className="ml-3 text-gray-600 dark:text-gray-400">
             Cargando contenido...
         </span>
@@ -21,7 +18,6 @@ const ContentLoader = () => (
 );
 
 const DashboardContent = memo(({ activeTab, auth, visits, stats }) => {
-    // Renderizar escritorio sin lazy loading (es la vista principal)
     if (activeTab === "escritorio") {
         return (
             <div className="min-h-full space-y-2">
@@ -37,7 +33,6 @@ const DashboardContent = memo(({ activeTab, auth, visits, stats }) => {
         );
     }
 
-    // Lazy load para las otras pestañas
     return (
         <div className="min-h-full space-y-2">
             <Suspense fallback={<ContentLoader />}>

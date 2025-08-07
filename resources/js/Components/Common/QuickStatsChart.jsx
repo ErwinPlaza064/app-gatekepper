@@ -1,5 +1,5 @@
 import React, { memo, lazy, Suspense } from "react";
-import { useTheme } from "@/Contexts/ThemeContext";
+import { useDashboardTheme } from "@/Contexts/DashboardThemeContext";
 
 // Simplificar el lazy loading para evitar problemas en producción
 const LazyBarChart = lazy(() =>
@@ -40,7 +40,7 @@ const ChartSkeleton = () => (
 );
 
 const QuickStatsChart = memo(({ stats }) => {
-    const { isDarkMode } = useTheme();
+    const { isDarkMode } = useDashboardTheme();
     const safeStats = stats || {};
 
     const data = {

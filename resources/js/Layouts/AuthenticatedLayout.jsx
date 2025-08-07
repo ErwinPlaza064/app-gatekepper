@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import DesktopNav from "@/Components/Common/DesktopNav";
 import MobileNav from "@/Components/Common/MobileNav";
+import ThemeCleaner from "@/Components/Common/ThemeCleaner";
 import { Toaster } from "react-hot-toast";
 
 export default function Authenticated({ user, children }) {
@@ -12,8 +13,16 @@ export default function Authenticated({ user, children }) {
 
     const userSession = user || null;
 
+    // Limpiar tema si no estamos en dashboard
+    useEffect(() => {
+        if (!window.location.pathname.includes('/dashboard')) {
+            document.documentElement.classList.remove("dark");
+        }
+    }, []);
+
     return (
         <div>
+            <ThemeCleaner />
             <div className="min-h-screen bg-gradient-to-br from-gray-100 via-white to-gray-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
                 <Toaster position="top-right" />
                 <div className="relative">

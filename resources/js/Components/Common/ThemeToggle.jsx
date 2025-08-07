@@ -1,9 +1,9 @@
 import React from "react";
 import { FaSun, FaMoon } from "react-icons/fa";
-import { useTheme } from "@/Contexts/ThemeContext";
+import { useDashboardTheme } from "@/Contexts/DashboardThemeContext";
 
 export default function ThemeToggle({ className = "" }) {
-    const { isDarkMode, toggleTheme } = useTheme();
+    const { isDarkMode, toggleTheme } = useDashboardTheme();
 
     return (
         <button

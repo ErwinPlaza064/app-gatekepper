@@ -5,6 +5,7 @@ import {
     useDashboardOptimization,
     useNotificationOptimization,
 } from "@/Hooks/useDashboardOptimization";
+import { DashboardThemeProvider } from "@/Contexts/DashboardThemeContext";
 
 import DashboardContent from "@/Components/Common/DashboardContent";
 
@@ -78,7 +79,7 @@ const Dashboard = memo(({ auth, visits, stats, visitsChartData, error }) => {
     }
 
     return (
-        <div>
+        <DashboardThemeProvider>
             <Head title="Dashboard" />
             <Suspense fallback={<QuickLoader />}>
                 <NotificationListener
@@ -147,7 +148,7 @@ const Dashboard = memo(({ auth, visits, stats, visitsChartData, error }) => {
                     </main>
                 </div>
             </div>
-        </div>
+        </DashboardThemeProvider>
     );
 });
 

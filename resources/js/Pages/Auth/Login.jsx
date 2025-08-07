@@ -35,7 +35,7 @@ export default function Login({ status }) {
     };
 
     return (
-        <>
+        <GuestLayout>
             <Head title="Inicia Sesión" />
 
             {/* Container principal con gradiente de fondo */}
@@ -291,6 +291,6 @@ export default function Login({ status }) {
                     </div>
                 </div>
             </div>
-        </>
+        </GuestLayout>
     );
 }

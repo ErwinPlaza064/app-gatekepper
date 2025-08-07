@@ -2,10 +2,12 @@ import { FaSignOutAlt } from "react-icons/fa";
 import React, { useState, useRef, useEffect } from "react";
 import { router } from "@inertiajs/react";
 import ThemeToggle from "./ThemeToggle";
+import { useDashboardTheme } from "@/Contexts/DashboardThemeContext";
 
 export default function UserProfile({ user, showThemeToggle, showLogout }) {
     const [open, setOpen] = useState(false);
     const dropdownRef = useRef(null);
+    const { resetTheme } = useDashboardTheme();
 
     useEffect(() => {
         if (!open) return;
@@ -25,6 +27,10 @@ export default function UserProfile({ user, showThemeToggle, showLogout }) {
 
     const handleLogout = (e) => {
         e.preventDefault();
+        
+        // Limpiar el tema del dashboard antes de cerrar sesión
+        resetTheme();
+        
         router.post(
             "/logout",
             {},

@@ -6,7 +6,9 @@ const DashboardThemeContext = createContext();
 export const useDashboardTheme = () => {
     const context = useContext(DashboardThemeContext);
     if (!context) {
-        throw new Error("useDashboardTheme debe ser usado dentro de un DashboardThemeProvider");
+        throw new Error(
+            "useDashboardTheme debe ser usado dentro de un DashboardThemeProvider"
+        );
     }
     return context;
 };
@@ -47,9 +49,9 @@ export const DashboardThemeProvider = ({ children }) => {
 
     // Escuchar cambios de ruta con Inertia
     useEffect(() => {
-        const removeListener = router.on('navigate', (event) => {
+        const removeListener = router.on("navigate", (event) => {
             // Si navegamos fuera del dashboard, limpiar el tema
-            if (!event.detail.page.url.includes('/dashboard')) {
+            if (!event.detail.page.url.includes("/dashboard")) {
                 document.documentElement.classList.remove("dark");
             }
         });

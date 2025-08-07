@@ -27,10 +27,10 @@ export default function UserProfile({ user, showThemeToggle, showLogout }) {
 
     const handleLogout = (e) => {
         e.preventDefault();
-        
+
         // Limpiar el tema del dashboard antes de cerrar sesión
         resetTheme();
-        
+
         router.post(
             "/logout",
             {},

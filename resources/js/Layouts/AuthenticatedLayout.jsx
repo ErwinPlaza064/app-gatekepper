@@ -15,7 +15,7 @@ export default function Authenticated({ user, children }) {
 
     // Limpiar tema si no estamos en dashboard
     useEffect(() => {
-        if (!window.location.pathname.includes('/dashboard')) {
+        if (!window.location.pathname.includes("/dashboard")) {
             document.documentElement.classList.remove("dark");
         }
     }, []);

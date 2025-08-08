@@ -205,7 +205,7 @@ class WhatsAppService
     {
         $emoji = $accion === 'approved' ? '✅' : '❌';
         $status = $accion === 'approved' ? 'APROBADO' : 'RECHAZADO';
-        
+
         $mensaje = "{$emoji} *Visita {$status}* {$emoji}\n\n" .
                   "👤 Visitante: {$visitante->name}\n" .
                   "🆔 Documento: {$visitante->id_document}\n" .
@@ -214,7 +214,7 @@ class WhatsAppService
         if ($accion === 'approved' || $accion === 'auto_approved') {
             $mensaje .= "\n✅ El visitante puede ingresar ahora\n" .
                        "🔄 Se ha notificado al personal de seguridad\n";
-            
+
             if ($accion === 'auto_approved') {
                 $mensaje .= "⏰ *Aprobación automática por tiempo de espera*\n";
             }

@@ -32,6 +32,47 @@ Route::get('/test-whatsapp', function() {
     return response()->json($resultado);
 });
 
+Route::get('/test-visitor-approval', function() {
+    try {
+        // Buscar un usuario residente
+        $resident = App\Models\User::where('rol', 'residente')->first();
+        if (!$resident) {
+            return 'No se encontró residente para prueba';
+        }
+
+        // Crear visitante de prueba
+        $visitor = App\Models\Visitor::create([
+            'name' => 'María García Test',
+            'id_document' => 'TEST789123',
+            'user_id' => $resident->id,
+            'vehicle_plate' => 'TEST-999',
+            'approval_notes' => 'Visitante de prueba del sistema de aprobación',
+            'entry_time' => now(),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Visitante de prueba creado',
+            'visitor' => [
+                'id' => $visitor->id,
+                'name' => $visitor->name,
+                'status' => $visitor->approval_status,
+                'token' => $visitor->approval_token,
+                'resident' => $resident->name,
+            ],
+            'urls' => [
+                'approve' => route('approval.approve.public', $visitor->approval_token),
+                'reject' => route('approval.reject.public', $visitor->approval_token),
+            ]
+        ]);
+        
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => $e->getMessage()
+        ], 500);
+    }
+});
+
 Route::get('/', function () {
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
@@ -73,6 +114,15 @@ Route::get('/error', function () {
 
 Route::post('/complaints', [DashboardController::class, 'store'])->name('complaints.store');
 
+// Rutas públicas para enlaces de aprobación desde WhatsApp (sin autenticación)
+Route::prefix('approval')->group(function () {
+    Route::get('/{token}/approve', [ApprovalController::class, 'approvePublic'])
+         ->name('approval.approve.public');
+    
+    Route::get('/{token}/reject', [ApprovalController::class, 'rejectPublic'])
+         ->name('approval.reject.public');
+});
+
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -84,8 +134,15 @@ Route::middleware('auth')->group(function () {
     Route::get('/api/user/visitors', [VisitorController::class, 'getUserVisitors']);
     Route::post('/api/qr-codes', [QrCodeController::class, 'store']);
 
-    // Rutas de aprobación autenticadas (frontend)
+    // Rutas de aprobación autenticadas (frontend) - prefijo api
     Route::prefix('api/approval')->name('api.approval.')->group(function () {
+        Route::post('/approve', [ApprovalController::class, 'approveApi'])->name('approve');
+        Route::post('/reject', [ApprovalController::class, 'rejectApi'])->name('reject');
+        Route::get('/pending', [ApprovalController::class, 'pendingVisitors'])->name('pending');
+    });
+
+    // Rutas web de aprobación (para el dashboard frontend) - sin prefijo api
+    Route::prefix('approval')->name('web.approval.')->group(function () {
         Route::post('/approve', [ApprovalController::class, 'approveApi'])->name('approve');
         Route::post('/reject', [ApprovalController::class, 'rejectApi'])->name('reject');
         Route::get('/pending', [ApprovalController::class, 'pendingVisitors'])->name('pending');
@@ -112,7 +169,6 @@ Route::get('/clear-cache', function () {
     return 'Cache limpiado';
 });
 
-
 Route::get('/csrf-token', function() {
     return response()->json([
         'csrf_token' => csrf_token(),
@@ -121,15 +177,6 @@ Route::get('/csrf-token', function() {
         'session_secure' => config('session.secure'),
         'cors_origins' => config('cors.allowed_origins'),
     ]);
-});
-
-// Rutas públicas para enlaces de aprobación desde WhatsApp (sin autenticación)
-Route::prefix('approval')->name('approval.')->group(function () {
-    Route::get('/{token}/approve', [ApprovalController::class, 'approvePublic'])
-         ->name('approve.public');
-    
-    Route::get('/{token}/reject', [ApprovalController::class, 'rejectPublic'])
-         ->name('reject.public');
 });
 
 require __DIR__.'/auth.php';

@@ -113,6 +113,9 @@ class ApprovalController extends Controller
             if ($visitor->isApprovalExpired()) {
                 $visitor->autoApprove('Aprobado automáticamente por expiración de tiempo');
                 
+                // Notificar al portero sobre la auto-aprobación
+                $this->notifyPortero($visitor, 'auto_approved');
+                
                 return Inertia::render('Approval/Success', [
                     'message' => "✅ Visitante {$visitor->name} fue aprobado automáticamente por timeout",
                     'visitor' => $visitor->load('user'),
@@ -128,6 +131,9 @@ class ApprovalController extends Controller
 
             // Enviar confirmación por WhatsApp
             $this->sendApprovalConfirmation($visitor, 'approved');
+
+            // Notificar al portero
+            $this->notifyPortero($visitor, 'approved', $visitor->user);
 
             Log::info('Visitante aprobado desde WhatsApp', [
                 'visitor_id' => $visitor->id,
@@ -184,6 +190,9 @@ class ApprovalController extends Controller
 
             // Enviar confirmación por WhatsApp
             $this->sendApprovalConfirmation($visitor, 'rejected');
+
+            // Notificar al portero
+            $this->notifyPortero($visitor, 'rejected', $visitor->user);
 
             Log::info('Visitante rechazado desde WhatsApp', [
                 'visitor_id' => $visitor->id,
@@ -267,6 +276,10 @@ class ApprovalController extends Controller
             foreach ($expiredVisitors as $visitor) {
                 $visitor->autoApprove();
                 $this->sendApprovalConfirmation($visitor, 'auto_approved');
+                
+                // Notificar al portero sobre la auto-aprobación
+                $this->notifyPortero($visitor, 'auto_approved');
+                
                 $processed++;
             }
 
@@ -360,6 +373,9 @@ class ApprovalController extends Controller
                 // Auto-aprobar si expiró
                 $visitor->autoApprove();
                 
+                // Notificar al portero sobre la auto-aprobación
+                $this->notifyPortero($visitor, 'auto_approved');
+                
                 return response()->json([
                     'success' => true,
                     'message' => 'Visitante auto-aprobado por tiempo de espera',
@@ -376,6 +392,9 @@ class ApprovalController extends Controller
 
             // Enviar confirmación
             $this->sendApprovalConfirmation($visitor, 'approved');
+
+            // Notificar al portero
+            $this->notifyPortero($visitor, 'approved', $user);
 
             Log::info('Visitante aprobado desde API', [
                 'visitor_id' => $visitor->id,
@@ -450,6 +469,9 @@ class ApprovalController extends Controller
             // Enviar confirmación
             $this->sendApprovalConfirmation($visitor, 'rejected');
 
+            // Notificar al portero
+            $this->notifyPortero($visitor, 'rejected', $user);
+
             Log::info('Visitante rechazado desde API', [
                 'visitor_id' => $visitor->id,
                 'visitor_name' => $visitor->name,
@@ -488,6 +510,36 @@ class ApprovalController extends Controller
                     'action' => $action, // 'approved', 'rejected', 'auto_approved'
                 ]
             );
+        }
+    }
+
+    /**
+     * Notificar al portero sobre el estado de una visita
+     */
+    private function notifyPortero(Visitor $visitor, string $status, $respondedBy = null)
+    {
+        try {
+            // Obtener todos los porteros activos
+            $porteros = \App\Models\User::where('rol', 'portero')->get();
+
+            foreach ($porteros as $portero) {
+                // Solo notificación en la base de datos (aparecerá en Filament)
+                $portero->notify(new \App\Notifications\VisitorStatusNotification($visitor, $status, $respondedBy));
+            }
+
+            Log::info('Notificaciones enviadas a porteros', [
+                'visitor_id' => $visitor->id,
+                'status' => $status,
+                'porteros_notificados' => $porteros->count(),
+                'responded_by' => $respondedBy ? $respondedBy->name : null,
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error notificando a porteros', [
+                'visitor_id' => $visitor->id,
+                'status' => $status,
+                'error' => $e->getMessage(),
+            ]);
         }
     }
 }

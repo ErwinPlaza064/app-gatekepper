@@ -54,6 +54,7 @@ class User extends Authenticatable implements FilamentUser
         'address',
         'phone',
         'whatsapp_notifications',
+        'email_notifications',
         'rol',
         'remember_token',
     ];
@@ -81,5 +82,6 @@ class User extends Authenticatable implements FilamentUser
         'email_verified_at' => 'datetime',
         'remember_token' => 'string',
         'whatsapp_notifications' => 'boolean',
+        'email_notifications' => 'boolean',
     ];
 }

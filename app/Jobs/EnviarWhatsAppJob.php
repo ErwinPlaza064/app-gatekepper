@@ -82,6 +82,15 @@ class EnviarWhatsAppJob implements ShouldQueue
                     );
                     break;
 
+                case 'notificacion_portero':
+                    $resultado = $whatsapp->notificacionPortero(
+                        $this->numero,
+                        $this->datos['visitante'],
+                        $this->datos['status'], // 'approved', 'rejected', 'auto_approved'
+                        $this->datos['respondedBy'] ?? null
+                    );
+                    break;
+
                 default:
                     Log::warning("Tipo de WhatsApp no reconocido: {$this->tipo}");
                     return;

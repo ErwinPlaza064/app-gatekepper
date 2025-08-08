@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 use App\Notifications\NewVisitorNotification;
+use App\Notifications\VisitorApprovalRequest;
 use Illuminate\Support\Facades\Log;
 use App\Jobs\EnviarWhatsAppJob;
 
@@ -110,6 +111,41 @@ class Visitor extends Model
             'approval_notes' => $notes,
         ]);
 
+        // Enviar notificación de solicitud de aprobación al residente
+        if ($this->user) {
+            // Notificación al frontend
+            $this->user->notify(new VisitorApprovalRequest($this));
+
+            // WhatsApp con enlaces de aprobación
+            if ($this->user->phone && $this->user->whatsapp_notifications) {
+                $approveUrl = route('approval.approve.public', ['token' => $this->approval_token]);
+                $rejectUrl = route('approval.reject.public', ['token' => $this->approval_token]);
+
+                EnviarWhatsAppJob::dispatch(
+                    $this->user->phone,
+                    'solicitud_aprobacion',
+                    [
+                        'visitante' => $this,
+                        'approve_url' => $approveUrl,
+                        'reject_url' => $rejectUrl,
+                    ]
+                );
+
+                Log::info('Solicitud de aprobación enviada por WhatsApp', [
+                    'visitor_id' => $this->id,
+                    'resident_phone' => $this->user->phone,
+                    'approve_url' => $approveUrl,
+                ]);
+            }
+
+            Log::info('Solicitud de aprobación enviada', [
+                'visitor_id' => $this->id,
+                'visitor_name' => $this->name,
+                'resident' => $this->user->name,
+                'token' => $this->approval_token,
+            ]);
+        }
+
         return $this;
     }
 
@@ -195,25 +231,33 @@ class Visitor extends Model
     static::created(function ($visitor) {
         // Verificar que exista un usuario relacionado
         if ($visitor->user) {
-            // Enviar notificación por email y database (como siempre)
-            $visitor->user->notify(new NewVisitorNotification($visitor));
+            // Si el visitante tiene QR code, es una visita programada → notificación normal
+            if ($visitor->qr_code_id) {
+                // Enviar notificación normal para visitantes con QR
+                $visitor->user->notify(new NewVisitorNotification($visitor));
 
-            // Enviar WhatsApp asíncrono si el usuario tiene teléfono y notificaciones habilitadas
-            if ($visitor->user->phone && $visitor->user->whatsapp_notifications) {
-                EnviarWhatsAppJob::dispatch(
-                    $visitor->user->phone,
-                    'nuevo_visitante',
-                    ['visitante' => $visitor]
-                );
+                // Enviar WhatsApp para visitas programadas
+                if ($visitor->user->phone && $visitor->user->whatsapp_notifications) {
+                    EnviarWhatsAppJob::dispatch(
+                        $visitor->user->phone,
+                        'nuevo_visitante',
+                        ['visitante' => $visitor]
+                    );
 
-                Log::info('WhatsApp programado para envío', [
-                    'usuario' => $visitor->user->name,
-                    'telefono' => $visitor->user->phone,
-                    'visitante' => $visitor->name
-                ]);
+                    Log::info('WhatsApp programado para visita con QR', [
+                        'usuario' => $visitor->user->name,
+                        'telefono' => $visitor->user->phone,
+                        'visitante' => $visitor->name
+                    ]);
+                }
+
+                Log::info('Notificaciones enviadas para visita programada: ' . $visitor->user->name . ' sobre el visitante ' . $visitor->name);
+            } else {
+                // Si NO tiene QR code, es visitante espontáneo → solicitar aprobación
+                $visitor->requestApproval();
+                
+                Log::info('Solicitud de aprobación iniciada para visitante espontáneo: ' . $visitor->name);
             }
-
-            Log::info('Notificaciones enviadas a ' . $visitor->user->name . ' sobre el visitante ' . $visitor->name);
         } else {
             Log::warning("No se pudo notificar al residente. No se encontró un usuario para el visitante con ID {$visitor->id}.");
         }

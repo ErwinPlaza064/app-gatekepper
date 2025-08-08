@@ -259,20 +259,22 @@ class VisitorResource extends Resource
     }
 
     /**
-     * Enviar notificación al residente después de guardar el visitante.
+     * Manejar eventos después de guardar el visitante.
+     * Ya no es necesario enviar notificaciones aquí porque el modelo
+     * lo maneja automáticamente en el evento 'created'
      *
      * @param \App\Models\Visitor $record
      */
     public static function afterSave($record)
     {
-        $user = $record->user;
-
-        if ($user) {
-            LaravelNotification::send($user, new NewVisitorNotification($record));
-
-            Log::info('Notificación enviada a ' . $user->name . ' sobre el visitante ' . $record->name);
-        } else {
-            Log::warning('No se asignó un residente para el visitante ' . $record->name);
-        }
+        // Las notificaciones se manejan automáticamente en el modelo
+        // según si es visitante con QR (programado) o sin QR (espontáneo)
+        
+        Log::info('Visitante guardado desde Filament', [
+            'visitor_id' => $record->id,
+            'visitor_name' => $record->name,
+            'has_qr' => $record->qr_code_id ? true : false,
+            'type' => $record->qr_code_id ? 'programado' : 'espontáneo'
+        ]);
     }
 }

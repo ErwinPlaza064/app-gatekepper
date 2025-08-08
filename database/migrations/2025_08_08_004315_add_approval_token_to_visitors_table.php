@@ -12,14 +12,16 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('visitors', function (Blueprint $table) {
-            // Token seguro para enlaces públicos de WhatsApp
-            $table->string('approval_token', 64)
-                  ->nullable()
-                  ->after('approval_status')
-                  ->comment('Token único para enlaces de aprobación/rechazo desde WhatsApp');
-            
-            // Índice para optimizar búsquedas por token
-            $table->index(['approval_token'], 'idx_approval_token');
+            // Verificar si la columna approval_token ya existe
+            if (!Schema::hasColumn('visitors', 'approval_token')) {
+                // Token seguro para enlaces públicos de WhatsApp
+                $table->string('approval_token', 64)
+                      ->nullable()
+                      ->comment('Token único para enlaces de aprobación/rechazo desde WhatsApp');
+                
+                // Índice para optimizar búsquedas por token
+                $table->index(['approval_token'], 'idx_approval_token');
+            }
         });
     }
 
@@ -29,11 +31,15 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('visitors', function (Blueprint $table) {
-            // Eliminar índice
-            $table->dropIndex('idx_approval_token');
+            // Verificar si el índice existe antes de eliminarlo
+            if (Schema::hasIndex('visitors', 'idx_approval_token')) {
+                $table->dropIndex('idx_approval_token');
+            }
             
-            // Eliminar columna
-            $table->dropColumn('approval_token');
+            // Verificar si la columna existe antes de eliminarla
+            if (Schema::hasColumn('visitors', 'approval_token')) {
+                $table->dropColumn('approval_token');
+            }
         });
     }
 };

@@ -7,6 +7,7 @@ use App\Http\Controllers\VisitorController;
 use App\Http\Controllers\QrController;
 use App\Http\Controllers\QrCodeController;
 use App\Http\Controllers\ComplaintController;
+use App\Http\Controllers\ApprovalController;
 
 
 
@@ -30,4 +31,22 @@ Route::post('/push/subscribe', function (Request $request) {
     );
     return response()->json(['success' => true]);
 })->middleware('auth:sanctum');
+
+// Rutas para el sistema de aprobación de visitantes
+Route::prefix('approval')->name('approval.')->group(function () {
+    // Solicitar aprobación para visitante espontáneo (requiere auth)
+    Route::post('/request', [ApprovalController::class, 'requestApproval'])
+         ->middleware('auth:sanctum')
+         ->name('request');
+    
+    // Obtener visitantes pendientes de aprobación (para monitoreo en admin)
+    Route::get('/pending', [ApprovalController::class, 'pendingVisitors'])
+         ->middleware('auth:sanctum')
+         ->name('pending');
+    
+    // Procesar aprobaciones expiradas (auto-aprobar por timeout)
+    Route::post('/process-expired', [ApprovalController::class, 'processExpiredApprovals'])
+         ->middleware('auth:sanctum')
+         ->name('process.expired');
+});
 

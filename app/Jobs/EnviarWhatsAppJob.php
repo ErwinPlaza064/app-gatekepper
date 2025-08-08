@@ -65,6 +65,23 @@ class EnviarWhatsAppJob implements ShouldQueue
                     $resultado = $whatsapp->enviarMensaje($this->numero, $this->datos['mensaje']);
                     break;
 
+                case 'solicitud_aprobacion':
+                    $resultado = $whatsapp->solicitudAprobacion(
+                        $this->numero,
+                        $this->datos['visitante'],
+                        $this->datos['approve_url'],
+                        $this->datos['reject_url']
+                    );
+                    break;
+
+                case 'respuesta_aprobacion':
+                    $resultado = $whatsapp->respuestaAprobacion(
+                        $this->numero,
+                        $this->datos['visitante'],
+                        $this->datos['action'] // 'approved', 'rejected', o 'auto_approved'
+                    );
+                    break;
+
                 default:
                     Log::warning("Tipo de WhatsApp no reconocido: {$this->tipo}");
                     return;

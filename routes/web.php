@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\VisitorController;
 use App\Http\Controllers\QrCodeController;
+use App\Http\Controllers\ApprovalController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -115,6 +116,14 @@ Route::get('/csrf-token', function() {
     ]);
 });
 
+// Rutas públicas para enlaces de aprobación desde WhatsApp (sin autenticación)
+Route::prefix('approval')->name('approval.')->group(function () {
+    Route::get('/{token}/approve', [ApprovalController::class, 'approvePublic'])
+         ->name('approve.public');
+    
+    Route::get('/{token}/reject', [ApprovalController::class, 'rejectPublic'])
+         ->name('reject.public');
+});
 
 require __DIR__.'/auth.php';
 

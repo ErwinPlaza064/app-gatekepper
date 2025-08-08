@@ -171,6 +171,64 @@ class WhatsAppService
     }
 
     /**
+     * Solicitud de aprobación para visitante espontáneo
+     */
+    public function solicitudAprobacion($numero, $visitante, $approveUrl, $rejectUrl)
+    {
+        $mensaje = "🔔 *Solicitud de Visita* 🔔\n\n" .
+                  "👤 Visitante: {$visitante->name}\n" .
+                  "🆔 Documento: {$visitante->id_document}\n" .
+                  "🕐 Solicita acceso a las: " . $visitante->entry_time->format('H:i d/m/Y') . "\n";
+
+        if ($visitante->vehicle_plate) {
+            $mensaje .= "🚗 Vehículo: {$visitante->vehicle_plate}\n";
+        }
+
+        if ($visitante->additional_info) {
+            $mensaje .= "📝 Información adicional: {$visitante->additional_info}\n";
+        }
+
+        $mensaje .= "\n⏰ *Tienes 7 minutos para responder*\n" .
+                   "Si no respondes, el acceso será automáticamente aprobado.\n\n" .
+                   "👆 *Opciones de respuesta:*\n" .
+                   "✅ APROBAR: {$approveUrl}\n" .
+                   "❌ RECHAZAR: {$rejectUrl}\n\n" .
+                   "🏘️ Sistema: Gatekeeper";
+
+        return $this->enviarMensaje($numero, $mensaje);
+    }
+
+    /**
+     * Confirmación de respuesta de aprobación
+     */
+    public function respuestaAprobacion($numero, $visitante, $accion)
+    {
+        $emoji = $accion === 'approved' ? '✅' : '❌';
+        $status = $accion === 'approved' ? 'APROBADO' : 'RECHAZADO';
+        
+        $mensaje = "{$emoji} *Visita {$status}* {$emoji}\n\n" .
+                  "👤 Visitante: {$visitante->name}\n" .
+                  "🆔 Documento: {$visitante->id_document}\n" .
+                  "🕐 Respuesta: " . now()->format('H:i d/m/Y') . "\n";
+
+        if ($accion === 'approved' || $accion === 'auto_approved') {
+            $mensaje .= "\n✅ El visitante puede ingresar ahora\n" .
+                       "🔄 Se ha notificado al personal de seguridad\n";
+            
+            if ($accion === 'auto_approved') {
+                $mensaje .= "⏰ *Aprobación automática por tiempo de espera*\n";
+            }
+        } else {
+            $mensaje .= "\n❌ Acceso denegado\n" .
+                       "🔄 Se ha notificado al personal de seguridad\n";
+        }
+
+        $mensaje .= "\n🏘️ Sistema: Gatekeeper";
+
+        return $this->enviarMensaje($numero, $mensaje);
+    }
+
+    /**
      * Formatear número de teléfono para WhatsApp
      */
     private function formatearNumero($numero)

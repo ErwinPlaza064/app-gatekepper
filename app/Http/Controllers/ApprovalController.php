@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Visitor;
 use App\Models\User;
 use App\Jobs\EnviarWhatsAppJob;
+use App\Notifications\VisitorApprovalRequest;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -297,27 +298,185 @@ class ApprovalController extends Controller
         $approveUrl = route('approval.approve.public', $visitor->approval_token);
         $rejectUrl = route('approval.reject.public', $visitor->approval_token);
 
-        EnviarWhatsAppJob::dispatch(
-            $resident->phone,
-            'solicitud_aprobacion',
-            [
-                'visitante' => $visitor,
-                'residente' => $resident,
-                'approve_url' => $approveUrl,
-                'reject_url' => $rejectUrl,
-            ]
-        );
+        // Enviar notificación al frontend (base de datos)
+        $resident->notify(new VisitorApprovalRequest($visitor));
 
-        Log::info('Solicitud de aprobación enviada por WhatsApp', [
+        // Enviar WhatsApp si está habilitado
+        if ($resident->phone && $resident->whatsapp_notifications) {
+            EnviarWhatsAppJob::dispatch(
+                $resident->phone,
+                'solicitud_aprobacion',
+                [
+                    'visitante' => $visitor,
+                    'residente' => $resident,
+                    'approve_url' => $approveUrl,
+                    'reject_url' => $rejectUrl,
+                ]
+            );
+        }
+
+        Log::info('Solicitud de aprobación enviada', [
             'visitor_id' => $visitor->id,
-            'resident_phone' => $resident->phone,
+            'resident_id' => $resident->id,
+            'channels' => [
+                'frontend' => true,
+                'whatsapp' => $resident->phone && $resident->whatsapp_notifications,
+            ],
             'approve_url' => $approveUrl,
         ]);
     }
 
     /**
-     * Enviar confirmación de aprobación/rechazo
+     * Aprobar visitante desde API (para frontend)
      */
+    public function approveApi(Request $request)
+    {
+        $request->validate([
+            'visitor_id' => 'required|exists:visitors,id',
+            'notes' => 'nullable|string|max:500',
+        ]);
+
+        try {
+            $visitor = Visitor::findOrFail($request->visitor_id);
+            $user = $request->user();
+
+            // Verificar que el usuario puede aprobar este visitante
+            if ($visitor->user_id !== $user->id) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No tienes permiso para aprobar este visitante'
+                ], 403);
+            }
+
+            // Verificar que el visitante esté pendiente y no expirado
+            if (!$visitor->isPending()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'El visitante ya fue procesado'
+                ], 400);
+            }
+
+            if ($visitor->isApprovalExpired()) {
+                // Auto-aprobar si expiró
+                $visitor->autoApprove();
+                
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Visitante auto-aprobado por tiempo de espera',
+                    'visitor' => $visitor->fresh(),
+                    'auto_approved' => true
+                ]);
+            }
+
+            // Aprobar el visitante
+            $visitor->approve(
+                $user->id,
+                $request->notes ?: 'Aprobado desde la aplicación web'
+            );
+
+            // Enviar confirmación
+            $this->sendApprovalConfirmation($visitor, 'approved');
+
+            Log::info('Visitante aprobado desde API', [
+                'visitor_id' => $visitor->id,
+                'visitor_name' => $visitor->name,
+                'approved_by' => $user->id,
+                'user_agent' => $request->userAgent(),
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => "Visitante {$visitor->name} aprobado correctamente",
+                'visitor' => $visitor->fresh()->load('user', 'approvedBy'),
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error aprobando visitante desde API', [
+                'visitor_id' => $request->visitor_id,
+                'user_id' => $request->user()->id,
+                'error' => $e->getMessage(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al procesar la aprobación: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Rechazar visitante desde API (para frontend)
+     */
+    public function rejectApi(Request $request)
+    {
+        $request->validate([
+            'visitor_id' => 'required|exists:visitors,id',
+            'reason' => 'nullable|string|max:500',
+        ]);
+
+        try {
+            $visitor = Visitor::findOrFail($request->visitor_id);
+            $user = $request->user();
+
+            // Verificar que el usuario puede rechazar este visitante
+            if ($visitor->user_id !== $user->id) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No tienes permiso para rechazar este visitante'
+                ], 403);
+            }
+
+            // Verificar que el visitante esté pendiente
+            if (!$visitor->isPending()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'El visitante ya fue procesado'
+                ], 400);
+            }
+
+            if ($visitor->isApprovalExpired()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'La solicitud ha expirado. El visitante fue auto-aprobado.'
+                ], 400);
+            }
+
+            // Rechazar el visitante
+            $visitor->reject(
+                $user->id,
+                $request->reason ?: 'Rechazado desde la aplicación web'
+            );
+
+            // Enviar confirmación
+            $this->sendApprovalConfirmation($visitor, 'rejected');
+
+            Log::info('Visitante rechazado desde API', [
+                'visitor_id' => $visitor->id,
+                'visitor_name' => $visitor->name,
+                'rejected_by' => $user->id,
+                'reason' => $request->reason,
+                'user_agent' => $request->userAgent(),
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => "Visitante {$visitor->name} rechazado",
+                'visitor' => $visitor->fresh()->load('user', 'approvedBy'),
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error rechazando visitante desde API', [
+                'visitor_id' => $request->visitor_id,
+                'user_id' => $request->user()->id,
+                'error' => $e->getMessage(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al procesar el rechazo: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
     private function sendApprovalConfirmation(Visitor $visitor, string $action)
     {
         if ($visitor->user && $visitor->user->phone && $visitor->user->whatsapp_notifications) {

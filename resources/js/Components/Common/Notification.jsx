@@ -1,6 +1,7 @@
 import React, { useRef } from "react";
 import axios from "axios";
 import { FaBell, FaCheck, FaInfoCircle } from "react-icons/fa";
+import VisitorApprovalNotification from "../Notifications/VisitorApprovalNotification";
 
 export default function Notification({ notifications, setNotifications }) {
     const [showNotifications, setShowNotifications] = React.useState(false);
@@ -94,6 +95,16 @@ export default function Notification({ notifications, setNotifications }) {
         }
     };
 
+    const updateNotification = (notificationId, updates) => {
+        setNotifications((prev) =>
+            prev.map((n) => 
+                n.id === notificationId 
+                    ? { ...n, ...updates, read_at: n.read_at || new Date().toISOString() }
+                    : n
+            )
+        );
+    };
+
     const unreadCount = notifications.filter((n) => !n.read_at).length;
 
     return (
@@ -157,66 +168,81 @@ export default function Notification({ notifications, setNotifications }) {
                             </div>
                         ) : (
                             <div className="p-2 space-y-2">
-                                {notifications.map((n, index) => (
-                                    <div
-                                        key={n.id}
-                                        className={`group relative px-4 py-3 text-sm cursor-pointer transition-all duration-200 rounded-lg border ${
-                                            n.read_at
-                                                ? "bg-gray-50 dark:bg-gray-800/50 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 border-gray-200 dark:border-gray-700"
-                                                : "bg-blue-50 dark:bg-blue-900/20 text-gray-900 dark:text-gray-100 hover:bg-blue-100 dark:hover:bg-blue-900/30 border-blue-200 dark:border-blue-800"
-                                        } hover:shadow-sm`}
-                                    >
-                                        <div className="flex items-start gap-3">
-                                            <div
-                                                className={`flex items-center justify-center w-8 h-8 rounded-full flex-shrink-0 ${
-                                                    n.read_at
-                                                        ? "bg-gray-200 dark:bg-gray-700"
-                                                        : "bg-blue-100 dark:bg-blue-800"
-                                                }`}
-                                            >
-                                                <FaBell
-                                                    className={`w-3 h-3 ${
+                                {notifications.map((n, index) => {
+                                    // Verificar si es una notificación de aprobación de visitante
+                                    if (n.data?.type === 'visitor_approval_request') {
+                                        return (
+                                            <VisitorApprovalNotification
+                                                key={n.id}
+                                                notification={n}
+                                                onUpdate={updateNotification}
+                                                showToast={showToast}
+                                            />
+                                        );
+                                    }
+
+                                    // Renderizado normal para otras notificaciones
+                                    return (
+                                        <div
+                                            key={n.id}
+                                            className={`group relative px-4 py-3 text-sm cursor-pointer transition-all duration-200 rounded-lg border ${
+                                                n.read_at
+                                                    ? "bg-gray-50 dark:bg-gray-800/50 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 border-gray-200 dark:border-gray-700"
+                                                    : "bg-blue-50 dark:bg-blue-900/20 text-gray-900 dark:text-gray-100 hover:bg-blue-100 dark:hover:bg-blue-900/30 border-blue-200 dark:border-blue-800"
+                                            } hover:shadow-sm`}
+                                        >
+                                            <div className="flex items-start gap-3">
+                                                <div
+                                                    className={`flex items-center justify-center w-8 h-8 rounded-full flex-shrink-0 ${
                                                         n.read_at
-                                                            ? "text-gray-400"
-                                                            : "text-blue-600 dark:text-blue-400"
-                                                    }`}
-                                                />
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                                <p
-                                                    className={`font-medium leading-snug ${
-                                                        n.read_at
-                                                            ? "text-gray-600 dark:text-gray-400"
-                                                            : "text-gray-900 dark:text-gray-100"
+                                                            ? "bg-gray-200 dark:bg-gray-700"
+                                                            : "bg-blue-100 dark:bg-blue-800"
                                                     }`}
                                                 >
-                                                    {n.data?.message ||
-                                                        n.data?.body ||
-                                                        "Notificación"}
-                                                </p>
-                                                <p className="mt-1 text-xs text-gray-500 dark:text-gray-500">
-                                                    {n.created_at
-                                                        ? new Date(
-                                                              n.created_at
-                                                          ).toLocaleString(
-                                                              "es-ES",
-                                                              {
-                                                                  day: "2-digit",
-                                                                  month: "2-digit",
-                                                                  year: "2-digit",
-                                                                  hour: "2-digit",
-                                                                  minute: "2-digit",
-                                                              }
-                                                          )
-                                                        : ""}
-                                                </p>
+                                                    <FaBell
+                                                        className={`w-3 h-3 ${
+                                                            n.read_at
+                                                                ? "text-gray-400"
+                                                                : "text-blue-600 dark:text-blue-400"
+                                                        }`}
+                                                    />
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <p
+                                                        className={`font-medium leading-snug ${
+                                                            n.read_at
+                                                                ? "text-gray-600 dark:text-gray-400"
+                                                                : "text-gray-900 dark:text-gray-100"
+                                                        }`}
+                                                    >
+                                                        {n.data?.message ||
+                                                            n.data?.body ||
+                                                            "Notificación"}
+                                                    </p>
+                                                    <p className="mt-1 text-xs text-gray-500 dark:text-gray-500">
+                                                        {n.created_at
+                                                            ? new Date(
+                                                                  n.created_at
+                                                              ).toLocaleString(
+                                                                  "es-ES",
+                                                                  {
+                                                                      day: "2-digit",
+                                                                      month: "2-digit",
+                                                                      year: "2-digit",
+                                                                      hour: "2-digit",
+                                                                      minute: "2-digit",
+                                                                  }
+                                                              )
+                                                            : ""}
+                                                    </p>
+                                                </div>
+                                                {!n.read_at && (
+                                                    <div className="flex-shrink-0 w-2 h-2 mt-2 bg-blue-500 rounded-full"></div>
+                                                )}
                                             </div>
-                                            {!n.read_at && (
-                                                <div className="flex-shrink-0 w-2 h-2 mt-2 bg-blue-500 rounded-full"></div>
-                                            )}
                                         </div>
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </div>
                         )}
                     </div>

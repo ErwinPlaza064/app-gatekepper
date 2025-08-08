@@ -32,14 +32,3 @@ Route::post('/push/subscribe', function (Request $request) {
     return response()->json(['success' => true]);
 })->middleware('auth:sanctum');
 
-// Rutas de aprobación de visitantes
-Route::middleware('auth:sanctum')->prefix('approval')->name('approval.')->group(function () {
-    Route::post('/request', [ApprovalController::class, 'requestApproval'])->name('request');
-    Route::get('/pending', [ApprovalController::class, 'pendingVisitors'])->name('pending');
-    Route::post('/process-expired', [ApprovalController::class, 'processExpiredApprovals'])->name('process-expired');
-    
-    // Nuevas rutas para aprobación desde frontend
-    Route::post('/approve', [ApprovalController::class, 'approveApi'])->name('approve');
-    Route::post('/reject', [ApprovalController::class, 'rejectApi'])->name('reject');
-});
-

@@ -33,7 +33,7 @@ export default function VisitorApprovalNotification({ notification, onUpdate, sh
             }
 
             const response = await axios.post(
-                `${API_URL}/api/approval/approve`,
+                `${API_URL}/approval/approve`,
                 {
                     visitor_id: visitor.id,
                     notes: 'Aprobado desde la aplicación web'
@@ -42,6 +42,7 @@ export default function VisitorApprovalNotification({ notification, onUpdate, sh
                     headers: {
                         "Content-Type": "application/json",
                         "X-Requested-With": "XMLHttpRequest",
+                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'),
                     },
                     withCredentials: true,
                 }
@@ -90,7 +91,7 @@ export default function VisitorApprovalNotification({ notification, onUpdate, sh
             }
 
             const response = await axios.post(
-                `${API_URL}/api/approval/reject`,
+                `${API_URL}/approval/reject`,
                 {
                     visitor_id: visitor.id,
                     reason: 'Rechazado desde la aplicación web'
@@ -99,6 +100,7 @@ export default function VisitorApprovalNotification({ notification, onUpdate, sh
                     headers: {
                         "Content-Type": "application/json",
                         "X-Requested-With": "XMLHttpRequest",
+                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'),
                     },
                     withCredentials: true,
                 }

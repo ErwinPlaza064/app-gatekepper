@@ -83,6 +83,13 @@ Route::middleware('auth')->group(function () {
     Route::patch('/api/qr-codes/{qrId}/reactivate', [QrCodeController::class, 'reactivateQr']);
     Route::get('/api/user/visitors', [VisitorController::class, 'getUserVisitors']);
     Route::post('/api/qr-codes', [QrCodeController::class, 'store']);
+
+    // Rutas de aprobación autenticadas (frontend)
+    Route::prefix('api/approval')->name('api.approval.')->group(function () {
+        Route::post('/approve', [ApprovalController::class, 'approveApi'])->name('approve');
+        Route::post('/reject', [ApprovalController::class, 'rejectApi'])->name('reject');
+        Route::get('/pending', [ApprovalController::class, 'pendingVisitors'])->name('pending');
+    });
 });
 
 Route::get('/create-admin', function () {

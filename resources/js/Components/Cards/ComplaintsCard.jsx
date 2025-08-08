@@ -29,7 +29,7 @@ export default function ComplaintsCard() {
             {/* Header Material Design */}
             <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
                 <div className="flex items-center gap-3">
-                    <div className="flex items-center justify-center w-10 h-10 bg-orange-100 rounded-lg dark:bg-orange-900/30">
+                    <div className="flex items-center justify-center w-10 h-10 bg-orange-100 rounded-lg dark:bg-black">
                         <FaExclamationTriangle className="w-5 h-5 text-black dark:text-orange-400" />
                     </div>
                     <div>
@@ -92,7 +92,7 @@ export default function ComplaintsCard() {
                     <button
                         type="submit"
                         disabled={processing}
-                        className={`w-full flex items-center justify-center gap-2 px-4 py-2.5 font-medium rounded-lg transition-colors duration-200 ${
+                        className={`w-full mx-auto flex items-center justify-center gap-2 px-4 py-2.5 font-medium rounded-lg transition-colors duration-200 ${
                             processing
                                 ? "bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed"
                                 : "bg-black hover:bg-blue-700 focus:bg-blue-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
@@ -113,7 +113,6 @@ export default function ComplaintsCard() {
                 </form>
             </div>
 
-            {/* Historial de quejas Material Design */}
             <div className="border-t border-gray-200 dark:border-gray-700">
                 <div className="px-6 py-4 bg-gray-50 dark:bg-gray-700/50">
                     <div className="flex items-center gap-3 mb-4">
@@ -159,7 +158,7 @@ export default function ComplaintsCard() {
                                         className="p-4 transition-colors duration-150 hover:bg-gray-50 dark:hover:bg-gray-700/50"
                                     >
                                         <div className="flex items-start gap-3">
-                                            <div className="flex items-center justify-center flex-shrink-0 w-6 h-6 mt-1 bg-orange-100 rounded-full dark:bg-orange-900/30">
+                                            <div className="flex items-center justify-center flex-shrink-0 w-6 h-6 mt-1 bg-orange-100 rounded-full dark:bg-black">
                                                 <span className="text-xs font-medium text-blackdark:text-orange-400">
                                                     {index + 1}
                                                 </span>

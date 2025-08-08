@@ -453,7 +453,7 @@ export default function QRGenerator({ userId }) {
                             !visitorInfo.id_document ||
                             isSaving
                         }
-                        className={`w-full flex items-center justify-center gap-3 px-6 py-3 font-medium rounded-lg transition-all duration-200 ${
+                        className={`w-full mx-auto flex items-center justify-center gap-3 px-6 py-3 font-medium rounded-lg transition-all duration-200 ${
                             !visitorInfo.name ||
                             !visitorInfo.id_document ||
                             isSaving

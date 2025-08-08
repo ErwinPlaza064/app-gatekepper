@@ -109,44 +109,44 @@ export default function VisitsHistory({ visits }) {
 
     return (
         <div className="overflow-hidden bg-white border border-gray-200 rounded-lg shadow-xl dark:bg-gray-900 dark:border-gray-700">
-            <div className="px-6 py-5 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
-                <div className="flex items-center gap-4">
-                    <div className="flex items-center justify-center w-12 h-12 bg-black rounded-full">
-                        <FaHistory className="w-6 h-6 text-white" />
+            <div className="px-4 py-4 border-b border-gray-200 sm:px-6 sm:py-5 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+                <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-4">
+                    <div className="flex items-center justify-center flex-shrink-0 w-10 h-10 bg-black rounded-full sm:w-12 sm:h-12">
+                        <FaHistory className="w-5 h-5 text-white sm:w-6 sm:h-6" />
                     </div>
                     <div>
                         <Typography
                             as="h4"
                             variant="h4"
-                            className="text-xl font-semibold text-gray-900 dark:text-white"
+                            className="text-lg font-semibold text-gray-900 sm:text-xl dark:text-white"
                         >
                             Historial de Visitas
                         </Typography>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                        <p className="text-xs text-gray-600 sm:text-sm dark:text-gray-400">
                             Registro completo de visitantes
                         </p>
                     </div>
                 </div>
             </div>
 
-            <div className="p-6 bg-gray-50 dark:bg-gray-800/50">
+            <div className="p-3 sm:p-6 bg-gray-50 dark:bg-gray-800/50">
                 {/* Barra de búsqueda principal */}
-                <div className="mb-6">
+                <div className="mb-4 sm:mb-6">
                     <div className="relative">
-                        <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
-                            <FaSearch className="w-5 h-5 text-gray-400" />
+                        <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none sm:pl-4">
+                            <FaSearch className="w-4 h-4 text-gray-400 sm:w-5 sm:h-5" />
                         </div>
                         <input
                             type="text"
-                            placeholder="Buscar visitante por nombre, documento o placa..."
+                            placeholder="Buscar visitante..."
                             value={globalSearch}
                             onChange={(e) => setGlobalSearch(e.target.value)}
-                            className="w-full py-4 pl-12 pr-4 text-lg text-gray-900 placeholder-gray-500 transition-colors duration-200 bg-white border-2 border-gray-200 rounded-lg shadow-sm dark:text-gray-100 dark:bg-gray-800 dark:border-gray-700 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:placeholder-gray-400"
+                            className="w-full py-3 pl-10 pr-10 text-base text-gray-900 placeholder-gray-500 transition-colors duration-200 bg-white border-2 border-gray-200 rounded-lg shadow-sm sm:py-4 sm:pl-12 sm:pr-4 sm:text-lg dark:text-gray-100 dark:bg-gray-800 dark:border-gray-700 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:placeholder-gray-400"
                         />
                         {globalSearch && (
                             <button
                                 onClick={() => setGlobalSearch("")}
-                                className="absolute inset-y-0 right-0 flex items-center justify-end pr-4 text-gray-400 bg-transparent hover:text-gray-600 dark:hover:text-gray-300"
+                                className="absolute inset-y-0 right-0 flex items-center justify-end pr-3 text-gray-400 bg-transparent sm:pr-4 hover:text-gray-600 dark:hover:text-gray-300"
                             >
                                 <FaTimes className="w-4 h-4" />
                             </button>
@@ -158,22 +158,22 @@ export default function VisitsHistory({ visits }) {
                 <div className="space-y-4">
                     {/* Filtro de fecha */}
                     <div>
-                        <label className="flex items-center gap-2 mb-3 text-sm font-medium text-gray-700 dark:text-gray-300">
+                        <label className="flex items-center justify-center gap-2 mb-3 text-sm font-medium text-gray-700 dark:text-gray-300">
                             <FaCalendarAlt className="w-4 h-4" />
                             Período
                         </label>
-                        <div className="flex flex-wrap gap-2 mb-4">
+                        <div className="flex flex-wrap justify-center gap-2 mb-4">
                             {[
-                                { key: "all", label: "Todos los registros" },
+                                { key: "all", label: "Todos" },
                                 { key: "today", label: "Hoy" },
-                                { key: "week", label: "Esta semana" },
-                                { key: "month", label: "Este mes" },
-                                { key: "custom", label: "Rango personalizado" },
+                                { key: "week", label: "Semana" },
+                                { key: "month", label: "Mes" },
+                                { key: "custom", label: "Personalizado" },
                             ].map((option) => (
                                 <button
                                     key={option.key}
                                     onClick={() => setDateRange(option.key)}
-                                    className={`px-4 py-2 text-sm font-medium rounded-lg border transition-colors duration-200 ${
+                                    className={`px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium rounded-lg border transition-colors duration-200 ${
                                         dateRange === option.key
                                             ? "bg-blue-600 text-white border-blue-600"
                                             : "bg-white text-gray-700 border-gray-200 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700 dark:hover:bg-gray-700"
@@ -184,10 +184,9 @@ export default function VisitsHistory({ visits }) {
                             ))}
                         </div>
 
-                        {/* Date pickers para rango personalizado */}
                         {showDatePicker && (
-                            <div className="p-4 bg-white border border-gray-200 rounded-lg dark:bg-gray-800 dark:border-gray-700">
-                                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                            <div className="p-3 bg-white border border-gray-200 rounded-lg sm:p-4 dark:bg-gray-800 dark:border-gray-700">
+                                <div className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2">
                                     <div>
                                         <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                                             Fecha desde
@@ -200,7 +199,7 @@ export default function VisitsHistory({ visits }) {
                                                     e.target.value
                                                 )
                                             }
-                                            className="w-full px-3 py-2 text-gray-900 transition-colors duration-200 bg-white border border-gray-200 rounded-lg dark:text-gray-100 dark:bg-gray-700 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
+                                            className="w-full px-3 py-2 text-sm text-gray-900 transition-colors duration-200 bg-white border border-gray-200 rounded-lg sm:text-base dark:text-gray-100 dark:bg-gray-700 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
                                         />
                                     </div>
                                     <div>
@@ -213,7 +212,7 @@ export default function VisitsHistory({ visits }) {
                                             onChange={(e) =>
                                                 setCustomDateTo(e.target.value)
                                             }
-                                            className="w-full px-3 py-2 text-gray-900 transition-colors duration-200 bg-white border border-gray-200 rounded-lg dark:text-gray-100 dark:bg-gray-700 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
+                                            className="w-full px-3 py-2 text-sm text-gray-900 transition-colors duration-200 bg-white border border-gray-200 rounded-lg sm:text-base dark:text-gray-100 dark:bg-gray-700 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
                                         />
                                     </div>
                                 </div>
@@ -221,7 +220,7 @@ export default function VisitsHistory({ visits }) {
                         )}
                     </div>
 
-                    <div className="flex items-center justify-between p-3 bg-white border border-gray-200 rounded-lg dark:bg-gray-800 dark:border-gray-700">
+                    <div className="flex flex-col items-start justify-between gap-3 p-3 bg-white border border-gray-200 rounded-lg sm:flex-row sm:items-center sm:p-4 dark:bg-gray-800 dark:border-gray-700">
                         <span className="text-sm text-gray-600 dark:text-gray-400">
                             {filteredVisits.length} de {visits?.length || 0}{" "}
                             registros encontrados
@@ -237,102 +236,181 @@ export default function VisitsHistory({ visits }) {
                                     setCustomDateFrom("");
                                     setCustomDateTo("");
                                 }}
-                                className="flex items-center gap-2 px-3 py-1 text-sm text-black bg-transparent hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"
+                                className="flex items-center gap-2 px-3 py-1.5 text-sm text-gray-700 bg-gray-100 hover:bg-gray-200 dark:text-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-lg transition-colors duration-200"
                             >
-                                <FaTimes className="w-3 h-3 " />
+                                <FaTimes className="w-3 h-3" />
                                 Limpiar filtros
                             </button>
                         )}
                     </div>
                 </div>
             </div>
-            <div className="p-6">
+            <div className="p-3 sm:p-6">
                 {filteredVisits.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-12 text-center">
-                        <div className="flex items-center justify-center w-16 h-16 mb-6 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700">
-                            <FaHistory className="w-8 h-8 text-gray-400" />
+                    <div className="flex flex-col items-center justify-center py-8 text-center sm:py-12">
+                        <div className="flex items-center justify-center w-12 h-12 mb-4 rounded-full sm:w-16 sm:h-16 sm:mb-6 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700">
+                            <FaHistory className="w-6 h-6 text-gray-400 sm:w-8 sm:h-8" />
                         </div>
                         <Typography
                             as="p"
                             variant="p"
-                            className="mb-2 text-lg font-medium text-gray-600 dark:text-gray-400"
+                            className="mb-2 text-base font-medium text-gray-600 sm:text-lg dark:text-gray-400"
                         >
                             Sin registros de visitas
                         </Typography>
                         <Typography
                             as="p"
                             variant="p"
-                            className="text-sm text-gray-500 dark:text-gray-500"
+                            className="px-4 text-sm text-gray-500 dark:text-gray-500"
                         >
                             Los registros de visitantes aparecerán aquí cuando
                             se registren
                         </Typography>
                     </div>
                 ) : (
-                    <div className="overflow-hidden border border-gray-200 rounded-lg dark:border-gray-700">
-                        <div className="overflow-x-auto">
-                            <table className="min-w-full">
-                                <thead className="bg-gray-50 dark:bg-gray-800">
-                                    <tr>
-                                        <th className="px-6 py-4 text-left">
-                                            <div className="flex items-center gap-2 text-xs font-bold tracking-wider text-gray-700 uppercase dark:text-gray-300">
-                                                <FaUser className="w-3 h-3" />
-                                                <span>Nombre</span>
-                                            </div>
-                                        </th>
-                                        <th className="px-6 py-4 text-left">
-                                            <div className="flex items-center gap-2 text-xs font-bold tracking-wider text-gray-700 uppercase dark:text-gray-300">
-                                                <FaIdCard className="w-3 h-3" />
-                                                <span>Documento</span>
-                                            </div>
-                                        </th>
-                                        <th className="px-6 py-4 text-left">
-                                            <div className="flex items-center gap-2 text-xs font-bold tracking-wider text-gray-700 uppercase dark:text-gray-300">
-                                                <FaCalendarAlt className="w-3 h-3" />
-                                                <span>Fecha</span>
-                                            </div>
-                                        </th>
-                                        <th className="px-6 py-4 text-left">
-                                            <div className="flex items-center gap-2 text-xs font-bold tracking-wider text-gray-700 uppercase dark:text-gray-300">
-                                                <FaCar className="w-3 h-3" />
-                                                <span>Placa</span>
-                                            </div>
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-900 dark:divide-gray-700">
-                                    {filteredVisits.map((visit, idx) => (
-                                        <tr
-                                            key={visit.id || visit.qr_id || idx}
-                                            className="transition-colors duration-200 hover:bg-gray-50 dark:hover:bg-gray-800"
-                                        >
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="flex items-center justify-center flex-shrink-0 w-8 h-8 rounded-lg bg-gradient-to-br from-gray-600 to-gray-800">
-                                                        <span className="text-xs font-bold text-white">
-                                                            {(
-                                                                visit.visitor_name ||
-                                                                visit.name ||
-                                                                "?"
-                                                            )
-                                                                .charAt(0)
-                                                                .toUpperCase()}
+                    <div>
+                        {/* Vista de tabla para pantallas grandes */}
+                        <div className="hidden overflow-hidden border border-gray-200 rounded-lg lg:block dark:border-gray-700">
+                            <div className="overflow-x-auto">
+                                <table className="min-w-full">
+                                    <thead className="bg-gray-50 dark:bg-gray-800">
+                                        <tr>
+                                            <th className="px-6 py-4 text-left">
+                                                <div className="flex items-center gap-2 text-xs font-bold tracking-wider text-gray-700 uppercase dark:text-gray-300">
+                                                    <FaUser className="w-3 h-3" />
+                                                    <span>Nombre</span>
+                                                </div>
+                                            </th>
+                                            <th className="px-6 py-4 text-left">
+                                                <div className="flex items-center gap-2 text-xs font-bold tracking-wider text-gray-700 uppercase dark:text-gray-300">
+                                                    <FaIdCard className="w-3 h-3" />
+                                                    <span>Documento</span>
+                                                </div>
+                                            </th>
+                                            <th className="px-6 py-4 text-left">
+                                                <div className="flex items-center gap-2 text-xs font-bold tracking-wider text-gray-700 uppercase dark:text-gray-300">
+                                                    <FaCalendarAlt className="w-3 h-3" />
+                                                    <span>Fecha</span>
+                                                </div>
+                                            </th>
+                                            <th className="px-6 py-4 text-left">
+                                                <div className="flex items-center gap-2 text-xs font-bold tracking-wider text-gray-700 uppercase dark:text-gray-300">
+                                                    <FaCar className="w-3 h-3" />
+                                                    <span>Placa</span>
+                                                </div>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-900 dark:divide-gray-700">
+                                        {filteredVisits.map((visit, idx) => (
+                                            <tr
+                                                key={
+                                                    visit.id ||
+                                                    visit.qr_id ||
+                                                    idx
+                                                }
+                                                className="transition-colors duration-200 hover:bg-gray-50 dark:hover:bg-gray-800"
+                                            >
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="flex items-center justify-center flex-shrink-0 w-8 h-8 rounded-lg bg-gradient-to-br from-gray-600 to-gray-800">
+                                                            <span className="text-xs font-bold text-white">
+                                                                {(
+                                                                    visit.visitor_name ||
+                                                                    visit.name ||
+                                                                    "?"
+                                                                )
+                                                                    .charAt(0)
+                                                                    .toUpperCase()}
+                                                            </span>
+                                                        </div>
+                                                        <span className="font-semibold text-gray-900 dark:text-gray-100">
+                                                            {visit.visitor_name ||
+                                                                visit.name}
                                                         </span>
                                                     </div>
-                                                    <span className="font-semibold text-gray-900 dark:text-gray-100">
-                                                        {visit.visitor_name ||
-                                                            visit.name}
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    <span className="font-medium text-gray-700 dark:text-gray-300">
+                                                        {visit.document_id ||
+                                                            visit.id_document}
                                                     </span>
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <span className="font-medium text-gray-700 dark:text-gray-300">
-                                                    {visit.document_id ||
-                                                        visit.id_document}
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    <span className="text-gray-700 dark:text-gray-300">
+                                                        {visit.created_at
+                                                            ? new Date(
+                                                                  visit.created_at
+                                                              ).toLocaleString(
+                                                                  "es-ES",
+                                                                  {
+                                                                      day: "2-digit",
+                                                                      month: "2-digit",
+                                                                      year: "2-digit",
+                                                                      hour: "2-digit",
+                                                                      minute: "2-digit",
+                                                                  }
+                                                              )
+                                                            : "-"}
+                                                    </span>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    <span
+                                                        className={`inline-flex items-center px-3 py-1 rounded-lg text-xs font-medium ${
+                                                            visit.vehicle_plate
+                                                                ? "bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-800"
+                                                                : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400"
+                                                        }`}
+                                                    >
+                                                        {visit.vehicle_plate ||
+                                                            "Sin vehículo"}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        {/* Vista de tarjetas para pantallas pequeñas */}
+                        <div className="block lg:hidden">
+                            <div className="max-w-2xl mx-auto space-y-4">
+                                {filteredVisits.map((visit, idx) => (
+                                    <div
+                                        key={visit.id || visit.qr_id || idx}
+                                        className="p-4 mx-auto bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700"
+                                    >
+                                        <div className="flex flex-col items-center mb-4 text-center">
+                                            <div className="flex items-center justify-center flex-shrink-0 w-12 h-12 mb-3 rounded-lg bg-gradient-to-br from-gray-600 to-gray-800">
+                                                <span className="text-sm font-bold text-white">
+                                                    {(
+                                                        visit.visitor_name ||
+                                                        visit.name ||
+                                                        "?"
+                                                    )
+                                                        .charAt(0)
+                                                        .toUpperCase()}
                                                 </span>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <span className="text-gray-700 dark:text-gray-300">
+                                            </div>
+                                            <h3 className="mb-1 text-lg font-semibold text-gray-900 dark:text-gray-100">
+                                                {visit.visitor_name ||
+                                                    visit.name}
+                                            </h3>
+                                            <p className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400">
+                                                <FaIdCard className="w-3 h-3" />
+                                                {visit.document_id ||
+                                                    visit.id_document}
+                                            </p>
+                                        </div>
+
+                                        <div className="space-y-3">
+                                            <div className="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                                                <span className="flex items-center gap-2 text-sm font-medium text-gray-600 dark:text-gray-400">
+                                                    <FaCalendarAlt className="w-4 h-4" />
+                                                    Fecha
+                                                </span>
+                                                <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">
                                                     {visit.created_at
                                                         ? new Date(
                                                               visit.created_at
@@ -348,23 +426,28 @@ export default function VisitsHistory({ visits }) {
                                                           )
                                                         : "-"}
                                                 </span>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
+                                            </div>
+
+                                            <div className="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                                                <span className="flex items-center gap-2 text-sm font-medium text-gray-600 dark:text-gray-400">
+                                                    <FaCar className="w-4 h-4" />
+                                                    Vehículo
+                                                </span>
                                                 <span
-                                                    className={`inline-flex items-center px-3 py-1 rounded-lg text-xs font-medium ${
+                                                    className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
                                                         visit.vehicle_plate
-                                                            ? "bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-800"
+                                                            ? "bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300"
                                                             : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400"
                                                     }`}
                                                 >
                                                     {visit.vehicle_plate ||
                                                         "Sin vehículo"}
                                                 </span>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     </div>
                 )}

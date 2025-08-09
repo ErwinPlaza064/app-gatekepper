@@ -96,16 +96,40 @@ class ApprovalController extends Controller
     public function approvePublic($token)
     {
         try {
+            Log::info('Intento de aprobación pública', [
+                'token' => $token,
+                'url' => request()->fullUrl(),
+                'ip' => request()->ip(),
+            ]);
+
             $visitor = Visitor::findByApprovalToken($token);
 
             if (!$visitor) {
+                Log::warning('Visitante no encontrado con token', [
+                    'token' => $token,
+                    'total_visitors' => Visitor::count(),
+                    'pending_visitors' => Visitor::where('approval_status', 'pending')->count(),
+                ]);
+
                 return Inertia::render('Approval/Error', [
-                    'message' => 'Enlace de aprobación inválido o expirado',
+                    'message' => 'Enlace de aprobación inválido o expirado. El token no corresponde a ningún visitante pendiente.',
                 ]);
             }
 
+            Log::info('Visitante encontrado', [
+                'visitor_id' => $visitor->id,
+                'visitor_name' => $visitor->name,
+                'approval_status' => $visitor->approval_status,
+                'approval_requested_at' => $visitor->approval_requested_at,
+            ]);
+
             // Verificar si ya fue procesado
             if (!$visitor->isPending()) {
+                Log::info('Visitante ya procesado', [
+                    'visitor_id' => $visitor->id,
+                    'status' => $visitor->approval_status,
+                ]);
+
                 return Inertia::render('Approval/AlreadyProcessed', [
                     'visitor' => $visitor->load('user'),
                     'status' => $visitor->approval_status,
@@ -175,16 +199,39 @@ class ApprovalController extends Controller
     public function rejectPublic($token)
     {
         try {
+            Log::info('Intento de rechazo público', [
+                'token' => $token,
+                'url' => request()->fullUrl(),
+                'ip' => request()->ip(),
+            ]);
+
             $visitor = Visitor::findByApprovalToken($token);
 
             if (!$visitor) {
+                Log::warning('Visitante no encontrado con token para rechazo', [
+                    'token' => $token,
+                    'total_visitors' => Visitor::count(),
+                    'pending_visitors' => Visitor::where('approval_status', 'pending')->count(),
+                ]);
+
                 return Inertia::render('Approval/Error', [
-                    'message' => 'Enlace de rechazo inválido o expirado',
+                    'message' => 'Enlace de rechazo inválido o expirado. El token no corresponde a ningún visitante pendiente.',
                 ]);
             }
 
+            Log::info('Visitante encontrado para rechazo', [
+                'visitor_id' => $visitor->id,
+                'visitor_name' => $visitor->name,
+                'approval_status' => $visitor->approval_status,
+            ]);
+
             // Verificar si ya fue procesado
             if (!$visitor->isPending()) {
+                Log::info('Visitante ya procesado para rechazo', [
+                    'visitor_id' => $visitor->id,
+                    'status' => $visitor->approval_status,
+                ]);
+
                 return Inertia::render('Approval/AlreadyProcessed', [
                     'visitor' => $visitor->load('user'),
                     'status' => $visitor->approval_status,

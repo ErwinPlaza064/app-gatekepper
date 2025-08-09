@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 
 Route::get('/check-auth', function () {
@@ -30,6 +32,58 @@ Route::get('/test-whatsapp', function() {
     $resultado = $whatsapp->enviarMensaje('+524641226304', '🎉 ¡Prueba de WhatsApp desde Gatekeeper! 🎉');
 
     return response()->json($resultado);
+});
+
+Route::get('/debug-approval/{token}', function($token) {
+    try {
+        Log::info('Debug approval token', ['token' => $token]);
+        
+        // Buscar sin scopes
+        $visitorDirect = DB::table('visitors')->where('approval_token', $token)->first();
+        
+        // Buscar con modelo normal
+        $visitorNormal = App\Models\Visitor::where('approval_token', $token)->first();
+        
+        // Buscar con includeRejected
+        $visitorWithRejected = App\Models\Visitor::includeRejected()->where('approval_token', $token)->first();
+        
+        // Buscar con el método específico
+        $visitorByMethod = App\Models\Visitor::findByApprovalToken($token);
+        
+        return response()->json([
+            'token' => $token,
+            'direct_query' => $visitorDirect ? [
+                'id' => $visitorDirect->id,
+                'name' => $visitorDirect->name,
+                'approval_status' => $visitorDirect->approval_status,
+                'approval_token' => $visitorDirect->approval_token,
+            ] : null,
+            'normal_model' => $visitorNormal ? [
+                'id' => $visitorNormal->id,
+                'name' => $visitorNormal->name,
+                'approval_status' => $visitorNormal->approval_status,
+            ] : null,
+            'with_rejected' => $visitorWithRejected ? [
+                'id' => $visitorWithRejected->id,
+                'name' => $visitorWithRejected->name,
+                'approval_status' => $visitorWithRejected->approval_status,
+            ] : null,
+            'by_method' => $visitorByMethod ? [
+                'id' => $visitorByMethod->id,
+                'name' => $visitorByMethod->name,
+                'approval_status' => $visitorByMethod->approval_status,
+            ] : null,
+            'total_visitors' => DB::table('visitors')->count(),
+            'pending_visitors' => DB::table('visitors')->where('approval_status', 'pending')->count(),
+            'visitors_with_tokens' => DB::table('visitors')->whereNotNull('approval_token')->count(),
+        ]);
+        
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => $e->getMessage(),
+            'token' => $token,
+        ], 500);
+    }
 });
 
 Route::get('/test-visitor-approval', function() {

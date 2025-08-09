@@ -187,7 +187,7 @@ Route::get('/debug-user', function() {
         'user_id' => $user ? $user->id : null,
         'user_email' => $user ? $user->email : null,
         'user_rol' => $user ? $user->rol : null,
-        'is_admin' => $user ? in_array($user->rol, ['administrador']) : false,
+        'is_admin' => $user ? in_array($user->rol, ['administrador', 'admin']) : false,
         'session_id' => session()->getId(),
     ]);
 })->middleware(['web', 'auth']);

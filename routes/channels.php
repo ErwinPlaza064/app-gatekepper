@@ -20,10 +20,11 @@ Broadcast::channel('admin.notifications', function ($user) {
         'user_id' => $user ? $user->id : 'No autenticado',
         'user_email' => $user ? $user->email : 'No disponible',
         'user_rol' => $user ? $user->rol : 'No disponible',
-        'is_admin' => $user ? in_array($user->rol, ['administrador']) : false
+        'is_admin' => $user ? in_array($user->rol, ['administrador', 'admin']) : false
     ]);
     
-    return $user && in_array($user->rol, ['administrador']);
+    // Aceptar tanto 'administrador' como 'admin'
+    return $user && in_array($user->rol, ['administrador', 'admin']);
 });
 
 // Canal específico para cada usuario

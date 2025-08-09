@@ -183,7 +183,7 @@ class AdminPanelProvider extends PanelProvider
                 });
 
                 // Escuchar eventos de actualización de visitantes
-                adminChannel.bind('App\\Events\\VisitorStatusUpdated', (data) => {
+                adminChannel.bind('visitor.status.updated', (data) => {
                     console.log('📧 Evento de visitante recibido:', data);
                     
                     // Crear notificación usando el sistema de Filament
@@ -203,7 +203,7 @@ class AdminPanelProvider extends PanelProvider
                             position: fixed;
                             top: 20px;
                             right: 20px;
-                            background: ${data.status === 'aprobado' ? '#10b981' : '#f59e0b'};
+                            background: ${data.status === 'approved' ? '#10b981' : '#f59e0b'};
                             color: white;
                             padding: 16px 20px;
                             border-radius: 8px;
@@ -211,17 +211,17 @@ class AdminPanelProvider extends PanelProvider
                             z-index: 9999;
                             max-width: 350px;
                             font-family: system-ui, -apple-system, sans-serif;
-                            border-left: 4px solid ${data.status === 'aprobado' ? '#065f46' : '#92400e'};
+                            border-left: 4px solid ${data.status === 'approved' ? '#065f46' : '#92400e'};
                         `;
                         
                         notification.innerHTML = `
                             <div style="display: flex; align-items: center; gap: 12px;">
                                 <div style="font-size: 20px;">
-                                    ${data.status === 'aprobado' ? '✅' : '⚠️'}
+                                    ${data.status === 'approved' ? '✅' : '⚠️'}
                                 </div>
                                 <div>
                                     <div style="font-weight: 600; margin-bottom: 4px;">Estado de Visitante Actualizado</div>
-                                    <div style="font-size: 14px; opacity: 0.9;">${data.message || `Visitante ${data.visitor.nombre} ${data.status}`}</div>
+                                    <div style="font-size: 14px; opacity: 0.9;">${data.message || `Visitante ${data.visitor.name} ${data.status}`}</div>
                                 </div>
                                 <button onclick="this.parentElement.parentElement.remove()" style="
                                     background: none; 

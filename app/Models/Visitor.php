@@ -173,6 +173,9 @@ class Visitor extends Model
             'entry_time' => now(), // Permitir entrada inmediata
         ]);
 
+        // Disparar evento para notificaciones en tiempo real
+        event(new \App\Events\VisitorStatusUpdated($this, 'approved', $notes));
+
         return $this;
     }
 
@@ -188,6 +191,9 @@ class Visitor extends Model
             'approval_notes' => $notes,
         ]);
 
+        // Disparar evento para notificaciones en tiempo real
+        event(new \App\Events\VisitorStatusUpdated($this, 'rejected', $notes));
+
         return $this;
     }
 
@@ -202,6 +208,9 @@ class Visitor extends Model
             'approval_notes' => $notes,
             'entry_time' => now(), // Permitir entrada inmediata
         ]);
+
+        // Disparar evento para notificaciones en tiempo real
+        event(new \App\Events\VisitorStatusUpdated($this, 'auto_approved', $notes));
 
         return $this;
     }

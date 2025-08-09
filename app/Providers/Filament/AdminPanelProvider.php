@@ -69,52 +69,84 @@ class AdminPanelProvider extends PanelProvider
     private function getRealTimeNotificationsScript(): string
     {
         return <<<'HTML'
+        <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
         <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                // Esperar a que Echo esté disponible
-                const initializeNotifications = () => {
-                    if (typeof window.Echo === 'undefined') {
-                        console.log('⏳ Echo no disponible aún, reintentando...');
-                        setTimeout(initializeNotifications, 1000);
-                        return;
-                    }
-
-                    console.log('🔔 Iniciando notificaciones en tiempo real...');
-
-                    // Verificar conexión de Pusher
-                    if (window.Echo.connector && window.Echo.connector.pusher) {
-                        window.Echo.connector.pusher.connection.bind('connected', () => {
-                            console.log('✅ Pusher conectado exitosamente');
-                        });
-                        
-                        window.Echo.connector.pusher.connection.bind('error', (error) => {
-                            console.error('❌ Error de conexión Pusher:', error);
-                        });
-                    }
-
-                    // Escuchar eventos de actualización de visitantes
-                    window.Echo.private('admin.notifications')
-                        .listen('VisitorStatusUpdated', (event) => {
-                            console.log('📧 Evento recibido:', event);
-                            
-                            // Mostrar notificación usando el sistema de Filament
-                            window.dispatchEvent(new CustomEvent('notify', {
-                                detail: {
-                                    message: event.message || `Visitante ${event.visitor.nombre} ${event.status}`,
-                                    type: event.status === 'aprobado' ? 'success' : 'warning'
-                                }
-                            }));
-                        })
-                        .error((error) => {
-                            console.error('❌ Error en canal de notificaciones:', error);
-                        });
-
-                    console.log('✅ Notificaciones configuradas');
-                };
-
-                // Inicializar después de un pequeño delay para asegurar que Echo esté cargado
-                setTimeout(initializeNotifications, 500);
+            // Configurar Pusher directamente
+            window.Pusher = Pusher;
+            
+            // Configurar conexión de Pusher
+            const pusher = new Pusher('7fa6f3ebe8d4679dd6ac', {
+                cluster: 'us3',
+                forceTLS: true,
+                authEndpoint: '/broadcasting/auth',
+                auth: {
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'),
+                    },
+                },
             });
+
+            // Debug de conexión
+            pusher.connection.bind('connected', () => {
+                console.log('✅ Pusher conectado exitosamente');
+            });
+            
+            pusher.connection.bind('error', (error) => {
+                console.error('❌ Error de conexión Pusher:', error);
+            });
+
+            // Suscribirse al canal de administradores
+            const adminChannel = pusher.subscribe('private-admin.notifications');
+            
+            adminChannel.bind('pusher:subscription_succeeded', () => {
+                console.log('✅ Suscrito al canal admin.notifications');
+            });
+
+            adminChannel.bind('pusher:subscription_error', (error) => {
+                console.error('❌ Error de suscripción:', error);
+            });
+
+            // Escuchar eventos de actualización de visitantes
+            adminChannel.bind('App\\Events\\VisitorStatusUpdated', (data) => {
+                console.log('📧 Evento de visitante recibido:', data);
+                
+                // Crear notificación visual
+                const notification = document.createElement('div');
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: ${data.status === 'aprobado' ? '#10b981' : '#f59e0b'};
+                    color: white;
+                    padding: 16px;
+                    border-radius: 8px;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                    z-index: 9999;
+                    max-width: 300px;
+                    font-family: system-ui, -apple-system, sans-serif;
+                `;
+                
+                notification.innerHTML = `
+                    <div style="font-weight: 600; margin-bottom: 4px;">Estado de Visitante Actualizado</div>
+                    <div style="font-size: 14px;">${data.message || `Visitante ${data.visitor.nombre} ${data.status}`}</div>
+                `;
+                
+                document.body.appendChild(notification);
+                
+                // Remover notificación después de 5 segundos
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 5000);
+
+                // Intentar recargar tabla de visitantes si existe
+                if (typeof Livewire !== 'undefined') {
+                    Livewire.emit('refreshComponent');
+                }
+            });
+
+            console.log('🔔 Sistema de notificaciones Pusher inicializado');
         </script>
         HTML;
     }

@@ -14,6 +14,7 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         Commands\NotifyExpiringQrCodes::class,
+        Commands\ProcessExpiredApprovals::class,
     ];
 
     /**
@@ -28,6 +29,12 @@ class Kernel extends ConsoleKernel
         $schedule->command('app:notify-expiring-qr-codes --hours=24') // ✅ CORREGIDO
                  ->dailyAt('09:00')
                  ->withoutOverlapping();
+
+        // Procesar aprobaciones expiradas cada minuto
+        $schedule->command('approvals:process-expired')
+                 ->everyMinute()
+                 ->withoutOverlapping()
+                 ->runInBackground();
     }
 
     /**

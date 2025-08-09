@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Visitor;
 use App\Models\User;
+use App\Models\Setting;
 use App\Jobs\EnviarWhatsAppJob;
 use App\Notifications\VisitorApprovalRequest;
 use Illuminate\Support\Facades\Log;
@@ -68,8 +69,9 @@ class ApprovalController extends Controller
                 'success' => true,
                 'message' => 'Solicitud de aprobación enviada al residente',
                 'visitor' => $visitor->load('user'),
-                'timeout_minutes' => 7,
-                'expires_at' => $visitor->approval_requested_at->addMinutes(7),
+                'timeout_minutes' => $resident->getApprovalTimeoutMinutes(),
+                'expires_at' => $visitor->approval_requested_at->addMinutes($resident->getApprovalTimeoutMinutes()),
+                'custom_timeout' => $resident->custom_approval_timeout !== null,
             ]);
 
         } catch (\Exception $e) {
@@ -237,10 +239,11 @@ class ApprovalController extends Controller
                         'resident' => $visitor->user->name ?? 'N/A',
                         'apartment' => $visitor->user->address ?? 'N/A',
                         'requested_at' => $visitor->approval_requested_at,
-                        'expires_at' => $visitor->approval_requested_at?->addMinutes(7),
-                        'minutes_remaining' => $visitor->approval_requested_at ? 
-                            max(0, Carbon::now()->diffInMinutes($visitor->approval_requested_at->addMinutes(7), false)) : 0,
+                        'timeout_minutes' => $visitor->user ? $visitor->user->getApprovalTimeoutMinutes() : Setting::getApprovalTimeout(),
+                        'expires_at' => $visitor->approval_requested_at?->addMinutes($visitor->user ? $visitor->user->getApprovalTimeoutMinutes() : Setting::getApprovalTimeout()),
+                        'minutes_remaining' => $visitor->getMinutesUntilExpiration(),
                         'is_expired' => $visitor->isApprovalExpired(),
+                        'custom_settings' => $visitor->user && $visitor->user->custom_approval_timeout !== null,
                     ];
                 });
 
@@ -269,21 +272,36 @@ class ApprovalController extends Controller
     {
         try {
             $expiredVisitors = Visitor::pendingApproval()
-                ->where('approval_requested_at', '<=', Carbon::now()->subMinutes(7))
-                ->get();
+                ->with('user')
+                ->get()
+                ->filter(function ($visitor) {
+                    return $visitor->isApprovalExpired();
+                });
 
             $processed = 0;
             foreach ($expiredVisitors as $visitor) {
-                $visitor->autoApprove();
-                $this->sendApprovalConfirmation($visitor, 'auto_approved');
+                // Verificar si el usuario tiene auto-aprobación habilitada
+                $autoApprovalEnabled = $visitor->user ? 
+                    $visitor->user->isAutoApprovalEnabled() : 
+                    Setting::isAutoApprovalEnabled();
+
+                if ($autoApprovalEnabled) {
+                    $visitor->autoApprove('Aprobado automáticamente por timeout personalizado');
+                    $action = 'auto_approved';
+                } else {
+                    $visitor->reject(null, 'Rechazado automáticamente por timeout sin respuesta');
+                    $action = 'auto_rejected';
+                }
+
+                $this->sendApprovalConfirmation($visitor, $action);
                 
-                // Notificar al portero sobre la auto-aprobación
-                $this->notifyPortero($visitor, 'auto_approved');
+                // Notificar al portero sobre la acción automática
+                $this->notifyPortero($visitor, $action);
                 
                 $processed++;
             }
 
-            Log::info("Auto-aprobados {$processed} visitantes por timeout");
+            Log::info("Procesados {$processed} visitantes por timeout con configuración personalizada");
 
             return response()->json([
                 'success' => true,

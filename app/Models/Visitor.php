@@ -214,15 +214,63 @@ class Visitor extends Model
     }
 
     /**
-     * Verificar si el token de aprobación está vencido (más de 7 minutos)
+     * Verificar si el token de aprobación está vencido
+     * Ahora usa la configuración personalizada del usuario
      */
     public function isApprovalExpired()
     {
-        if (!$this->approval_requested_at) {
+        if (!$this->approval_requested_at || !$this->user) {
             return false;
         }
 
-        return $this->approval_requested_at->addMinutes(7)->isPast();
+        $timeoutMinutes = $this->user->getApprovalTimeoutMinutes();
+        return $this->approval_requested_at->addMinutes($timeoutMinutes)->isPast();
+    }
+
+    /**
+     * Verificar si debe enviarse un recordatorio de aprobación
+     */
+    public function shouldSendReminder()
+    {
+        if (!$this->approval_requested_at || !$this->user || !$this->isPending()) {
+            return false;
+        }
+
+        // Verificar si el usuario quiere recordatorios
+        if (!$this->user->wantsApprovalReminders()) {
+            return false;
+        }
+
+        $timeoutMinutes = $this->user->getApprovalTimeoutMinutes();
+        $reminderMinutes = $this->user->getApprovalReminderMinutes();
+
+        // No enviar recordatorio si es 0 o mayor que el timeout
+        if ($reminderMinutes <= 0 || $reminderMinutes >= $timeoutMinutes) {
+            return false;
+        }
+
+        $reminderTime = $this->approval_requested_at->addMinutes($timeoutMinutes - $reminderMinutes);
+        $expirationTime = $this->approval_requested_at->addMinutes($timeoutMinutes);
+
+        $now = now();
+        
+        // Enviar recordatorio si ya pasó el tiempo de recordatorio pero no ha expirado
+        return $now->greaterThanOrEqualTo($reminderTime) && $now->lessThan($expirationTime);
+    }
+
+    /**
+     * Obtener minutos restantes para la expiración
+     */
+    public function getMinutesUntilExpiration(): int
+    {
+        if (!$this->approval_requested_at || !$this->user) {
+            return 0;
+        }
+
+        $timeoutMinutes = $this->user->getApprovalTimeoutMinutes();
+        $expirationTime = $this->approval_requested_at->addMinutes($timeoutMinutes);
+        
+        return max(0, now()->diffInMinutes($expirationTime, false));
     }
 
 

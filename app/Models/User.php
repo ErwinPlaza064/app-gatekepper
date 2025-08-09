@@ -57,6 +57,9 @@ class User extends Authenticatable implements FilamentUser
         'email_notifications',
         'rol',
         'remember_token',
+        'custom_approval_timeout',
+        'approval_reminders_enabled',
+        'custom_auto_approval',
     ];
 
     public function visitors()
@@ -83,5 +86,42 @@ class User extends Authenticatable implements FilamentUser
         'remember_token' => 'string',
         'whatsapp_notifications' => 'boolean',
         'email_notifications' => 'boolean',
+        'approval_reminders_enabled' => 'boolean',
+        'custom_auto_approval' => 'boolean',
     ];
+
+    // === MÉTODOS PARA CONFIGURACIÓN DE APROBACIÓN ===
+
+    /**
+     * Obtener timeout de aprobación para este usuario
+     * Si tiene configuración personalizada, la usa; si no, usa la global
+     */
+    public function getApprovalTimeoutMinutes(): int
+    {
+        return $this->custom_approval_timeout ?? Setting::getApprovalTimeout();
+    }
+
+    /**
+     * Verificar si auto-aprobación está habilitada para este usuario
+     */
+    public function isAutoApprovalEnabled(): bool
+    {
+        return $this->custom_auto_approval ?? Setting::isAutoApprovalEnabled();
+    }
+
+    /**
+     * Verificar si el usuario quiere recibir recordatorios de aprobación
+     */
+    public function wantsApprovalReminders(): bool
+    {
+        return $this->approval_reminders_enabled && $this->whatsapp_notifications;
+    }
+
+    /**
+     * Obtener minutos antes del timeout para enviar recordatorio
+     */
+    public function getApprovalReminderMinutes(): int
+    {
+        return Setting::getApprovalReminderMinutes();
+    }
 }

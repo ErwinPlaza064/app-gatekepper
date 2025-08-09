@@ -86,10 +86,28 @@ class VisitorResource extends Resource
                     ->label('Placa del Vehículo')
                     ->placeholder('ABC-123'),
 
+                Forms\Components\Select::make('visitor_type')
+                    ->label('Tipo de Visitante')
+                    ->options([
+                        'spontaneous' => 'Espontáneo (ya está aquí)',
+                        'scheduled' => 'Programado (llegará después)',
+                    ])
+                    ->default('spontaneous')
+                    ->required()
+                    ->live(),
+
                 Forms\Components\DateTimePicker::make('entry_time')
                     ->label('Hora de Entrada')
-                    ->default(now())
-                    ->required(),
+                    ->default(fn (Forms\Get $get) => $get('visitor_type') === 'spontaneous' ? now() : null)
+                    ->required(fn (Forms\Get $get) => $get('visitor_type') === 'spontaneous')
+                    ->visible(fn (Forms\Get $get) => $get('visitor_type') === 'spontaneous')
+                    ->helperText('Se registra automáticamente para visitantes espontáneos'),
+
+                Forms\Components\DateTimePicker::make('scheduled_time')
+                    ->label('Hora Programada de Llegada')
+                    ->visible(fn (Forms\Get $get) => $get('visitor_type') === 'scheduled')
+                    ->required(fn (Forms\Get $get) => $get('visitor_type') === 'scheduled')
+                    ->helperText('El visitante escaneará el QR cuando llegue'),
 
                 Forms\Components\DateTimePicker::make('exit_time')
                     ->label('Hora de Salida')
@@ -126,6 +144,19 @@ class VisitorResource extends Resource
                     ->badge()
                     ->color('gray'),
 
+                Tables\Columns\BadgeColumn::make('visitor_type')
+                    ->label('Tipo')
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'spontaneous' => 'Espontáneo',
+                        'scheduled' => 'Programado',
+                        default => $state,
+                    })
+                    ->color(fn (string $state): string => match ($state) {
+                        'spontaneous' => 'success',
+                        'scheduled' => 'info',
+                        default => 'gray',
+                    }),
+
                 Tables\Columns\TextColumn::make('approval_status')
                     ->label('Estado Aprobación')
                     ->badge()
@@ -147,7 +178,15 @@ class VisitorResource extends Resource
                 Tables\Columns\TextColumn::make('entry_time')
                     ->label('Entrada')
                     ->dateTime('d/m/Y H:i')
-                    ->sortable(),
+                    ->sortable()
+                    ->placeholder('Aún no ha entrado'),
+
+                Tables\Columns\TextColumn::make('scheduled_time')
+                    ->label('Hora Programada')
+                    ->dateTime('d/m/Y H:i')
+                    ->sortable()
+                    ->visible(fn ($record) => $record && $record->visitor_type === 'scheduled')
+                    ->placeholder('No programada'),
 
                 Tables\Columns\TextColumn::make('exit_time')
                     ->label('Salida')

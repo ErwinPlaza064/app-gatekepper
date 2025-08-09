@@ -26,6 +26,8 @@ class Visitor extends Model
         'entry_time',
         'exit_time',
         'vehicle_plate',
+        'visitor_type',
+        'scheduled_time',
         'approval_status',
         'approval_token',
         'approval_requested_at',
@@ -37,6 +39,7 @@ class Visitor extends Model
     protected $casts = [
         'entry_time' => 'datetime',
         'exit_time' => 'datetime',
+        'scheduled_time' => 'datetime',
         'approval_requested_at' => 'datetime',
         'approval_responded_at' => 'datetime',
     ];

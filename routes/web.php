@@ -179,5 +179,8 @@ Route::get('/csrf-token', function() {
     ]);
 });
 
+// Rutas de broadcasting para autenticación WebSocket
+Broadcast::routes(['middleware' => ['web', 'auth']]);
+
 require __DIR__.'/auth.php';
 

@@ -71,82 +71,122 @@ class AdminPanelProvider extends PanelProvider
         return <<<'HTML'
         <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
         <script>
+            // Habilitar debugging detallado
+            Pusher.logToConsole = true;
+            
             // Configurar Pusher directamente
             window.Pusher = Pusher;
             
-            // Configurar conexión de Pusher
+            // Verificar que el meta tag CSRF esté disponible
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            console.log('🔐 CSRF Token:', csrfToken ? 'Disponible' : 'No encontrado');
+            
+            // Configurar conexión de Pusher con más detalles
             const pusher = new Pusher('7fa6f3ebe8d4679dd6ac', {
                 cluster: 'us3',
                 forceTLS: true,
+                encrypted: true,
                 authEndpoint: '/broadcasting/auth',
                 auth: {
                     headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'),
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
                     },
                 },
+                enabledTransports: ['ws', 'wss']
             });
 
-            // Debug de conexión
+            // Debug detallado de conexión
+            pusher.connection.bind('connecting', () => {
+                console.log('🔄 Conectando a Pusher...');
+            });
+            
             pusher.connection.bind('connected', () => {
                 console.log('✅ Pusher conectado exitosamente');
+                console.log('📡 Socket ID:', pusher.connection.socket_id);
+            });
+            
+            pusher.connection.bind('disconnected', () => {
+                console.log('❌ Pusher desconectado');
             });
             
             pusher.connection.bind('error', (error) => {
                 console.error('❌ Error de conexión Pusher:', error);
+                console.error('📋 Detalles del error:', {
+                    type: error.type,
+                    error: error.error,
+                    data: error.data
+                });
             });
-
-            // Suscribirse al canal de administradores
-            const adminChannel = pusher.subscribe('private-admin.notifications');
             
-            adminChannel.bind('pusher:subscription_succeeded', () => {
-                console.log('✅ Suscrito al canal admin.notifications');
+            pusher.connection.bind('state_change', (states) => {
+                console.log('🔄 Cambio de estado Pusher:', states.previous, '=>', states.current);
             });
 
-            adminChannel.bind('pusher:subscription_error', (error) => {
-                console.error('❌ Error de suscripción:', error);
-            });
+            // Intentar suscribirse al canal después de la conexión
+            pusher.connection.bind('connected', () => {
+                console.log('🔔 Intentando suscribirse al canal admin.notifications...');
+                
+                // Suscribirse al canal de administradores
+                const adminChannel = pusher.subscribe('private-admin.notifications');
+                
+                adminChannel.bind('pusher:subscription_succeeded', () => {
+                    console.log('✅ Suscrito exitosamente al canal admin.notifications');
+                });
 
-            // Escuchar eventos de actualización de visitantes
-            adminChannel.bind('App\\Events\\VisitorStatusUpdated', (data) => {
-                console.log('📧 Evento de visitante recibido:', data);
-                
-                // Crear notificación visual
-                const notification = document.createElement('div');
-                notification.style.cssText = `
-                    position: fixed;
-                    top: 20px;
-                    right: 20px;
-                    background: ${data.status === 'aprobado' ? '#10b981' : '#f59e0b'};
-                    color: white;
-                    padding: 16px;
-                    border-radius: 8px;
-                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-                    z-index: 9999;
-                    max-width: 300px;
-                    font-family: system-ui, -apple-system, sans-serif;
-                `;
-                
-                notification.innerHTML = `
-                    <div style="font-weight: 600; margin-bottom: 4px;">Estado de Visitante Actualizado</div>
-                    <div style="font-size: 14px;">${data.message || `Visitante ${data.visitor.nombre} ${data.status}`}</div>
-                `;
-                
-                document.body.appendChild(notification);
-                
-                // Remover notificación después de 5 segundos
-                setTimeout(() => {
-                    if (notification.parentNode) {
-                        notification.parentNode.removeChild(notification);
+                adminChannel.bind('pusher:subscription_error', (error) => {
+                    console.error('❌ Error de suscripción al canal:', error);
+                    console.error('📋 Detalles del error de suscripción:', error);
+                });
+
+                // Escuchar eventos de actualización de visitantes
+                adminChannel.bind('App\\Events\\VisitorStatusUpdated', (data) => {
+                    console.log('📧 Evento de visitante recibido:', data);
+                    
+                    // Crear notificación visual
+                    const notification = document.createElement('div');
+                    notification.style.cssText = `
+                        position: fixed;
+                        top: 20px;
+                        right: 20px;
+                        background: ${data.status === 'aprobado' ? '#10b981' : '#f59e0b'};
+                        color: white;
+                        padding: 16px;
+                        border-radius: 8px;
+                        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                        z-index: 9999;
+                        max-width: 300px;
+                        font-family: system-ui, -apple-system, sans-serif;
+                    `;
+                    
+                    notification.innerHTML = `
+                        <div style="font-weight: 600; margin-bottom: 4px;">Estado de Visitante Actualizado</div>
+                        <div style="font-size: 14px;">${data.message || `Visitante ${data.visitor.nombre} ${data.status}`}</div>
+                    `;
+                    
+                    document.body.appendChild(notification);
+                    
+                    // Remover notificación después de 5 segundos
+                    setTimeout(() => {
+                        if (notification.parentNode) {
+                            notification.parentNode.removeChild(notification);
+                        }
+                    }, 5000);
+
+                    // Intentar recargar tabla de visitantes si existe
+                    if (typeof Livewire !== 'undefined') {
+                        Livewire.emit('refreshComponent');
                     }
-                }, 5000);
-
-                // Intentar recargar tabla de visitantes si existe
-                if (typeof Livewire !== 'undefined') {
-                    Livewire.emit('refreshComponent');
-                }
+                });
             });
 
             console.log('🔔 Sistema de notificaciones Pusher inicializado');
+            console.log('🔧 Configuración Pusher:', {
+                key: '7fa6f3ebe8d4679dd6ac',
+                cluster: 'us3',
+                authEndpoint: '/broadcasting/auth'
+            });
         </script>
         HTML;
     }

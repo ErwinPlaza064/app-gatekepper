@@ -95,7 +95,7 @@ window.Pusher = Pusher;
 window.Echo = new Echo({
     broadcaster: 'pusher',
     key: '7fa6f3ebe8d4679dd6ac',
-    cluster: 'us3',
+    cluster: 'us2',
     forceTLS: true,
     enabledTransports: ['ws', 'wss'],
     authEndpoint: baseURL + '/broadcasting/auth',

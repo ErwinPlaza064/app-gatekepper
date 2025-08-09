@@ -83,7 +83,7 @@ class AdminPanelProvider extends PanelProvider
             
             // Configurar conexión de Pusher con más detalles
             const pusher = new Pusher('7fa6f3ebe8d4679dd6ac', {
-                cluster: 'us3',
+                cluster: 'us2',
                 forceTLS: true,
                 encrypted: true,
                 authEndpoint: '/broadcasting/auth',
@@ -184,7 +184,7 @@ class AdminPanelProvider extends PanelProvider
             console.log('🔔 Sistema de notificaciones Pusher inicializado');
             console.log('🔧 Configuración Pusher:', {
                 key: '7fa6f3ebe8d4679dd6ac',
-                cluster: 'us3',
+                cluster: 'us2',
                 authEndpoint: '/broadcasting/auth'
             });
         </script>

@@ -100,6 +100,10 @@ class VisitorResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(function (Builder $query) {
+                // Filtrar automáticamente los visitantes rechazados
+                return $query->where('approval_status', '!=', 'rejected');
+            })
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->label('Visitante')
@@ -122,6 +126,24 @@ class VisitorResource extends Resource
                     ->badge()
                     ->color('gray'),
 
+                Tables\Columns\TextColumn::make('approval_status')
+                    ->label('Estado Aprobación')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'pending' => 'warning',
+                        'approved' => 'success',
+                        'auto_approved' => 'info',
+                        'rejected' => 'danger',
+                        default => 'gray',
+                    })
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'pending' => 'Pendiente',
+                        'approved' => 'Aprobado',
+                        'auto_approved' => 'Auto-aprobado',
+                        'rejected' => 'Rechazado',
+                        default => $state,
+                    }),
+
                 Tables\Columns\TextColumn::make('entry_time')
                     ->label('Entrada')
                     ->dateTime('d/m/Y H:i')
@@ -134,7 +156,7 @@ class VisitorResource extends Resource
                     ->color(fn ($record) => $record->exit_time ? 'success' : 'warning'),
 
                 Tables\Columns\IconColumn::make('status')
-                    ->label('Estado')
+                    ->label('Estado Visita')
                     ->getStateUsing(fn ($record) => is_null($record->exit_time))
                     ->boolean()
                     ->trueIcon('heroicon-o-clock')
@@ -163,6 +185,33 @@ class VisitorResource extends Resource
                             })
                         );
                     }),
+
+                SelectFilter::make('approval_status')
+                    ->label('Estado de Aprobación')
+                    ->options([
+                        'pending' => 'Pendiente',
+                        'approved' => 'Aprobado',
+                        'auto_approved' => 'Auto-aprobado',
+                        'rejected' => 'Rechazado',
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        if (!empty($data['value'])) {
+                            // Si selecciona 'rejected', remover el filtro automático
+                            if ($data['value'] === 'rejected') {
+                                return $query->withoutGlobalScope('hideRejected')->where('approval_status', $data['value']);
+                            }
+                            return $query->where('approval_status', $data['value']);
+                        }
+                        return $query;
+                    }),
+
+                Filter::make('show_rejected')
+                    ->label('Incluir rechazados')
+                    ->query(function (Builder $query): Builder {
+                        // Remover el filtro automático que oculta rechazados
+                        return $query->withoutGlobalScope('hideRejected');
+                    })
+                    ->toggle(),
 
                 Filter::make('active_visits')
                     ->label('Visitantes adentro')
@@ -224,7 +273,10 @@ class VisitorResource extends Resource
                     ->label('Marcar Salida')
                     ->icon('heroicon-o-arrow-right-on-rectangle')
                     ->color('success')
-                    ->visible(fn ($record) => is_null($record->exit_time))
+                    ->visible(fn ($record) => 
+                        is_null($record->exit_time) && 
+                        in_array($record->approval_status, ['approved', 'auto_approved'])
+                    )
                     ->requiresConfirmation()
                     ->modalHeading('Marcar salida del visitante')
                     ->modalDescription(fn ($record) => "¿Confirmas que {$record->name} está saliendo?")
@@ -235,6 +287,42 @@ class VisitorResource extends Resource
                             ->title('Salida registrada')
                             ->body("Se registró la salida de {$record->name}")
                             ->success()
+                            ->send();
+                    }),
+
+                Tables\Actions\Action::make('approve_visitor')
+                    ->label('Aprobar')
+                    ->icon('heroicon-o-check-circle')
+                    ->color('success')
+                    ->visible(fn ($record) => $record->approval_status === 'pending')
+                    ->requiresConfirmation()
+                    ->modalHeading('Aprobar visitante')
+                    ->modalDescription(fn ($record) => "¿Confirmas la aprobación de {$record->name}?")
+                    ->action(function ($record) {
+                        $record->approve(auth()->id(), 'Aprobado desde el panel de administración');
+
+                        Notification::make()
+                            ->title('Visitante aprobado')
+                            ->body("El visitante {$record->name} fue aprobado correctamente")
+                            ->success()
+                            ->send();
+                    }),
+
+                Tables\Actions\Action::make('reject_visitor')
+                    ->label('Rechazar')
+                    ->icon('heroicon-o-x-circle')
+                    ->color('danger')
+                    ->visible(fn ($record) => $record->approval_status === 'pending')
+                    ->requiresConfirmation()
+                    ->modalHeading('Rechazar visitante')
+                    ->modalDescription(fn ($record) => "¿Confirmas el rechazo de {$record->name}? Esta acción no se puede deshacer.")
+                    ->action(function ($record) {
+                        $record->reject(auth()->id(), 'Rechazado desde el panel de administración');
+
+                        Notification::make()
+                            ->title('Visitante rechazado')
+                            ->body("El visitante {$record->name} fue rechazado")
+                            ->warning()
                             ->send();
                     }),
             ])

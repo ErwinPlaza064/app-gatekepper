@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Notifications\Notifiable;
 use App\Notifications\NewVisitorNotification;
 use App\Notifications\VisitorApprovalRequest;
@@ -73,6 +74,16 @@ class Visitor extends Model
     public function scopeRejected($query)
     {
         return $query->where('approval_status', 'rejected');
+    }
+
+    public function scopeIncludeRejected($query)
+    {
+        return $query->withoutGlobalScope('hideRejected');
+    }
+
+    public function scopeOnlyRejected($query)
+    {
+        return $query->withoutGlobalScope('hideRejected')->where('approval_status', 'rejected');
     }
 
     // === MÉTODOS DE ESTADO ===
@@ -276,6 +287,11 @@ class Visitor extends Model
 
   protected static function booted()
 {
+    // Scope global para ocultar visitantes rechazados por defecto
+    static::addGlobalScope('hideRejected', function (Builder $builder) {
+        $builder->where('approval_status', '!=', 'rejected');
+    });
+
     static::created(function ($visitor) {
         // Verificar que exista un usuario relacionado
         if ($visitor->user) {

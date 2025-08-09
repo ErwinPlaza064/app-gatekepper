@@ -49,7 +49,7 @@ class VisitorApprovalRequest extends Notification
             ->line("Tienes una nueva solicitud de visita que requiere tu aprobación:")
             ->line("👤 **Visitante:** {$this->visitor->name}")
             ->line("🆔 **Documento:** {$this->visitor->id_document}")
-            ->line("🕐 **Hora de solicitud:** " . $this->visitor->entry_time->format('H:i d/m/Y'))
+            ->line("🕐 **Hora de solicitud:** " . ($this->visitor->approval_requested_at ? $this->visitor->approval_requested_at->format('H:i d/m/Y') : now()->format('H:i d/m/Y')))
             ->when($this->visitor->vehicle_plate, function ($mail) {
                 return $mail->line("🚗 **Vehículo:** {$this->visitor->vehicle_plate}");
             })

@@ -236,7 +236,8 @@ class ApprovalController extends Controller
     public function pendingVisitors()
     {
         try {
-            $pendingVisitors = Visitor::pendingApproval()
+            $pendingVisitors = Visitor::includeRejected()
+                ->pendingApproval()
                 ->with(['user', 'approvedBy'])
                 ->orderBy('approval_requested_at', 'desc')
                 ->get()
@@ -249,11 +250,11 @@ class ApprovalController extends Controller
                         'resident' => $visitor->user->name ?? 'N/A',
                         'apartment' => $visitor->user->address ?? 'N/A',
                         'requested_at' => $visitor->approval_requested_at,
-                        'timeout_minutes' => $visitor->user ? $visitor->user->getApprovalTimeoutMinutes() : Setting::getApprovalTimeout(),
-                        'expires_at' => $visitor->approval_requested_at?->addMinutes($visitor->user ? $visitor->user->getApprovalTimeoutMinutes() : Setting::getApprovalTimeout()),
+                        'timeout_minutes' => Setting::getApprovalTimeout(),
+                        'expires_at' => $visitor->approval_requested_at?->addMinutes(Setting::getApprovalTimeout()),
                         'minutes_remaining' => $visitor->getMinutesUntilExpiration(),
                         'is_expired' => $visitor->isApprovalExpired(),
-                        'custom_settings' => $visitor->user && $visitor->user->custom_approval_timeout !== null,
+                        'global_timeout' => true,
                     ];
                 });
 
@@ -281,7 +282,8 @@ class ApprovalController extends Controller
     public function processExpiredApprovals()
     {
         try {
-            $expiredVisitors = Visitor::pendingApproval()
+            $expiredVisitors = Visitor::includeRejected()
+                ->pendingApproval()
                 ->with('user')
                 ->get()
                 ->filter(function ($visitor) {

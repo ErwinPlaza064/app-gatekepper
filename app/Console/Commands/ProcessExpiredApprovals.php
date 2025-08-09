@@ -15,7 +15,8 @@ class ProcessExpiredApprovals extends Command
 
     public function handle()
     {
-        $expiredVisitors = Visitor::pendingApproval()
+        $expiredVisitors = Visitor::includeRejected()
+            ->pendingApproval()
             ->with('user')
             ->get()
             ->filter(function ($visitor) {

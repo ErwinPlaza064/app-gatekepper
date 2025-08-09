@@ -91,7 +91,7 @@ class AdminPanelProvider extends PanelProvider
                     headers: {
                         'X-CSRF-TOKEN': csrfToken,
                         'Accept': 'application/json',
-                        'Content-Type': 'application/json',
+                        'Content-Type': 'application/x-www-form-urlencoded',
                         'X-Requested-With': 'XMLHttpRequest',
                     },
                 },

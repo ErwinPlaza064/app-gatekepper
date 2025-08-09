@@ -154,7 +154,7 @@ return [
     |
     */
 
-    'domain' => env('SESSION_DOMAIN', '.gatekepper.com'),
+    'domain' => env('SESSION_DOMAIN', null), // null permite cualquier dominio
 
     /*
     |--------------------------------------------------------------------------

@@ -13,3 +13,17 @@ use Illuminate\Support\Facades\Broadcast;
 |
 */
 
+// Canal para notificaciones de administradores
+Broadcast::channel('admin.notifications', function ($user) {
+    return $user && in_array($user->rol, ['administrador']);
+});
+
+// Canal específico para cada usuario
+Broadcast::channel('private-user.{userId}', function ($user, $userId) {
+    return $user && $user->id == $userId;
+});
+
+// Canal de Filament para notificaciones de base de datos
+Broadcast::channel('filament.notifications.{userId}', function ($user, $userId) {
+    return $user && $user->id == $userId;
+});

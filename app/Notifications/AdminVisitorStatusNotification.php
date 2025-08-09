@@ -7,6 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use App\Models\Visitor;
+use App\Events\VisitorStatusUpdated;
 use Filament\Notifications\Notification as FilamentNotification;
 use Filament\Notifications\Actions\Action;
 
@@ -73,27 +74,49 @@ class AdminVisitorStatusNotification extends Notification implements ShouldQueue
     }
 
     /**
-     * Enviar notificación usando Filament Notifications
+     * Enviar notificación usando Filament Notifications con Broadcasting
      */
     public function sendFilamentNotification($user)
     {
+        // Enviar notificación inmediata a Filament
         FilamentNotification::make()
             ->title($this->getNotificationTitle())
-            ->body($this->getDetailedMessage())
+            ->body($this->getSimpleMessage())
             ->icon($this->getStatusIcon())
             ->iconColor($this->getStatusColor())
+            ->duration('5000')
             ->actions([
-                Action::make('view')
-                    ->label('Ver Dashboard')
-                    ->url('/admin')
-                    ->button(),
+                Action::make('view_visitors')
+                    ->label('Ver Visitantes')
+                    ->url('/admin/visitors')
+                    ->button()
+                    ->color('primary'),
                 Action::make('dismiss')
                     ->label('Cerrar')
                     ->close()
                     ->color('gray'),
             ])
-            ->persistent() // Mantener hasta que se cierre manualmente
-            ->sendToDatabase($user);
+            ->send(); // Envío inmediato al usuario actual
+
+        // Disparar evento de broadcasting para tiempo real
+        broadcast(new VisitorStatusUpdated($this->visitor, $this->status, $this->respondedBy));
+    }
+
+    /**
+     * Mensaje simplificado para notificaciones
+     */
+    private function getSimpleMessage(): string
+    {
+        $visitorName = $this->visitor->name;
+        $residentName = $this->visitor->user->name;
+        
+        return match($this->status) {
+            'approved' => "✅ Visitante {$visitorName} aprobado para {$residentName}",
+            'rejected' => "❌ Visitante {$visitorName} rechazado para {$residentName}",
+            'auto_approved' => "⏰ Visitante {$visitorName} auto-aprobado (timeout)",
+            'auto_rejected' => "⏰ Visitante {$visitorName} auto-rechazado (timeout)",
+            default => "🔔 Estado de {$visitorName} actualizado",
+        };
     }
 
     /**

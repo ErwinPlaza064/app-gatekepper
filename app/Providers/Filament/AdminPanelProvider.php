@@ -92,6 +92,7 @@ class AdminPanelProvider extends PanelProvider
                         'X-CSRF-TOKEN': csrfToken,
                         'Accept': 'application/json',
                         'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
                     },
                 },
                 enabledTransports: ['ws', 'wss']
@@ -142,6 +143,25 @@ class AdminPanelProvider extends PanelProvider
                 })
                 .catch(error => {
                     console.error('❌ Error obteniendo info del usuario:', error);
+                });
+
+                // Debug específico del endpoint de broadcasting
+                fetch('/debug-broadcasting-auth', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                    credentials: 'same-origin'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('📡 Debug broadcasting auth:', data);
+                })
+                .catch(error => {
+                    console.error('❌ Error en debug broadcasting:', error);
                 });
                 
                 // Suscribirse al canal de administradores

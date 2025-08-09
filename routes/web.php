@@ -192,8 +192,27 @@ Route::get('/debug-user', function() {
     ]);
 })->middleware(['web', 'auth']);
 
-// Rutas de broadcasting para autenticación WebSocket
-Broadcast::routes(['middleware' => ['web', 'auth']]);
+// Debug específico para el endpoint de broadcasting
+Route::post('/debug-broadcasting-auth', function () {
+    $user = Auth::user();
+    return response()->json([
+        'authenticated' => Auth::check(),
+        'user_id' => $user ? $user->id : null,
+        'user_email' => $user ? $user->email : null,
+        'user_rol' => $user ? $user->rol : null,
+        'is_admin' => $user ? in_array($user->rol, ['administrador', 'admin']) : false,
+        'session_id' => session()->getId(),
+        'csrf_token' => csrf_token(),
+        'headers' => request()->headers->all(),
+    ]);
+})->middleware(['web', 'auth']);
+
+// Rutas de broadcasting para autenticación WebSocket con configuración específica
+Broadcast::routes([
+    'middleware' => ['web'],
+    'prefix' => '',
+    'as' => ''
+]);
 
 require __DIR__.'/auth.php';
 

@@ -209,9 +209,7 @@ Route::post('/debug-broadcasting-auth', function () {
 
 // Rutas de broadcasting para autenticación WebSocket con configuración específica
 Broadcast::routes([
-    'middleware' => ['web', 'debug.broadcast'],
-    'prefix' => '',
-    'as' => ''
+    'middleware' => ['web', 'auth'],
 ]);
 
 require __DIR__.'/auth.php';

@@ -128,6 +128,22 @@ class AdminPanelProvider extends PanelProvider
             pusher.connection.bind('connected', () => {
                 console.log('🔔 Intentando suscribirse al canal admin.notifications...');
                 
+                // Debug del usuario actual
+                fetch('/debug-user', {
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json',
+                    },
+                    credentials: 'same-origin'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('👤 Debug del usuario:', data);
+                })
+                .catch(error => {
+                    console.error('❌ Error obteniendo info del usuario:', error);
+                });
+                
                 // Suscribirse al canal de administradores
                 const adminChannel = pusher.subscribe('private-admin.notifications');
                 
@@ -138,6 +154,12 @@ class AdminPanelProvider extends PanelProvider
                 adminChannel.bind('pusher:subscription_error', (error) => {
                     console.error('❌ Error de suscripción al canal:', error);
                     console.error('📋 Detalles del error de suscripción:', error);
+                    
+                    // Sugerencia si es error 403
+                    if (error.status === 403) {
+                        console.error('🚫 Error 403: El usuario no está autorizado para este canal');
+                        console.error('💡 Verifique que el usuario tenga rol de "administrador"');
+                    }
                 });
 
                 // Escuchar eventos de actualización de visitantes

@@ -179,6 +179,19 @@ Route::get('/csrf-token', function() {
     ]);
 });
 
+// Debug para verificar usuario autenticado
+Route::get('/debug-user', function() {
+    $user = Auth::user();
+    return response()->json([
+        'authenticated' => Auth::check(),
+        'user_id' => $user ? $user->id : null,
+        'user_email' => $user ? $user->email : null,
+        'user_rol' => $user ? $user->rol : null,
+        'is_admin' => $user ? in_array($user->rol, ['administrador']) : false,
+        'session_id' => session()->getId(),
+    ]);
+})->middleware(['web', 'auth']);
+
 // Rutas de broadcasting para autenticación WebSocket
 Broadcast::routes(['middleware' => ['web', 'auth']]);
 

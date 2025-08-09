@@ -15,6 +15,14 @@ use Illuminate\Support\Facades\Broadcast;
 
 // Canal para notificaciones de administradores
 Broadcast::channel('admin.notifications', function ($user) {
+    // Debug para verificar autorización
+    \Illuminate\Support\Facades\Log::info('Canal admin.notifications - Verificando autorización', [
+        'user_id' => $user ? $user->id : 'No autenticado',
+        'user_email' => $user ? $user->email : 'No disponible',
+        'user_rol' => $user ? $user->rol : 'No disponible',
+        'is_admin' => $user ? in_array($user->rol, ['administrador']) : false
+    ]);
+    
     return $user && in_array($user->rol, ['administrador']);
 });
 

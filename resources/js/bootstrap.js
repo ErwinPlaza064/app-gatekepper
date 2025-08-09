@@ -7,41 +7,53 @@
 import axios from "axios";
 window.axios = axios;
 
-// Configurar base URL con HTTPS forzado para Railway
+// CONFIGURACIÓN INMEDIATA Y ROBUSTA DE HTTPS
+// Detectar entorno y configurar URL apropiada ANTES de cualquier request
 let baseURL;
 
-// Detectar entorno y configurar URL apropiada
+// En el navegador, usar la URL actual pero SIEMPRE forzar HTTPS
 if (typeof window !== 'undefined') {
-    // En el navegador, usar la URL actual pero forzar HTTPS
     const currentURL = window.location.origin;
     baseURL = currentURL.replace("http://", "https://");
+    
+    // Si estamos en producción (gatekepper.com), forzar HTTPS siempre
+    if (currentURL.includes('gatekepper.com')) {
+        baseURL = "https://gatekepper.com";
+    }
 } else {
     // Fallback para SSR
-    baseURL = import.meta.env.VITE_API_URL || "https://gatekepper.com";
+    baseURL = "https://gatekepper.com";
 }
 
-// Asegurar que siempre use HTTPS
-axios.defaults.baseURL = baseURL.replace("http://", "https://");
+// CONFIGURAR AXIOS INMEDIATAMENTE
+axios.defaults.baseURL = baseURL;
 axios.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
 axios.defaults.withCredentials = true;
 
-// Interceptor para forzar HTTPS en todas las peticiones
+// INTERCEPTOR MÁS AGRESIVO PARA FORZAR HTTPS
 axios.interceptors.request.use(
     (config) => {
-        // Forzar HTTPS en todas las URLs
-        if (config.url && config.url.startsWith("http://")) {
-            config.url = config.url.replace("http://", "https://");
+        // SIEMPRE forzar HTTPS en todas las URLs
+        if (config.url) {
+            // Si es una URL completa, forzar HTTPS
+            if (config.url.startsWith("http://")) {
+                config.url = config.url.replace("http://", "https://");
+            }
+            // Si es una URL relativa y estamos en gatekepper.com, usar baseURL HTTPS
+            else if (!config.url.startsWith("http") && config.url.startsWith("/")) {
+                config.url = baseURL + config.url;
+            }
         }
 
-        // Si la baseURL también usa HTTP, cambiarla
+        // Asegurar baseURL HTTPS
         if (config.baseURL && config.baseURL.startsWith("http://")) {
             config.baseURL = config.baseURL.replace("http://", "https://");
         }
 
         // Debug en desarrollo
         if (import.meta.env.DEV) {
-            console.log("Request URL:", config.url);
-            console.log("Base URL:", config.baseURL);
+            console.log("🔒 Request URL final:", config.url);
+            console.log("🔒 Base URL:", config.baseURL);
         }
 
         return config;

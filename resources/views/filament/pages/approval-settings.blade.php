@@ -9,8 +9,8 @@
                 <div>
                     <h2 class="text-xl font-semibold text-gray-900">Sistema de Aprobación de Visitantes</h2>
                     <p class="text-sm text-gray-600">
-                        Configura los parámetros globales para el sistema de aprobación de visitantes espontáneos.
-                        Los residentes pueden personalizar estos valores en su perfil individual.
+                        Configura los parámetros globales para todo el residencial. 
+                        <strong>Solo los super administradores</strong> pueden modificar estos valores que aplican a todos los residentes por igual.
                     </p>
                 </div>
             </div>
@@ -39,9 +39,9 @@
                         <ul class="list-disc pl-5 space-y-1">
                             <li>Cuando llega un visitante espontáneo, el portero lo registra sin código QR</li>
                             <li>El sistema envía automáticamente una notificación al residente por WhatsApp y el panel web</li>
-                            <li>El residente tiene un tiempo límite para aprobar o rechazar la visita</li>
-                            <li>Si no responde en el tiempo configurado, se aplica la acción automática (aprobar o rechazar)</li>
-                            <li>Los residentes pueden personalizar estos tiempos en su perfil individual</li>
+                            <li>El residente tiene un tiempo límite <strong>global</strong> para aprobar o rechazar la visita</li>
+                            <li>Si no responde en el tiempo configurado, se aplica la acción automática <strong>global</strong> (aprobar o rechazar)</li>
+                            <li><strong>Todos los residentes usan la misma configuración</strong> establecida por el super admin</li>
                         </ul>
                     </div>
                 </div>

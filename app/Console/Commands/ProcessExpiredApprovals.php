@@ -26,23 +26,18 @@ class ProcessExpiredApprovals extends Command
 
         foreach ($expiredVisitors as $visitor) {
             try {
-                // Verificar configuración de auto-aprobación del usuario
-                $autoApprovalEnabled = $visitor->user ? 
-                    $visitor->user->isAutoApprovalEnabled() : 
-                    \App\Models\Setting::isAutoApprovalEnabled();
+                // Usar configuración global del sistema
+                $autoApprovalEnabled = \App\Models\Setting::isAutoApprovalEnabled();
+                $timeoutMinutes = \App\Models\Setting::getApprovalTimeout();
 
                 if ($autoApprovalEnabled) {
-                    $timeoutMinutes = $visitor->user ? 
-                        $visitor->user->getApprovalTimeoutMinutes() : 
-                        \App\Models\Setting::getApprovalTimeout();
-                        
-                    $visitor->autoApprove("Aprobado automáticamente por timeout de {$timeoutMinutes} minutos");
+                    $visitor->autoApprove("Aprobado automáticamente por timeout global de {$timeoutMinutes} minutos");
                     $action = 'auto_approved';
-                    $this->info("✅ Auto-aprobado: {$visitor->name} (timeout: {$timeoutMinutes}min)");
+                    $this->info("✅ Auto-aprobado: {$visitor->name} (timeout global: {$timeoutMinutes}min)");
                 } else {
                     $visitor->reject(null, 'Rechazado automáticamente por timeout sin respuesta');
                     $action = 'auto_rejected';
-                    $this->info("❌ Auto-rechazado: {$visitor->name}");
+                    $this->info("❌ Auto-rechazado: {$visitor->name} (timeout global: {$timeoutMinutes}min)");
                 }
                 
                 // Enviar confirmación por WhatsApp
@@ -71,8 +66,8 @@ class ProcessExpiredApprovals extends Command
             }
         }
 
-        $this->info("✅ Procesados {$processed} visitantes por timeout personalizado");
-        Log::info("Auto-procesamiento completado: {$processed}");
+        $this->info("✅ Procesados {$processed} visitantes por timeout global del sistema");
+        Log::info("Auto-procesamiento completado con configuración global: {$processed}");
 
         return 0;
     }

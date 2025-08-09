@@ -215,15 +215,15 @@ class Visitor extends Model
 
     /**
      * Verificar si el token de aprobación está vencido
-     * Ahora usa la configuración personalizada del usuario
+     * Usa la configuración global del sistema
      */
     public function isApprovalExpired()
     {
-        if (!$this->approval_requested_at || !$this->user) {
+        if (!$this->approval_requested_at) {
             return false;
         }
 
-        $timeoutMinutes = $this->user->getApprovalTimeoutMinutes();
+        $timeoutMinutes = \App\Models\Setting::getApprovalTimeout();
         return $this->approval_requested_at->addMinutes($timeoutMinutes)->isPast();
     }
 
@@ -236,13 +236,13 @@ class Visitor extends Model
             return false;
         }
 
-        // Verificar si el usuario quiere recordatorios
-        if (!$this->user->wantsApprovalReminders()) {
+        // Verificar si el usuario tiene WhatsApp habilitado
+        if (!$this->user->whatsapp_notifications) {
             return false;
         }
 
-        $timeoutMinutes = $this->user->getApprovalTimeoutMinutes();
-        $reminderMinutes = $this->user->getApprovalReminderMinutes();
+        $timeoutMinutes = \App\Models\Setting::getApprovalTimeout();
+        $reminderMinutes = \App\Models\Setting::getApprovalReminderMinutes();
 
         // No enviar recordatorio si es 0 o mayor que el timeout
         if ($reminderMinutes <= 0 || $reminderMinutes >= $timeoutMinutes) {
@@ -263,11 +263,11 @@ class Visitor extends Model
      */
     public function getMinutesUntilExpiration(): int
     {
-        if (!$this->approval_requested_at || !$this->user) {
+        if (!$this->approval_requested_at) {
             return 0;
         }
 
-        $timeoutMinutes = $this->user->getApprovalTimeoutMinutes();
+        $timeoutMinutes = \App\Models\Setting::getApprovalTimeout();
         $expirationTime = $this->approval_requested_at->addMinutes($timeoutMinutes);
         
         return max(0, now()->diffInMinutes($expirationTime, false));

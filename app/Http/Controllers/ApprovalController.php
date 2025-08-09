@@ -69,9 +69,9 @@ class ApprovalController extends Controller
                 'success' => true,
                 'message' => 'Solicitud de aprobación enviada al residente',
                 'visitor' => $visitor->load('user'),
-                'timeout_minutes' => $resident->getApprovalTimeoutMinutes(),
-                'expires_at' => $visitor->approval_requested_at->addMinutes($resident->getApprovalTimeoutMinutes()),
-                'custom_timeout' => $resident->custom_approval_timeout !== null,
+                'timeout_minutes' => Setting::getApprovalTimeout(),
+                'expires_at' => $visitor->approval_requested_at->addMinutes(Setting::getApprovalTimeout()),
+                'global_timeout' => true,
             ]);
 
         } catch (\Exception $e) {
@@ -280,13 +280,11 @@ class ApprovalController extends Controller
 
             $processed = 0;
             foreach ($expiredVisitors as $visitor) {
-                // Verificar si el usuario tiene auto-aprobación habilitada
-                $autoApprovalEnabled = $visitor->user ? 
-                    $visitor->user->isAutoApprovalEnabled() : 
-                    Setting::isAutoApprovalEnabled();
+                // Usar configuración global del sistema
+                $autoApprovalEnabled = Setting::isAutoApprovalEnabled();
 
                 if ($autoApprovalEnabled) {
-                    $visitor->autoApprove('Aprobado automáticamente por timeout personalizado');
+                    $visitor->autoApprove('Aprobado automáticamente por timeout del sistema');
                     $action = 'auto_approved';
                 } else {
                     $visitor->reject(null, 'Rechazado automáticamente por timeout sin respuesta');
@@ -301,7 +299,7 @@ class ApprovalController extends Controller
                 $processed++;
             }
 
-            Log::info("Procesados {$processed} visitantes por timeout con configuración personalizada");
+            Log::info("Procesados {$processed} visitantes por timeout global del sistema");
 
             return response()->json([
                 'success' => true,

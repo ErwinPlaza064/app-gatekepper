@@ -39,7 +39,7 @@ class ProcessExpiredApprovals extends Command
                     $action = 'auto_rejected';
                     $this->info("❌ Auto-rechazado: {$visitor->name} (timeout global: {$timeoutMinutes}min)");
                 }
-                
+
                 // Enviar confirmación por WhatsApp
                 if ($visitor->user && $visitor->user->phone && $visitor->user->whatsapp_notifications) {
                     EnviarWhatsAppJob::dispatch(
@@ -54,6 +54,9 @@ class ProcessExpiredApprovals extends Command
 
                 // Notificar a porteros
                 $this->notifyPorteros($visitor, $action);
+
+                // Notificar a administradores
+                $this->notifyAdmins($visitor, $action);
 
                 $processed++;
 
@@ -75,12 +78,29 @@ class ProcessExpiredApprovals extends Command
     private function notifyPorteros(Visitor $visitor, string $action)
     {
         $porteros = \App\Models\User::where('rol', 'portero')->get();
-        
+
         foreach ($porteros as $portero) {
             $portero->notify(new \App\Notifications\VisitorStatusNotification(
-                $visitor, 
+                $visitor,
                 $action
             ));
+        }
+    }
+
+    private function notifyAdmins(Visitor $visitor, string $action)
+    {
+        $admins = \App\Models\User::where('rol', 'administrador')->get();
+
+        foreach ($admins as $admin) {
+            // Notificación tradicional
+            $admin->notify(new \App\Notifications\VisitorStatusNotification(
+                $visitor,
+                $action
+            ));
+
+            // Notificación de Filament
+            $adminNotification = new \App\Notifications\AdminVisitorStatusNotification($visitor, $action);
+            $adminNotification->sendFilamentNotification($admin);
         }
     }
 }

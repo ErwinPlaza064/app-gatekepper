@@ -16,7 +16,7 @@ return new class extends Migration
             // Solo el super admin puede configurar el sistema globalmente
             $table->dropColumn([
                 'custom_approval_timeout',
-                'approval_reminders_enabled', 
+                'approval_reminders_enabled',
                 'custom_auto_approval'
             ]);
         });

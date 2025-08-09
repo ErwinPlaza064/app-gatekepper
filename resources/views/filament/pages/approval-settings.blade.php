@@ -9,7 +9,7 @@
                 <div>
                     <h2 class="text-xl font-semibold text-gray-900">Sistema de Aprobación de Visitantes</h2>
                     <p class="text-sm text-gray-600">
-                        Configura los parámetros globales para todo el residencial. 
+                        Configura los parámetros globales para todo el residencial.
                         <strong>Solo los super administradores</strong> pueden modificar estos valores que aplican a todos los residentes por igual.
                     </p>
                 </div>
@@ -19,7 +19,7 @@
         <!-- Formulario principal -->
         <form wire:submit="save">
             {{ $this->form }}
-            
+
             <div class="flex justify-end mt-6">
                 {{ $this->getFormActions()[0] }}
             </div>

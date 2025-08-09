@@ -59,7 +59,7 @@ class Visitor extends Model
     }
 
     // === SCOPES PARA CONSULTAS ===
-    
+
     public function scopePendingApproval($query)
     {
         return $query->where('approval_status', 'pending');
@@ -76,7 +76,7 @@ class Visitor extends Model
     }
 
     // === MÉTODOS DE ESTADO ===
-    
+
     public function isPending()
     {
         return $this->approval_status === 'pending';
@@ -253,7 +253,7 @@ class Visitor extends Model
         $expirationTime = $this->approval_requested_at->addMinutes($timeoutMinutes);
 
         $now = now();
-        
+
         // Enviar recordatorio si ya pasó el tiempo de recordatorio pero no ha expirado
         return $now->greaterThanOrEqualTo($reminderTime) && $now->lessThan($expirationTime);
     }
@@ -269,7 +269,7 @@ class Visitor extends Model
 
         $timeoutMinutes = \App\Models\Setting::getApprovalTimeout();
         $expirationTime = $this->approval_requested_at->addMinutes($timeoutMinutes);
-        
+
         return max(0, now()->diffInMinutes($expirationTime, false));
     }
 
@@ -303,7 +303,7 @@ class Visitor extends Model
             } else {
                 // Si NO tiene QR code, es visitante espontáneo → solicitar aprobación
                 $visitor->requestApproval();
-                
+
                 Log::info('Solicitud de aprobación iniciada para visitante espontáneo: ' . $visitor->name);
             }
         } else {

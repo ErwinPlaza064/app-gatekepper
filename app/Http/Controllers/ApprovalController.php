@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\Setting;
 use App\Jobs\EnviarWhatsAppJob;
 use App\Notifications\VisitorApprovalRequest;
+use App\Notifications\AdminVisitorStatusNotification;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -114,10 +115,13 @@ class ApprovalController extends Controller
             // Verificar si expiró (más de 7 minutos)
             if ($visitor->isApprovalExpired()) {
                 $visitor->autoApprove('Aprobado automáticamente por expiración de tiempo');
-                
+
                 // Notificar al portero sobre la auto-aprobación
                 $this->notifyPortero($visitor, 'auto_approved');
-                
+
+                // Notificar a los administradores
+                $this->notifyAdmins($visitor, 'auto_approved');
+
                 return Inertia::render('Approval/Success', [
                     'message' => "✅ Visitante {$visitor->name} fue aprobado automáticamente por timeout",
                     'visitor' => $visitor->load('user'),
@@ -136,6 +140,9 @@ class ApprovalController extends Controller
 
             // Notificar al portero
             $this->notifyPortero($visitor, 'approved', $visitor->user);
+
+            // Notificar a los administradores
+            $this->notifyAdmins($visitor, 'approved', $visitor->user);
 
             Log::info('Visitante aprobado desde WhatsApp', [
                 'visitor_id' => $visitor->id,
@@ -195,6 +202,9 @@ class ApprovalController extends Controller
 
             // Notificar al portero
             $this->notifyPortero($visitor, 'rejected', $visitor->user);
+
+            // Notificar a los administradores
+            $this->notifyAdmins($visitor, 'rejected', $visitor->user);
 
             Log::info('Visitante rechazado desde WhatsApp', [
                 'visitor_id' => $visitor->id,
@@ -292,10 +302,13 @@ class ApprovalController extends Controller
                 }
 
                 $this->sendApprovalConfirmation($visitor, $action);
-                
+
                 // Notificar al portero sobre la acción automática
                 $this->notifyPortero($visitor, $action);
-                
+
+                // Notificar a los administradores
+                $this->notifyAdmins($visitor, $action);
+
                 $processed++;
             }
 
@@ -388,10 +401,13 @@ class ApprovalController extends Controller
             if ($visitor->isApprovalExpired()) {
                 // Auto-aprobar si expiró
                 $visitor->autoApprove();
-                
+
                 // Notificar al portero sobre la auto-aprobación
                 $this->notifyPortero($visitor, 'auto_approved');
-                
+
+                // Notificar a los administradores
+                $this->notifyAdmins($visitor, 'auto_approved');
+
                 return response()->json([
                     'success' => true,
                     'message' => 'Visitante auto-aprobado por tiempo de espera',
@@ -411,6 +427,9 @@ class ApprovalController extends Controller
 
             // Notificar al portero
             $this->notifyPortero($visitor, 'approved', $user);
+
+            // Notificar a los administradores
+            $this->notifyAdmins($visitor, 'approved', $user);
 
             Log::info('Visitante aprobado desde API', [
                 'visitor_id' => $visitor->id,
@@ -488,6 +507,9 @@ class ApprovalController extends Controller
             // Notificar al portero
             $this->notifyPortero($visitor, 'rejected', $user);
 
+            // Notificar a los administradores
+            $this->notifyAdmins($visitor, 'rejected', $user);
+
             Log::info('Visitante rechazado desde API', [
                 'visitor_id' => $visitor->id,
                 'visitor_name' => $visitor->name,
@@ -529,6 +551,39 @@ class ApprovalController extends Controller
         }
     }
 
+    /**
+     * Notificar a admins sobre el estado de una visita usando Filament Notifications
+     */
+    private function notifyAdmins(Visitor $visitor, string $status, $respondedBy = null)
+    {
+        try {
+            // Obtener todos los administradores
+            $admins = User::where('rol', 'administrador')->get();
+
+            foreach ($admins as $admin) {
+                // Enviar notificación de base de datos tradicional
+                $admin->notify(new \App\Notifications\VisitorStatusNotification($visitor, $status, $respondedBy));
+
+                // Enviar notificación de Filament (para el panel admin)
+                $adminNotification = new AdminVisitorStatusNotification($visitor, $status, $respondedBy);
+                $adminNotification->sendFilamentNotification($admin);
+            }
+
+            Log::info('Notificaciones enviadas a administradores', [
+                'visitor_id' => $visitor->id,
+                'status' => $status,
+                'admins_notificados' => $admins->count(),
+                'responded_by' => $respondedBy ? $respondedBy->name : null,
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error notificando a administradores', [
+                'visitor_id' => $visitor->id,
+                'status' => $status,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
     /**
      * Notificar al portero sobre el estado de una visita
      */

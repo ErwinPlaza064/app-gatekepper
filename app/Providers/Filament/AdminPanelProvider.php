@@ -186,40 +186,96 @@ class AdminPanelProvider extends PanelProvider
                 adminChannel.bind('App\\Events\\VisitorStatusUpdated', (data) => {
                     console.log('📧 Evento de visitante recibido:', data);
                     
-                    // Crear notificación visual
-                    const notification = document.createElement('div');
-                    notification.style.cssText = `
-                        position: fixed;
-                        top: 20px;
-                        right: 20px;
-                        background: ${data.status === 'aprobado' ? '#10b981' : '#f59e0b'};
-                        color: white;
-                        padding: 16px;
-                        border-radius: 8px;
-                        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-                        z-index: 9999;
-                        max-width: 300px;
-                        font-family: system-ui, -apple-system, sans-serif;
-                    `;
-                    
-                    notification.innerHTML = `
-                        <div style="font-weight: 600; margin-bottom: 4px;">Estado de Visitante Actualizado</div>
-                        <div style="font-size: 14px;">${data.message || `Visitante ${data.visitor.nombre} ${data.status}`}</div>
-                    `;
-                    
-                    document.body.appendChild(notification);
-                    
-                    // Remover notificación después de 5 segundos
-                    setTimeout(() => {
-                        if (notification.parentNode) {
-                            notification.parentNode.removeChild(notification);
-                        }
-                    }, 5000);
-
-                    // Intentar recargar tabla de visitantes si existe
-                    if (typeof Livewire !== 'undefined') {
-                        Livewire.emit('refreshComponent');
+                    // Crear notificación usando el sistema de Filament
+                    if (typeof window.$wireui !== 'undefined') {
+                        // Si WireUI está disponible
+                        window.$wireui.notify({
+                            title: 'Estado de Visitante Actualizado',
+                            description: data.message || `Visitante ${data.visitor.nombre} ${data.status}`,
+                            icon: data.status === 'aprobado' ? 'check' : 'exclamation',
+                            color: data.status === 'aprobado' ? 'positive' : 'warning',
+                            timeout: 5000
+                        });
+                    } else {
+                        // Crear notificación visual personalizada
+                        const notification = document.createElement('div');
+                        notification.style.cssText = `
+                            position: fixed;
+                            top: 20px;
+                            right: 20px;
+                            background: ${data.status === 'aprobado' ? '#10b981' : '#f59e0b'};
+                            color: white;
+                            padding: 16px 20px;
+                            border-radius: 8px;
+                            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                            z-index: 9999;
+                            max-width: 350px;
+                            font-family: system-ui, -apple-system, sans-serif;
+                            border-left: 4px solid ${data.status === 'aprobado' ? '#065f46' : '#92400e'};
+                        `;
+                        
+                        notification.innerHTML = `
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <div style="font-size: 20px;">
+                                    ${data.status === 'aprobado' ? '✅' : '⚠️'}
+                                </div>
+                                <div>
+                                    <div style="font-weight: 600; margin-bottom: 4px;">Estado de Visitante Actualizado</div>
+                                    <div style="font-size: 14px; opacity: 0.9;">${data.message || `Visitante ${data.visitor.nombre} ${data.status}`}</div>
+                                </div>
+                                <button onclick="this.parentElement.parentElement.remove()" style="
+                                    background: none; 
+                                    border: none; 
+                                    color: white; 
+                                    font-size: 18px; 
+                                    cursor: pointer;
+                                    padding: 0;
+                                    margin-left: auto;
+                                ">×</button>
+                            </div>
+                        `;
+                        
+                        document.body.appendChild(notification);
+                        
+                        // Remover notificación después de 8 segundos
+                        setTimeout(() => {
+                            if (notification.parentNode) {
+                                notification.style.opacity = '0';
+                                notification.style.transform = 'translateX(100%)';
+                                notification.style.transition = 'all 0.3s ease';
+                                setTimeout(() => {
+                                    if (notification.parentNode) {
+                                        notification.parentNode.removeChild(notification);
+                                    }
+                                }, 300);
+                            }
+                        }, 8000);
                     }
+
+                    // Intentar actualizar los componentes de Filament
+                    if (typeof Livewire !== 'undefined') {
+                        // Refrescar componentes de Livewire/Filament
+                        Livewire.emit('refreshComponent');
+                        
+                        // Intentar refrescar widgets específicos
+                        setTimeout(() => {
+                            const widgets = document.querySelectorAll('[wire\\:id]');
+                            widgets.forEach(widget => {
+                                if (widget.__livewire) {
+                                    widget.__livewire.call('$refresh');
+                                }
+                            });
+                        }, 100);
+                    }
+
+                    // Intentar refrescar el badge de notificaciones de Filament
+                    setTimeout(() => {
+                        const notificationBadge = document.querySelector('[data-filament-notifications-trigger]');
+                        if (notificationBadge) {
+                            notificationBadge.click();
+                            setTimeout(() => notificationBadge.click(), 500);
+                        }
+                    }, 500);
                 });
             });
 

@@ -86,4 +86,33 @@ axios.interceptors.response.use(
  * allows your team to easily build robust real-time web applications.
  */
 
-// Eliminado: Echo y Pusher
+import Echo from 'laravel-echo';
+import Pusher from 'pusher-js';
+
+window.Pusher = Pusher;
+
+// Configurar Echo con Pusher
+window.Echo = new Echo({
+    broadcaster: 'pusher',
+    key: '7fa6f3ebe8d4679dd6ac',
+    cluster: 'us3',
+    forceTLS: true,
+    enabledTransports: ['ws', 'wss'],
+    authEndpoint: baseURL + '/broadcasting/auth',
+    auth: {
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'),
+        },
+    },
+});
+
+// Debug para desarrollo
+if (import.meta.env.DEV) {
+    window.Echo.connector.pusher.connection.bind('connected', () => {
+        console.log('✅ Pusher connected successfully');
+    });
+    
+    window.Echo.connector.pusher.connection.bind('error', (error) => {
+        console.error('❌ Pusher connection error:', error);
+    });
+}

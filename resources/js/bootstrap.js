@@ -7,8 +7,18 @@
 import axios from "axios";
 window.axios = axios;
 
-// Configurar base URL con HTTPS forzado
-const baseURL = import.meta.env.VITE_API_URL || "https://gatekepper.com";
+// Configurar base URL con HTTPS forzado para Railway
+let baseURL;
+
+// Detectar entorno y configurar URL apropiada
+if (typeof window !== 'undefined') {
+    // En el navegador, usar la URL actual pero forzar HTTPS
+    const currentURL = window.location.origin;
+    baseURL = currentURL.replace("http://", "https://");
+} else {
+    // Fallback para SSR
+    baseURL = import.meta.env.VITE_API_URL || "https://gatekepper.com";
+}
 
 // Asegurar que siempre use HTTPS
 axios.defaults.baseURL = baseURL.replace("http://", "https://");

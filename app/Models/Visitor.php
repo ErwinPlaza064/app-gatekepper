@@ -228,8 +228,8 @@ class Visitor extends Model
      */
     public static function findByApprovalToken($token)
     {
-        return static::where('approval_token', $token)
-                    ->where('approval_status', 'pending')
+        return static::includeRejected()
+                    ->where('approval_token', $token)
                     ->first();
     }
 

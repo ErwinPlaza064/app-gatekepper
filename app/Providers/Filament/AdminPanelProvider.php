@@ -32,8 +32,8 @@ class AdminPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Blue,
             ])
-            ->databaseNotifications() // Habilitar notificaciones de base de datos
-            ->databaseNotificationsPolling('2s') // Mantener polling rápido como respaldo
+            ->databaseNotifications()
+            ->databaseNotificationsPolling('2s')
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
@@ -71,136 +71,43 @@ class AdminPanelProvider extends PanelProvider
         return <<<'HTML'
         <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
         <script>
-            // Habilitar debugging detallado
-            Pusher.logToConsole = true;
-
-            // Configurar Pusher directamente
-            window.Pusher = Pusher;
-
-            // Verificar que el meta tag CSRF esté disponible
+        try {
+            // Obtener CSRF token
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
             console.log('🔐 CSRF Token:', csrfToken ? 'Disponible' : 'No encontrado');
 
-            // Configurar conexión de Pusher con headers mejorados y formato correcto
+            if (!csrfToken) {
+                console.error('❌ No se encontró CSRF token, activando SSE...');
+                initializeSSEFallback();
+                return;
+            }
+
+            // Configurar Pusher
+            Pusher.logToConsole = true;
             const pusher = new Pusher('7fa6f3ebe8d4679dd6ac', {
-                cluster: 'us2',
+                cluster: 'eu',
                 forceTLS: true,
-                encrypted: true,
                 authEndpoint: '/broadcasting/auth',
                 auth: {
                     headers: {
                         'X-CSRF-TOKEN': csrfToken,
                         'X-Requested-With': 'XMLHttpRequest'
                     }
-                },
-                enabledTransports: ['ws', 'wss']
+                }
             });
 
-            // Debug detallado de conexión
-            pusher.connection.bind('connecting', () => {
-                console.log('🔄 Conectando a Pusher...');
-            });
-
+            // Eventos de conexión
             pusher.connection.bind('connected', () => {
-                console.log('✅ Pusher conectado exitosamente');
-                console.log('📡 Socket ID:', pusher.connection.socket_id);
-            });
-
-            pusher.connection.bind('disconnected', () => {
-                console.log('❌ Pusher desconectado');
-            });
-
-            pusher.connection.bind('error', (error) => {
-                console.error('❌ Error de conexión Pusher:', error);
-                console.error('📋 Detalles del error:', {
-                    type: error.type,
-                    error: error.error,
-                    data: error.data
-                });
-            });
-
-            pusher.connection.bind('state_change', (states) => {
-                console.log('🔄 Cambio de estado Pusher:', states.previous, '=>', states.current);
-            });
-
-            // Intentar suscribirse al canal después de la conexión
-            pusher.connection.bind('connected', () => {
-                console.log('🔔 Intentando suscribirse al canal admin.notifications...');
-
-                // Debug del usuario actual
-                fetch('/debug-user', {
-                    headers: {
-                        'X-CSRF-TOKEN': csrfToken,
-                        'Accept': 'application/json',
-                    },
-                    credentials: 'same-origin'
-                })
-                .then(response => response.json())
-                .then(data => {
-                    console.log('👤 Debug del usuario:', data);
-                })
-                .catch(error => {
-                    console.error('❌ Error obteniendo info del usuario:', error);
-                });
-
-                // Suscribirse al canal de administradores (corregido el nombre del canal)
+                console.log('✅ Pusher conectado');
+                
                 const adminChannel = pusher.subscribe('private-admin.notifications');
-
+                
                 adminChannel.bind('pusher:subscription_succeeded', () => {
                     console.log('✅ Suscrito exitosamente al canal admin.notifications');
                 });
 
-                adminChannel.bind('pusher:subscription_error', (error) => {
-                    console.error('❌ Error de suscripción al canal:', error);
-                    console.error('📋 Detalles del error de suscripción:', error);
-
-                    // Información adicional de debugging
-                    console.error('🔍 Headers enviados:', {
-                        'X-CSRF-TOKEN': csrfToken,
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json'
-                    });
-
-                    console.error('🔍 URL de autenticación:', '/broadcasting/auth');
-                    console.error('🔍 Socket ID:', pusher.connection.socket_id);
-
-                    // Sugerencia si es error 403
-                    if (error.status === 403) {
-                        console.error('🚫 Error 403: El usuario no está autorizado para este canal');
-                        console.error('💡 Verifique que el usuario tenga rol de "administrador"');
-                        console.error('💡 Verifique que /broadcasting/auth esté excluido del CSRF');
-
-                        // Comparar con request real de Pusher
-                        fetch('/broadcasting/auth', {
-                            method: 'POST',
-                            headers: {
-                                'X-CSRF-TOKEN': csrfToken,
-                                'X-Requested-With': 'XMLHttpRequest'
-                            },
-                            body: new URLSearchParams({
-                                socket_id: pusher.connection.socket_id,
-                                channel_name: 'private-admin.notifications'
-                            })
-                        })
-                        .then(response => {
-                            console.log('🔍 Test con URLSearchParams status:', response.status);
-                            return response.text();
-                        })
-                        .then(text => {
-                            console.log('🔍 Test con URLSearchParams body:', text);
-                        })
-                        .catch(testError => {
-                            console.error('🔍 Test con URLSearchParams failed:', testError);
-                        });
-                    }
-                });
-
-                                // Listener para el evento de cambio de estado del visitante
                 adminChannel.bind('visitor.status.updated', (data) => {
-                    console.log('� Evento recibido:', data);
-                    
-                    // Mostrar notificación toast
+                    console.log('🔔 Evento Pusher recibido:', data);
                     new FilamentNotification()
                         .title('Estado de Visitante Actualizado')
                         .body(`El visitante ${data.visitor?.name || 'Desconocido'} ha sido ${data.action || 'actualizado'}`)
@@ -208,30 +115,39 @@ class AdminPanelProvider extends PanelProvider
                         .send();
                 });
 
-                adminChannel.bind('pusher:error', (error) => {
-                    console.error('❌ Error en el canal admin.notifications:', error);
+                adminChannel.bind('pusher:subscription_error', (error) => {
+                    console.error('❌ Error suscripción Pusher:', error);
+                    console.warn('🔄 Activando SSE por error...');
+                    initializeSSEFallback();
                 });
             });
 
-            // Fallback a SSE si Pusher falla después de 10 segundos
+            pusher.connection.bind('error', (error) => {
+                console.error('❌ Error conexión Pusher:', error);
+                console.warn('🔄 Activando SSE por error de conexión...');
+                initializeSSEFallback();
+            });
+
+            // Timeout para SSE si Pusher no conecta
             setTimeout(() => {
                 if (pusher.connection.state !== 'connected') {
-                    console.warn('⚠️ Pusher no conectó, activando fallback SSE...');
+                    console.warn('⚠️ Pusher timeout, activando SSE...');
                     initializeSSEFallback();
                 }
             }, 10000);
 
-            window.pusher = pusher;
-
         } catch (error) {
-            console.error('❌ Error fatal inicializando Pusher:', error);
-            console.warn('🔄 Activando fallback SSE por error de Pusher...');
+            console.error('❌ Error fatal Pusher:', error);
             initializeSSEFallback();
         }
 
-        // Función fallback usando Server-Sent Events
+        // Función SSE fallback
         function initializeSSEFallback() {
-            console.log('🔄 Inicializando notificaciones SSE...');
+            console.log('🔄 Inicializando SSE...');
+            
+            if (window.sseConnection) {
+                window.sseConnection.close();
+            }
             
             const eventSource = new EventSource('/notifications/sse');
             
@@ -241,7 +157,7 @@ class AdminPanelProvider extends PanelProvider
                     console.log('📨 SSE recibido:', data);
                     
                     if (data.type === 'connected') {
-                        console.log('✅ Conectado a SSE:', data.message);
+                        console.log('✅ Conectado a SSE');
                         new FilamentNotification()
                             .title('Sistema de Notificaciones')
                             .body('Conectado via SSE (fallback)')
@@ -250,7 +166,7 @@ class AdminPanelProvider extends PanelProvider
                     }
                     
                     if (data.type === 'visitor_status_updated') {
-                        console.log('🔔 Notificación SSE visitante:', data);
+                        console.log('🔔 Notificación SSE:', data);
                         new FilamentNotification()
                             .title('Estado de Visitante Actualizado')
                             .body(data.message)
@@ -259,30 +175,18 @@ class AdminPanelProvider extends PanelProvider
                     }
                     
                 } catch (e) {
-                    console.error('❌ Error procesando evento SSE:', e);
+                    console.error('❌ Error procesando SSE:', e);
                 }
             };
             
             eventSource.onerror = function(event) {
-                console.error('❌ Error en SSE:', event);
-                // Reconectar después de 5 segundos
-                setTimeout(() => {
-                    if (eventSource.readyState === EventSource.CLOSED) {
-                        initializeSSEFallback();
-                    }
-                }, 5000);
+                console.error('❌ Error SSE:', event);
             };
             
             window.sseConnection = eventSource;
         }
-            });
 
-            console.log('🔔 Sistema de notificaciones Pusher inicializado');
-            console.log('🔧 Configuración Pusher:', {
-                key: '7fa6f3ebe8d4679dd6ac',
-                cluster: 'us2',
-                authEndpoint: '/broadcasting/auth'
-            });
+        console.log('🔔 Sistema de notificaciones inicializado');
         </script>
         HTML;
     }

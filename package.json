@@ -4,7 +4,7 @@
     "scripts": {
         "dev": "vite",
         "build": "vite build",
-        "build:production": "NODE_ENV=production vite build",
+        "build:production": "NODE_ENV=production vite build --config vite.config.production.js",
         "optimize": "npm run optimize:images && npm run preload-critical",
         "optimize:images": "echo 'Optimizing images...'",
         "preload-critical": "echo 'Generating critical CSS...'",

@@ -73,14 +73,14 @@ class AdminPanelProvider extends PanelProvider
         <script>
             // Habilitar debugging detallado
             Pusher.logToConsole = true;
-            
+
             // Configurar Pusher directamente
             window.Pusher = Pusher;
-            
+
             // Verificar que el meta tag CSRF esté disponible
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
             console.log('🔐 CSRF Token:', csrfToken ? 'Disponible' : 'No encontrado');
-            
+
             // Configurar conexión de Pusher con headers mejorados y formato correcto
             const pusher = new Pusher('7fa6f3ebe8d4679dd6ac', {
                 cluster: 'us2',
@@ -100,16 +100,16 @@ class AdminPanelProvider extends PanelProvider
             pusher.connection.bind('connecting', () => {
                 console.log('🔄 Conectando a Pusher...');
             });
-            
+
             pusher.connection.bind('connected', () => {
                 console.log('✅ Pusher conectado exitosamente');
                 console.log('📡 Socket ID:', pusher.connection.socket_id);
             });
-            
+
             pusher.connection.bind('disconnected', () => {
                 console.log('❌ Pusher desconectado');
             });
-            
+
             pusher.connection.bind('error', (error) => {
                 console.error('❌ Error de conexión Pusher:', error);
                 console.error('📋 Detalles del error:', {
@@ -118,7 +118,7 @@ class AdminPanelProvider extends PanelProvider
                     data: error.data
                 });
             });
-            
+
             pusher.connection.bind('state_change', (states) => {
                 console.log('🔄 Cambio de estado Pusher:', states.previous, '=>', states.current);
             });
@@ -126,7 +126,7 @@ class AdminPanelProvider extends PanelProvider
             // Intentar suscribirse al canal después de la conexión
             pusher.connection.bind('connected', () => {
                 console.log('🔔 Intentando suscribirse al canal admin.notifications...');
-                
+
                 // Debug del usuario actual
                 fetch('/debug-user', {
                     headers: {
@@ -142,10 +142,10 @@ class AdminPanelProvider extends PanelProvider
                 .catch(error => {
                     console.error('❌ Error obteniendo info del usuario:', error);
                 });
-                
+
                 // Suscribirse al canal de administradores (corregido el nombre del canal)
                 const adminChannel = pusher.subscribe('private-admin.notifications');
-                
+
                 adminChannel.bind('pusher:subscription_succeeded', () => {
                     console.log('✅ Suscrito exitosamente al canal admin.notifications');
                 });
@@ -153,7 +153,7 @@ class AdminPanelProvider extends PanelProvider
                 adminChannel.bind('pusher:subscription_error', (error) => {
                     console.error('❌ Error de suscripción al canal:', error);
                     console.error('📋 Detalles del error de suscripción:', error);
-                    
+
                     // Información adicional de debugging
                     console.error('🔍 Headers enviados:', {
                         'X-CSRF-TOKEN': csrfToken,
@@ -161,16 +161,16 @@ class AdminPanelProvider extends PanelProvider
                         'Accept': 'application/json',
                         'Content-Type': 'application/json'
                     });
-                    
+
                     console.error('🔍 URL de autenticación:', '/broadcasting/auth');
                     console.error('🔍 Socket ID:', pusher.connection.socket_id);
-                    
+
                     // Sugerencia si es error 403
                     if (error.status === 403) {
                         console.error('🚫 Error 403: El usuario no está autorizado para este canal');
                         console.error('💡 Verifique que el usuario tenga rol de "administrador"');
                         console.error('💡 Verifique que /broadcasting/auth esté excluido del CSRF');
-                        
+
                         // Comparar con request real de Pusher
                         fetch('/broadcasting/auth', {
                             method: 'POST',
@@ -199,7 +199,7 @@ class AdminPanelProvider extends PanelProvider
                 // Escuchar eventos de actualización de visitantes
                 adminChannel.bind('App\\Events\\VisitorStatusUpdated', (data) => {
                     console.log('📧 Evento de visitante recibido:', data);
-                    
+
                     // Crear notificación visual
                     const notification = document.createElement('div');
                     notification.style.cssText = `
@@ -215,14 +215,14 @@ class AdminPanelProvider extends PanelProvider
                         max-width: 300px;
                         font-family: system-ui, -apple-system, sans-serif;
                     `;
-                    
+
                     notification.innerHTML = `
                         <div style="font-weight: 600; margin-bottom: 4px;">Estado de Visitante Actualizado</div>
                         <div style="font-size: 14px;">${data.message || `Visitante ${data.visitor.nombre} ${data.status}`}</div>
                     `;
-                    
+
                     document.body.appendChild(notification);
-                    
+
                     // Remover notificación después de 5 segundos
                     setTimeout(() => {
                         if (notification.parentNode) {

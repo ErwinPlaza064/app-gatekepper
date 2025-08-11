@@ -196,9 +196,10 @@ class AdminPanelProvider extends PanelProvider
                     }
                 });
 
-                // Escuchar eventos de actualización de visitantes
-                adminChannel.bind('App\\Events\\VisitorStatusUpdated', (data) => {
+                // Escuchar eventos de actualización de visitantes (nombre correcto del evento)
+                adminChannel.bind('visitor.status.updated', (data) => {
                     console.log('📧 Evento de visitante recibido:', data);
+                    console.log('📋 Datos completos del evento:', JSON.stringify(data, null, 2));
 
                     // Crear notificación visual
                     const notification = document.createElement('div');

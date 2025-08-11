@@ -1,32 +1,36 @@
 # FIX PUSHER EN RAILWAY
 
-## Problema
-Railway bloquea conexiones HTTPS salientes a IPs externas.
+## Problema Final
+Railway tiene restricciones DNS muy severas que bloquean conexiones a Pusher.
 
-## Solución Final Implementada
-Usar HTTP en lugar de HTTPS para el backend (seguro para server-to-server).
+## Solución Implementada
+Sistema híbrido: **Pusher + SSE Fallback**
 
-## Variables de entorno a actualizar en Railway:
+## Variables de entorno en Railway:
 
 ```bash
-# En Railway Dashboard > Variables:
-PUSHER_HOST=api-mt1.pusherapp.com
-PUSHER_PORT=80
-PUSHER_SCHEME=http
-PUSHER_APP_CLUSTER=mt1
+# Probar cluster EU (mejor para Railway):
+PUSHER_APP_CLUSTER=eu
+PUSHER_HOST=api-eu.pusherapp.com
+PUSHER_PORT=443
+PUSHER_SCHEME=https
 ```
 
-## Configuración aplicada:
-- ✅ HTTP para backend (server-to-server)
-- ✅ Frontend mantiene WSS (cliente seguro)
-- ✅ Bypass de restricciones Railway
-- ✅ Timeouts optimizados
+## Características:
+- ✅ **Pusher como primario** (si funciona)
+- ✅ **SSE como fallback** automático
+- ✅ **Sin dependencias externas**
+- ✅ **Notificaciones garantizadas**
 
-## Test después del deployment:
-1. Ve a: https://gatekepper.com/test-notification-web
-2. Debería funcionar sin errores de timeout
+## Test endpoints:
+1. **SSE Test**: https://gatekepper.com/test-sse-notification
+2. **Pusher Test**: https://gatekepper.com/test-notification-web
 
-## Nota de seguridad:
-- Backend usa HTTP (interno, seguro)
-- Frontend mantiene WSS encrypted
-- Datos sensibles siguen protegidos
+## Funcionamiento:
+1. Intenta conectar Pusher (10 segundos)
+2. Si falla → activa SSE automáticamente
+3. Las notificaciones funcionan siempre
+
+## Panel Admin:
+- Verás: "Conectado via SSE (fallback)" si Pusher falla
+- O: "Suscrito exitosamente al canal" si Pusher funciona

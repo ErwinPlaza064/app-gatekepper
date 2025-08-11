@@ -34,23 +34,24 @@ return [
             'secret' => env('PUSHER_APP_SECRET'),
             'app_id' => env('PUSHER_APP_ID'),
             'options' => [
-                'cluster' => env('PUSHER_APP_CLUSTER', 'mt1'),
-                'host' => env('PUSHER_HOST', 'api-mt1.pusherapp.com'),
-                'port' => env('PUSHER_PORT', 80), // HTTP en lugar de HTTPS
-                'scheme' => env('PUSHER_SCHEME', 'http'), // HTTP para evitar bloqueo SSL
-                'encrypted' => false,
-                'useTLS' => false,
+                'cluster' => env('PUSHER_APP_CLUSTER', 'eu'),
+                'host' => env('PUSHER_HOST', 'api-eu.pusherapp.com'),
+                'port' => env('PUSHER_PORT', 443),
+                'scheme' => env('PUSHER_SCHEME', 'https'),
+                'encrypted' => true,
+                'useTLS' => true,
             ],
             'client_options' => [
-                'timeout' => 30,
-                'connect_timeout' => 10,
+                'timeout' => 60,
+                'connect_timeout' => 30,
                 'verify' => false,
                 'curl' => [
                     CURLOPT_IPRESOLVE => CURL_IPRESOLVE_V4,
                     CURLOPT_FOLLOWLOCATION => true,
                     CURLOPT_MAXREDIRS => 3,
                     CURLOPT_DNS_USE_GLOBAL_CACHE => false,
-                    CURLOPT_DNS_CACHE_TIMEOUT => 60,
+                    CURLOPT_DNS_CACHE_TIMEOUT => 0,
+                    CURLOPT_FRESH_CONNECT => true,
                 ],
             ],
         ],

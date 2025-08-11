@@ -192,6 +192,15 @@ Route::get('/debug-user', function() {
     ]);
 })->middleware(['web', 'auth']);
 
+// Rutas SSE para notificaciones en tiempo real (alternativa a Pusher)
+Route::get('/notifications/sse', [App\Http\Controllers\NotificationController::class, 'sseNotifications'])
+    ->middleware(['web', 'auth'])
+    ->name('notifications.sse');
+
+Route::get('/test-sse-notification', [App\Http\Controllers\NotificationController::class, 'testSseNotification'])
+    ->middleware(['web', 'auth'])
+    ->name('test.sse.notification');
+
 // Ruta temporal para probar notificaciones desde el navegador
 Route::get('/test-notification-web', function() {
     try {

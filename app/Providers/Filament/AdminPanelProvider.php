@@ -196,46 +196,85 @@ class AdminPanelProvider extends PanelProvider
                     }
                 });
 
-                // Escuchar eventos de actualización de visitantes (nombre correcto del evento)
+                                // Listener para el evento de cambio de estado del visitante
                 adminChannel.bind('visitor.status.updated', (data) => {
-                    console.log('📧 Evento de visitante recibido:', data);
-                    console.log('📋 Datos completos del evento:', JSON.stringify(data, null, 2));
-
-                    // Crear notificación visual
-                    const notification = document.createElement('div');
-                    notification.style.cssText = `
-                        position: fixed;
-                        top: 20px;
-                        right: 20px;
-                        background: ${data.status === 'aprobado' ? '#10b981' : '#f59e0b'};
-                        color: white;
-                        padding: 16px;
-                        border-radius: 8px;
-                        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-                        z-index: 9999;
-                        max-width: 300px;
-                        font-family: system-ui, -apple-system, sans-serif;
-                    `;
-
-                    notification.innerHTML = `
-                        <div style="font-weight: 600; margin-bottom: 4px;">Estado de Visitante Actualizado</div>
-                        <div style="font-size: 14px;">${data.message || `Visitante ${data.visitor.nombre} ${data.status}`}</div>
-                    `;
-
-                    document.body.appendChild(notification);
-
-                    // Remover notificación después de 5 segundos
-                    setTimeout(() => {
-                        if (notification.parentNode) {
-                            notification.parentNode.removeChild(notification);
-                        }
-                    }, 5000);
-
-                    // Intentar recargar tabla de visitantes si existe
-                    if (typeof Livewire !== 'undefined') {
-                        Livewire.emit('refreshComponent');
-                    }
+                    console.log('� Evento recibido:', data);
+                    
+                    // Mostrar notificación toast
+                    new FilamentNotification()
+                        .title('Estado de Visitante Actualizado')
+                        .body(`El visitante ${data.visitor?.name || 'Desconocido'} ha sido ${data.action || 'actualizado'}`)
+                        .success()
+                        .send();
                 });
+
+                adminChannel.bind('pusher:error', (error) => {
+                    console.error('❌ Error en el canal admin.notifications:', error);
+                });
+            });
+
+            // Fallback a SSE si Pusher falla después de 10 segundos
+            setTimeout(() => {
+                if (pusher.connection.state !== 'connected') {
+                    console.warn('⚠️ Pusher no conectó, activando fallback SSE...');
+                    initializeSSEFallback();
+                }
+            }, 10000);
+
+            window.pusher = pusher;
+
+        } catch (error) {
+            console.error('❌ Error fatal inicializando Pusher:', error);
+            console.warn('🔄 Activando fallback SSE por error de Pusher...');
+            initializeSSEFallback();
+        }
+
+        // Función fallback usando Server-Sent Events
+        function initializeSSEFallback() {
+            console.log('🔄 Inicializando notificaciones SSE...');
+            
+            const eventSource = new EventSource('/notifications/sse');
+            
+            eventSource.onmessage = function(event) {
+                try {
+                    const data = JSON.parse(event.data);
+                    console.log('📨 SSE recibido:', data);
+                    
+                    if (data.type === 'connected') {
+                        console.log('✅ Conectado a SSE:', data.message);
+                        new FilamentNotification()
+                            .title('Sistema de Notificaciones')
+                            .body('Conectado via SSE (fallback)')
+                            .info()
+                            .send();
+                    }
+                    
+                    if (data.type === 'visitor_status_updated') {
+                        console.log('🔔 Notificación SSE visitante:', data);
+                        new FilamentNotification()
+                            .title('Estado de Visitante Actualizado')
+                            .body(data.message)
+                            .success()
+                            .send();
+                    }
+                    
+                } catch (e) {
+                    console.error('❌ Error procesando evento SSE:', e);
+                }
+            };
+            
+            eventSource.onerror = function(event) {
+                console.error('❌ Error en SSE:', event);
+                // Reconectar después de 5 segundos
+                setTimeout(() => {
+                    if (eventSource.readyState === EventSource.CLOSED) {
+                        initializeSSEFallback();
+                    }
+                }, 5000);
+            };
+            
+            window.sseConnection = eventSource;
+        }
             });
 
             console.log('🔔 Sistema de notificaciones Pusher inicializado');

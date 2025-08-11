@@ -124,7 +124,7 @@ export default function Notification({ notifications, setNotifications }) {
             </button>
 
             {showNotifications && (
-                <div className="absolute left-1/2 transform -translate-x-1/2 sm:left-auto sm:right-0 sm:transform-none z-50 mt-4 w-80 max-w-[calc(100vw-2rem)] sm:max-w-sm overflow-hidden transition-all duration-300 border border-gray-200 dark:border-gray-700 shadow-2xl rounded-lg bg-white dark:bg-gray-900">
+                <div className="absolute right-0 sm:right-0 z-50 mt-4 w-80 max-w-[calc(100vw-1rem)] sm:max-w-sm overflow-hidden transition-all duration-300 border border-gray-200 dark:border-gray-700 shadow-2xl rounded-lg bg-white dark:bg-gray-900 transform -translate-x-4 sm:translate-x-0">
                     <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">

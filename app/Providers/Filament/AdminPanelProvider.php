@@ -97,11 +97,24 @@ class AdminPanelProvider extends PanelProvider
                 .then(data => {
                     if (data.notifications && data.notifications.length > 0) {
                         data.notifications.forEach(notification => {
-                            new FilamentNotification()
+                            // Crear notificación con ícono y color específico
+                            let filamentNotification = new FilamentNotification()
                                 .title(notification.title || 'Nueva Notificación')
-                                .body(notification.body || 'Tienes una nueva notificación')
-                                .success()
-                                .send();
+                                .body(notification.body || 'Tienes una nueva notificación');
+                            
+                            // Aplicar color según el estado
+                            if (notification.color === 'success') {
+                                filamentNotification.success();
+                            } else if (notification.color === 'danger') {
+                                filamentNotification.danger();
+                            } else if (notification.color === 'warning') {
+                                filamentNotification.warning();
+                            } else {
+                                filamentNotification.info();
+                            }
+                            
+                            // Enviar la notificación
+                            filamentNotification.send();
                         });
                     }
                 })

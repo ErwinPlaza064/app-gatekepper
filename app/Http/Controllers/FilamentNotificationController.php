@@ -28,21 +28,30 @@ class FilamentNotificationController extends Controller
                 return response()->json(['notifications' => [], 'message' => 'No autorizado']);
             }
 
-            // Versión simple - solo usar timestamp básico
-            $now = now();
-            $lastCheck = $now->subMinutes(2);
+            // Obtener última verificación de la sesión
+            $lastCheck = session('last_notification_check', now()->subMinutes(5));
             
-            // Query usando approval_status (no status)
+            // Query usando approval_status con filtro de tiempo más estricto
             $recentVisitors = \App\Models\Visitor::where('updated_at', '>=', $lastCheck)
                 ->whereIn('approval_status', ['approved', 'rejected', 'pending'])
                 ->orderBy('updated_at', 'desc')
-                ->limit(5)
+                ->limit(3)
                 ->get();
 
             $notifications = [];
             
             foreach ($recentVisitors as $visitor) {
-                // Usar approval_status en lugar de status
+                // Evitar duplicados usando session
+                $sessionKey = "notif_{$visitor->id}_{$visitor->approval_status}_{$visitor->updated_at->timestamp}";
+                if (session()->has($sessionKey)) {
+                    continue;
+                }
+                
+                // Verificar que no es una creación muy reciente (cambio real de estado)
+                if ($visitor->created_at->diffInMinutes($visitor->updated_at) < 1) {
+                    continue;
+                }
+                
                 $statusText = 'actualizado';
                 $statusColor = 'info';
                 
@@ -65,6 +74,14 @@ class FilamentNotificationController extends Controller
                     $mensaje .= "\n\n✅ AUTORIZAR INGRESO";
                 }
                 
+                // Crear notificación en la base de datos de Filament
+                \Filament\Notifications\Notification::make()
+                    ->title('Estado de Visitante Actualizado')
+                    ->body($mensaje)
+                    ->color($statusColor)
+                    ->persistent($visitor->approval_status === 'rejected') // Persistente para rechazados
+                    ->sendToDatabase($user);
+                
                 $notifications[] = [
                     'title' => 'Estado de Visitante Actualizado',
                     'body' => $mensaje,
@@ -73,13 +90,19 @@ class FilamentNotificationController extends Controller
                     'color' => $statusColor,
                     'timestamp' => $visitor->updated_at->toISOString()
                 ];
+                
+                // Marcar como procesado
+                session()->put($sessionKey, true);
             }
+
+            // Actualizar timestamp de última verificación
+            session(['last_notification_check' => now()]);
 
             return response()->json([
                 'notifications' => $notifications,
                 'count' => count($notifications),
                 'status' => 'ok',
-                'timestamp' => $now->toISOString()
+                'timestamp' => now()->toISOString()
             ]);
 
         } catch (\Exception $e) {

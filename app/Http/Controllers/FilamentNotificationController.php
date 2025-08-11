@@ -31,8 +31,9 @@ class FilamentNotificationController extends Controller
             // Obtener última verificación de la sesión (más tiempo para detectar cambios)
             $lastCheck = session('last_notification_check', now()->subMinutes(10));
             
-            // Query usando approval_status
-            $recentVisitors = \App\Models\Visitor::where('updated_at', '>=', $lastCheck)
+            // Query usando approval_status - INCLUIR RECHAZADOS con withoutGlobalScope
+            $recentVisitors = \App\Models\Visitor::withoutGlobalScope('hideRejected')
+                ->where('updated_at', '>=', $lastCheck)
                 ->whereIn('approval_status', ['approved', 'rejected', 'pending'])
                 ->orderBy('updated_at', 'desc')
                 ->limit(5)

@@ -91,13 +91,13 @@ const Dashboard = memo(({ auth, visits, stats, visitsChartData, error }) => {
             </Suspense>
 
             <div className="flex flex-col h-screen dashboard-gradient">
-                <header className="relative z-40 flex items-center justify-between w-full px-4 shadow-md header-glass dark:shadow-gray-800/50">
-                    <Suspense fallback={<div className="w-8 h-8"></div>}>
+                <header className="relative z-40 flex items-center justify-between w-full px-3 py-2 shadow-md header-glass dark:shadow-gray-800/50">
+                    <Suspense fallback={<div className="w-10 h-10"></div>}>
                         <MobileHeader setSidebarOpen={setSidebarOpen} />
                     </Suspense>
 
-                    <div className="relative z-40 flex items-center gap-4">
-                        <Suspense fallback={<div className="w-8 h-8"></div>}>
+                    <div className="relative z-40 flex items-center gap-2">
+                        <Suspense fallback={<div className="w-10 h-10"></div>}>
                             <Notification
                                 notifications={notifications}
                                 setNotifications={setNotifications}

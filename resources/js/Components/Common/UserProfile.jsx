@@ -44,17 +44,17 @@ export default function UserProfile({ user, showThemeToggle, showLogout }) {
 
     return (
         <div
-            className="relative p-2 mr-4 border-t border-white/10 dark:border-gray-700/10"
+            className="relative"
             ref={dropdownRef}
         >
-            <div className="flex items-center gap-2">
+            <div className="flex items-center">
                 <div
-                    className="group flex items-center p-1 space-x-3 transition-all duration-500 cursor-pointer rounded-3xl  shadow-xl hover:shadow-2xl hover:scale-[1.02]"
+                    className="group flex items-center transition-all duration-300 cursor-pointer rounded-xl shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-95"
                     onClick={() => setOpen((v) => !v)}
                 >
                     <div className="relative">
-                        <div className="flex items-center justify-center w-12 h-12 transition-all duration-500 bg-black shadow-2xl rounded-3xl group-hover:shadow-black/50">
-                            <span className="text-lg font-bold text-white drop-shadow-lg">
+                        <div className="flex items-center justify-center w-10 h-10 transition-all duration-300 bg-black shadow-lg rounded-xl border border-white/10 dark:border-gray-700/30 group-hover:shadow-xl">
+                            <span className="text-sm font-bold text-white drop-shadow-lg">
                                 {user.name.charAt(0).toUpperCase()}
                             </span>
                         </div>

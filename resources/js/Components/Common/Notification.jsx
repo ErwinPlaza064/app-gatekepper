@@ -110,17 +110,17 @@ export default function Notification({ notifications, setNotifications }) {
     return (
         <div className="relative" ref={dropdownRef}>
             <button
-                className="group relative p-3 transition-all duration-500 bg-black rounded-xl shadow-xl backdrop-blur-sm border border-white/10 dark:border-gray-700/30 hover:from-black hover:via-gray-800 hover:to-black hover:shadow-2xl hover:scale-[1.05] focus:outline-none focus:ring-2 focus:ring-white/20"
+                className="group relative p-2.5 transition-all duration-300 bg-black rounded-xl shadow-lg backdrop-blur-sm border border-white/10 dark:border-gray-700/30 hover:shadow-xl hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-white/20 active:scale-95"
                 onClick={() => setShowNotifications((v) => !v)}
             >
                 <span className="sr-only">Ver notificaciones</span>
                 <FaBell className="w-5 h-5 mx-auto text-white transition-all duration-300 group-hover:text-gray-200 drop-shadow-lg" />
                 {unreadCount > 0 && (
-                    <span className="absolute -top-1 -right-1 inline-flex items-center justify-center min-w-[20px] h-5 px-1 text-xs font-bold leading-none text-white bg-gradient-to-r from-red-500 to-red-600 rounded-full shadow-lg border-2 border-white dark:border-gray-800 animate-pulse">
+                    <span className="absolute -top-1 -right-1 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-xs font-bold leading-none text-white bg-gradient-to-r from-red-500 to-red-600 rounded-full shadow-lg border-2 border-white dark:border-gray-800 animate-pulse">
                         {unreadCount > 99 ? "99+" : unreadCount}
                     </span>
                 )}
-                <div className="absolute inset-0 transition-opacity duration-500 opacity-0 rounded-2xl bg-gradient-to-r from-transparent via-white/5 to-transparent group-hover:opacity-100"></div>
+                <div className="absolute inset-0 transition-opacity duration-300 opacity-0 rounded-xl bg-gradient-to-r from-transparent via-white/5 to-transparent group-hover:opacity-100"></div>
             </button>
 
             {showNotifications && (

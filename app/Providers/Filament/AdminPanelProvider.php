@@ -69,125 +69,49 @@ class AdminPanelProvider extends PanelProvider
     private function getRealTimeNotificationsScript(): string
     {
         return <<<'HTML'
-        <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
         <script>
-        try {
-            // Obtener CSRF token
-            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-            console.log('🔐 CSRF Token:', csrfToken ? 'Disponible' : 'No encontrado');
-
-            if (!csrfToken) {
-                console.error('❌ No se encontró CSRF token, activando SSE...');
-                initializeSSEFallback();
-            } else {
-
-            // Configurar Pusher
-            Pusher.logToConsole = true;
-            const pusher = new Pusher('7fa6f3ebe8d4679dd6ac', {
-                cluster: 'us2',
-                forceTLS: true,
-                authEndpoint: '/broadcasting/auth',
-                auth: {
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🔔 Sistema de notificaciones de Filament inicializado');
+            
+            // Función para mostrar notificación de prueba
+            window.testNotification = function() {
+                new FilamentNotification()
+                    .title('Notificación de Prueba')
+                    .body('El sistema de notificaciones está funcionando correctamente')
+                    .success()
+                    .send();
+            };
+            
+            // Función para escuchar eventos de visitantes via polling mejorado
+            setInterval(function() {
+                // Verificar nuevas notificaciones cada 3 segundos
+                fetch('/admin/notifications/check', {
+                    method: 'GET',
                     headers: {
-                        'X-CSRF-TOKEN': csrfToken,
-                        'X-Requested-With': 'XMLHttpRequest'
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json',
+                    },
+                    credentials: 'same-origin'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.notifications && data.notifications.length > 0) {
+                        data.notifications.forEach(notification => {
+                            new FilamentNotification()
+                                .title(notification.title || 'Nueva Notificación')
+                                .body(notification.body || 'Tienes una nueva notificación')
+                                .success()
+                                .send();
+                        });
                     }
-                }
-            });
-
-            // Eventos de conexión
-            pusher.connection.bind('connected', () => {
-                console.log('✅ Pusher conectado');
-                
-                const adminChannel = pusher.subscribe('private-admin.notifications');
-                
-                adminChannel.bind('pusher:subscription_succeeded', () => {
-                    console.log('✅ Suscrito exitosamente al canal admin.notifications');
+                })
+                .catch(error => {
+                    console.log('Polling silencioso - sin notificaciones nuevas');
                 });
-
-                adminChannel.bind('visitor.status.updated', (data) => {
-                    console.log('🔔 Evento Pusher recibido:', data);
-                    new FilamentNotification()
-                        .title('Estado de Visitante Actualizado')
-                        .body(`El visitante ${data.visitor?.name || 'Desconocido'} ha sido ${data.action || 'actualizado'}`)
-                        .success()
-                        .send();
-                });
-
-                adminChannel.bind('pusher:subscription_error', (error) => {
-                    console.error('❌ Error suscripción Pusher:', error);
-                    console.warn('🔄 Activando SSE por error...');
-                    initializeSSEFallback();
-                });
-            });
-
-            pusher.connection.bind('error', (error) => {
-                console.error('❌ Error conexión Pusher:', error);
-                console.warn('🔄 Activando SSE por error de conexión...');
-                initializeSSEFallback();
-            });
-
-            // Timeout para SSE si Pusher no conecta
-            setTimeout(() => {
-                if (pusher.connection.state !== 'connected') {
-                    console.warn('⚠️ Pusher timeout, activando SSE...');
-                    initializeSSEFallback();
-                }
-            }, 10000);
+            }, 3000);
             
-            } // Cerrar el else del csrfToken
-
-        } catch (error) {
-            console.error('❌ Error fatal Pusher:', error);
-            initializeSSEFallback();
-        }
-
-        // Función SSE fallback
-        function initializeSSEFallback() {
-            console.log('🔄 Inicializando SSE...');
-            
-            if (window.sseConnection) {
-                window.sseConnection.close();
-            }
-            
-            const eventSource = new EventSource('/notifications/sse');
-            
-            eventSource.onmessage = function(event) {
-                try {
-                    const data = JSON.parse(event.data);
-                    console.log('📨 SSE recibido:', data);
-                    
-                    if (data.type === 'connected') {
-                        console.log('✅ Conectado a SSE');
-                        new FilamentNotification()
-                            .title('Sistema de Notificaciones')
-                            .body('Conectado via SSE (fallback)')
-                            .info()
-                            .send();
-                    }
-                    
-                    if (data.type === 'visitor_status_updated') {
-                        console.log('🔔 Notificación SSE:', data);
-                        new FilamentNotification()
-                            .title('Estado de Visitante Actualizado')
-                            .body(data.message)
-                            .success()
-                            .send();
-                    }
-                    
-                } catch (e) {
-                    console.error('❌ Error procesando SSE:', e);
-                }
-            };
-            
-            eventSource.onerror = function(event) {
-                console.error('❌ Error SSE:', event);
-            };
-            
-            window.sseConnection = eventSource;
-        }
-
-        console.log('🔔 Sistema de notificaciones inicializado');
+            console.log('✅ Sistema de polling de notificaciones activo');
+        });
         </script>
         HTML;
     }

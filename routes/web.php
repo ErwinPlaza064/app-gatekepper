@@ -192,6 +192,19 @@ Route::get('/debug-user', function() {
     ]);
 })->middleware(['web', 'auth']);
 
+// Rutas para notificaciones de Filament (polling simple y efectivo)
+Route::get('/admin/notifications/check', [App\Http\Controllers\FilamentNotificationController::class, 'checkNotifications'])
+    ->middleware(['web', 'auth'])
+    ->name('admin.notifications.check');
+
+Route::post('/admin/notifications/mark-sent', [App\Http\Controllers\FilamentNotificationController::class, 'markSent'])
+    ->middleware(['web', 'auth'])
+    ->name('admin.notifications.mark-sent');
+
+Route::get('/admin/notifications/test', [App\Http\Controllers\FilamentNotificationController::class, 'testNotification'])
+    ->middleware(['web', 'auth'])
+    ->name('admin.notifications.test');
+
 // Rutas SSE para notificaciones en tiempo real (alternativa a Pusher)
 Route::get('/notifications/sse', [App\Http\Controllers\NotificationController::class, 'sseNotifications'])
     ->middleware(['web', 'auth'])

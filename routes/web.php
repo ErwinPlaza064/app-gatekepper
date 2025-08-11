@@ -205,6 +205,10 @@ Route::get('/admin/notifications/test', [App\Http\Controllers\FilamentNotificati
     ->middleware(['web', 'auth'])
     ->name('admin.notifications.test');
 
+Route::get('/admin/notifications/force/{visitor}', [App\Http\Controllers\FilamentNotificationController::class, 'forceNotification'])
+    ->middleware(['web', 'auth'])
+    ->name('admin.notifications.force');
+
 // Rutas SSE para notificaciones en tiempo real (alternativa a Pusher)
 Route::get('/notifications/sse', [App\Http\Controllers\NotificationController::class, 'sseNotifications'])
     ->middleware(['web', 'auth'])

@@ -107,6 +107,8 @@ class AdminPanelProvider extends PanelProvider
                                 filamentNotification.success();
                             } else if (notification.color === 'danger') {
                                 filamentNotification.danger();
+                                // Para rechazos, hacer la notificación más visible
+                                filamentNotification.persistent(); // No se cierra automáticamente
                             } else if (notification.color === 'warning') {
                                 filamentNotification.warning();
                             } else {
@@ -115,6 +117,13 @@ class AdminPanelProvider extends PanelProvider
                             
                             // Enviar la notificación
                             filamentNotification.send();
+                            
+                            // Log para debugging
+                            console.log('🔔 Notificación enviada:', {
+                                status: notification.status,
+                                color: notification.color,
+                                body: notification.body
+                            });
                         });
                     }
                 })

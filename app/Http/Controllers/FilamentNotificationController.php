@@ -28,12 +28,12 @@ class FilamentNotificationController extends Controller
                 return response()->json(['notifications' => [], 'message' => 'No autorizado']);
             }
 
-            // Obtener timestamp de última verificación (sin cache, solo session)
-            $lastCheck = session('last_notification_check', Carbon::now()->subMinutes(2));
+            // Versión simple - solo usar timestamp básico
+            $now = now();
+            $lastCheck = $now->subMinutes(2);
             
-            // Buscar visitantes actualizados recientemente
-            $recentVisitors = Visitor::where('updated_at', '>=', $lastCheck)
-                ->whereIn('status', ['approved', 'rejected', 'pending'])
+            // Query simple de visitantes
+            $recentVisitors = \App\Models\Visitor::where('updated_at', '>=', $lastCheck)
                 ->orderBy('updated_at', 'desc')
                 ->limit(5)
                 ->get();
@@ -41,36 +41,26 @@ class FilamentNotificationController extends Controller
             $notifications = [];
             
             foreach ($recentVisitors as $visitor) {
-                // Usar session para evitar duplicados (sin cache externo)
-                $sessionKey = "notification_sent_{$visitor->id}_{$visitor->status}";
-                if (session()->has($sessionKey)) {
-                    continue;
+                // Sin cache, sin match - solo if simple
+                $statusText = 'actualizado';
+                $statusColor = 'info';
+                
+                if ($visitor->status == 'approved') {
+                    $statusText = 'APROBADO ✅';
+                    $statusColor = 'success';
+                } elseif ($visitor->status == 'rejected') {
+                    $statusText = 'RECHAZADO ❌';
+                    $statusColor = 'danger';
+                } elseif ($visitor->status == 'pending') {
+                    $statusText = 'marcado como PENDIENTE ⏳';
+                    $statusColor = 'warning';
                 }
-                
-                // Verificar que no es una creación muy reciente (cambio real de estado)
-                if ($visitor->created_at->diffInMinutes($visitor->updated_at) < 1) {
-                    continue;
-                }
-                
-                $statusText = match($visitor->status) {
-                    'approved' => 'APROBADO ✅',
-                    'rejected' => 'RECHAZADO ❌',
-                    'pending' => 'marcado como PENDIENTE ⏳',
-                    default => 'actualizado'
-                };
-                
-                $statusColor = match($visitor->status) {
-                    'approved' => 'success',
-                    'rejected' => 'danger',
-                    'pending' => 'warning',
-                    default => 'info'
-                };
                 
                 $mensaje = "El visitante {$visitor->name} ha sido {$statusText}";
                 
-                if ($visitor->status === 'rejected') {
+                if ($visitor->status == 'rejected') {
                     $mensaje .= "\n\n🚫 NO PERMITIR EL INGRESO";
-                } elseif ($visitor->status === 'approved') {
+                } elseif ($visitor->status == 'approved') {
                     $mensaje .= "\n\n✅ AUTORIZAR INGRESO";
                 }
                 
@@ -82,25 +72,21 @@ class FilamentNotificationController extends Controller
                     'color' => $statusColor,
                     'timestamp' => $visitor->updated_at->toISOString()
                 ];
-                
-                // Marcar como procesado en session (expira con la sesión)
-                session()->put($sessionKey, true);
             }
-
-            // Actualizar timestamp
-            session(['last_notification_check' => Carbon::now()]);
 
             return response()->json([
                 'notifications' => $notifications,
                 'count' => count($notifications),
-                'last_check' => Carbon::now()->toISOString(),
-                'status' => 'ok'
+                'status' => 'ok',
+                'timestamp' => $now->toISOString()
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'notifications' => [],
-                'error' => 'Error: ' . $e->getMessage(),
+                'error' => $e->getMessage(),
+                'line' => $e->getLine(),
+                'file' => basename($e->getFile()),
                 'status' => 'error'
             ], 500);
         }

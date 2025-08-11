@@ -28,7 +28,7 @@ class FilamentNotificationController extends Controller
                 return response()->json(['notifications' => [], 'message' => 'No autorizado']);
             }
 
-            // Obtener timestamp de última verificación
+            // Obtener timestamp de última verificación (sin cache, solo session)
             $lastCheck = session('last_notification_check', Carbon::now()->subMinutes(2));
             
             // Buscar visitantes actualizados recientemente
@@ -41,9 +41,9 @@ class FilamentNotificationController extends Controller
             $notifications = [];
             
             foreach ($recentVisitors as $visitor) {
-                // Evitar duplicados
-                $cacheKey = "notification_sent_{$visitor->id}_{$visitor->status}";
-                if (cache()->has($cacheKey)) {
+                // Usar session para evitar duplicados (sin cache externo)
+                $sessionKey = "notification_sent_{$visitor->id}_{$visitor->status}";
+                if (session()->has($sessionKey)) {
                     continue;
                 }
                 
@@ -83,8 +83,8 @@ class FilamentNotificationController extends Controller
                     'timestamp' => $visitor->updated_at->toISOString()
                 ];
                 
-                // Marcar como procesado
-                cache()->put($cacheKey, true, 300);
+                // Marcar como procesado en session (expira con la sesión)
+                session()->put($sessionKey, true);
             }
 
             // Actualizar timestamp
@@ -98,16 +98,10 @@ class FilamentNotificationController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            Log::error('Error en checkNotifications', [
-                'error' => $e->getMessage(),
-                'line' => $e->getLine(),
-                'file' => $e->getFile()
-            ]);
-
             return response()->json([
                 'notifications' => [],
                 'error' => 'Error: ' . $e->getMessage(),
-                'line' => $e->getLine()
+                'status' => 'error'
             ], 500);
         }
     }

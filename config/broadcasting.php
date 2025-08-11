@@ -42,7 +42,14 @@ return [
                 'useTLS' => env('PUSHER_SCHEME', 'https') === 'https',
             ],
             'client_options' => [
-                // Guzzle client options: https://docs.guzzlephp.org/en/stable/request-options.html
+                // Guzzle client options para mejorar conectividad
+                'timeout' => 30,
+                'connect_timeout' => 10,
+                'verify' => true,
+                'curl' => [
+                    CURLOPT_IPRESOLVE => CURL_IPRESOLVE_V4, // Forzar IPv4
+                    CURLOPT_DNS_CACHE_TIMEOUT => 300, // Cache DNS por 5 minutos
+                ],
             ],
         ],
 

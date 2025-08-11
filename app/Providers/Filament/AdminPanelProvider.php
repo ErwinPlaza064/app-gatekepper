@@ -84,7 +84,7 @@ class AdminPanelProvider extends PanelProvider
             // Configurar Pusher
             Pusher.logToConsole = true;
             const pusher = new Pusher('7fa6f3ebe8d4679dd6ac', {
-                cluster: 'eu',
+                cluster: 'us2',
                 forceTLS: true,
                 authEndpoint: '/broadcasting/auth',
                 auth: {

@@ -24,7 +24,7 @@ class NotificationController extends Controller
     public function sseNotifications(Request $request)
     {
         // Verificar autenticación
-        if (!auth()->check() || auth()->user()->role !== 'administrador') {
+        if (!auth()->check() || auth()->user()->rol !== 'administrador') {
             abort(403, 'No autorizado');
         }
 

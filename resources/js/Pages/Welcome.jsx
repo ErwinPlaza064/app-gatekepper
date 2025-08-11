@@ -15,7 +15,7 @@ export default function Welcome({ auth }) {
                 <Head title="Bienvenido" />
                 <div className="relative min-h-screen overflow-hidden bg-gray-100">
                     <div className="relative px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
-                        <div className="flex flex-col items-center justify-between min-h-screen py-28 lg:flex-row">
+                        <div className="flex flex-col items-center justify-between min-h-screen py-16 lg:flex-row">
                             <Hero />
                             <Illustration />
                         </div>

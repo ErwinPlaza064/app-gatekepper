@@ -32,8 +32,12 @@ export default function VisitorApprovalNotification({ notification, onUpdate, sh
                 API_URL = API_URL.replace("http://", "https://");
             }
 
+            // Obtener CSRF token
+            const csrfResponse = await axios.get(`${API_URL}/csrf-token`);
+            const csrfToken = csrfResponse.data.token;
+
             const response = await axios.post(
-                `${API_URL}/approval/approve`,
+                `${API_URL}/api/approval/approve`,
                 {
                     visitor_id: visitor.id,
                     notes: 'Aprobado desde la aplicación web'
@@ -42,7 +46,7 @@ export default function VisitorApprovalNotification({ notification, onUpdate, sh
                     headers: {
                         "Content-Type": "application/json",
                         "X-Requested-With": "XMLHttpRequest",
-                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'),
+                        "X-CSRF-TOKEN": csrfToken,
                     },
                     withCredentials: true,
                 }
@@ -90,8 +94,12 @@ export default function VisitorApprovalNotification({ notification, onUpdate, sh
                 API_URL = API_URL.replace("http://", "https://");
             }
 
+            // Obtener CSRF token
+            const csrfResponse = await axios.get(`${API_URL}/csrf-token`);
+            const csrfToken = csrfResponse.data.token;
+
             const response = await axios.post(
-                `${API_URL}/approval/reject`,
+                `${API_URL}/api/approval/reject`,
                 {
                     visitor_id: visitor.id,
                     reason: 'Rechazado desde la aplicación web'
@@ -100,7 +108,7 @@ export default function VisitorApprovalNotification({ notification, onUpdate, sh
                     headers: {
                         "Content-Type": "application/json",
                         "X-Requested-With": "XMLHttpRequest",
-                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'),
+                        "X-CSRF-TOKEN": csrfToken,
                     },
                     withCredentials: true,
                 }

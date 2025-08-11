@@ -54,7 +54,7 @@ class VisitorController extends Controller
             }
         }
 
-        // Crear visitante (código existente)
+        // Crear visitante (con approval_status para QR pre-aprobados)
         $visitor = Visitor::create([
             'name' => $validated['visitor_name'],
             'id_document' => $validated['document_id'],
@@ -62,6 +62,9 @@ class VisitorController extends Controller
             'vehicle_plate' => $validated['vehicle_plate'],
             'entry_time' => now(),
             'qr_code_id' => $qrCode ? $qrCode->id : null,
+            'approval_status' => 'approved', // QR significa pre-aprobado
+            'approval_responded_at' => now(),
+            'approval_notes' => 'Aprobado automáticamente por código QR pre-autorizado',
         ]);
 
         $resident = $visitor->user;

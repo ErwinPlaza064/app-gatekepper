@@ -577,7 +577,7 @@ export default function QRGenerator({ userId }) {
 
                             <button
                                 onClick={resetForm}
-                                className="flex items-center justify-center w-full gap-2 px-4 py-3 text-gray-700 transition-colors duration-200 bg-gray-100 rounded-lg dark:text-gray-300 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+                                className="flex items-center justify-center w-full gap-2 px-4 py-3 mx-auto text-gray-700 transition-colors duration-200 bg-gray-100 rounded-lg dark:text-gray-300 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
                             >
                                 <FaPlus className="w-4 h-4" />
                                 <span>Crear Nuevo QR</span>

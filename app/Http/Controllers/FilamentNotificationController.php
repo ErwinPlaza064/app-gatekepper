@@ -17,102 +17,37 @@ class FilamentNotificationController extends Controller
     public function checkNotifications(Request $request)
     {
         try {
-            // Verificar autenticación de administrador
-            if (!auth()->check() || auth()->user()->rol !== 'administrador') {
-                return response()->json(['notifications' => []]);
+            // Verificar autenticación básica
+            if (!auth()->check()) {
+                return response()->json(['notifications' => [], 'message' => 'No autenticado']);
             }
 
-            // Obtener el último timestamp verificado desde la sesión
-            $lastCheck = session('last_notification_check', Carbon::now()->subMinutes(2));
-            
-            // Buscar visitantes con cambios de status recientes (más específico)
-            $recentVisitors = Visitor::where('updated_at', '>=', $lastCheck)
-                ->whereIn('status', ['approved', 'rejected', 'pending'])
-                ->orderBy('updated_at', 'desc')
-                ->limit(5)
-                ->get();
-
-            $notifications = [];
-            
-            foreach ($recentVisitors as $visitor) {
-                // Verificar si ya se envió notificación para evitar duplicados
-                $cacheKey = "notification_sent_{$visitor->id}_{$visitor->status}";
-                if (cache()->has($cacheKey)) {
-                    continue;
-                }
-                
-                // Verificar que no es una creación muy reciente
-                if ($visitor->created_at->diffInMinutes($visitor->updated_at) < 1) {
-                    continue;
-                }
-                
-                $statusText = match($visitor->status) {
-                    'approved' => 'APROBADO ✅',
-                    'rejected' => 'RECHAZADO ❌',
-                    'pending' => 'marcado como PENDIENTE ⏳',
-                    default => 'actualizado'
-                };
-                
-                $statusColor = match($visitor->status) {
-                    'approved' => 'success',
-                    'rejected' => 'danger',
-                    'pending' => 'warning',
-                    default => 'info'
-                };
-                
-                $mensaje = "El visitante {$visitor->name} ha sido {$statusText}";
-                
-                if ($visitor->status === 'rejected') {
-                    $mensaje .= "\n\n🚫 NO PERMITIR EL INGRESO";
-                } elseif ($visitor->status === 'approved') {
-                    $mensaje .= "\n\n✅ AUTORIZAR INGRESO";
-                }
-                
-                // Crear notificación en base de datos
-                try {
-                    $user = auth()->user();
-                    Notification::make()
-                        ->title('Estado de Visitante Actualizado')
-                        ->body($mensaje)
-                        ->success()
-                        ->sendToDatabase($user);
-                } catch (\Exception $e) {
-                    // Si falla la notificación de BD, continuar
-                    Log::warning('Error creando notificación BD', ['error' => $e->getMessage()]);
-                }
-                
-                $notifications[] = [
-                    'title' => 'Estado de Visitante Actualizado',
-                    'body' => $mensaje,
-                    'visitor_id' => $visitor->id,
-                    'status' => $visitor->status,
-                    'color' => $statusColor,
-                    'timestamp' => $visitor->updated_at->toISOString()
-                ];
-                
-                // Marcar como procesado
-                cache()->put($cacheKey, true, 300);
+            // Verificar rol de administrador
+            $user = auth()->user();
+            if (!$user || $user->rol !== 'administrador') {
+                return response()->json(['notifications' => [], 'message' => 'No autorizado']);
             }
 
-            // Actualizar timestamp de última verificación
-            session(['last_notification_check' => Carbon::now()]);
-
+            // Respuesta simple para testing
             return response()->json([
-                'notifications' => $notifications,
-                'count' => count($notifications),
-                'last_check' => Carbon::now()->toISOString()
+                'notifications' => [],
+                'count' => 0,
+                'status' => 'ok',
+                'user' => $user->name,
+                'timestamp' => now()->toISOString()
             ]);
 
         } catch (\Exception $e) {
             Log::error('Error en checkNotifications', [
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'line' => $e->getLine(),
+                'file' => $e->getFile()
             ]);
 
             return response()->json([
                 'notifications' => [],
-                'error' => 'Error interno del servidor',
-                'debug' => app()->environment('local') ? $e->getMessage() : null
+                'error' => 'Error: ' . $e->getMessage(),
+                'line' => $e->getLine()
             ], 500);
         }
     }

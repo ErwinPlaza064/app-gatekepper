@@ -117,3 +117,4 @@ El proyecto aplica principios de codificación segura en varios aspectos:
 -   **Gestión de autenticación y tokens:** Se emplea Laravel Sanctum para la autenticación basada en tokens, restringiendo el acceso a rutas protegidas solo a usuarios autenticados.
 
 Estas prácticas contribuyen a la protección de los datos y la integridad de la aplicación frente a ataques comunes como inyección, XSS, CSRF y robo de sesiones.
+# Pusher Broadcasting Fix Applied

@@ -32,8 +32,9 @@ class FilamentNotificationController extends Controller
             $now = now();
             $lastCheck = $now->subMinutes(2);
             
-            // Query simple de visitantes
+            // Query usando approval_status (no status)
             $recentVisitors = \App\Models\Visitor::where('updated_at', '>=', $lastCheck)
+                ->whereIn('approval_status', ['approved', 'rejected', 'pending'])
                 ->orderBy('updated_at', 'desc')
                 ->limit(5)
                 ->get();
@@ -41,26 +42,26 @@ class FilamentNotificationController extends Controller
             $notifications = [];
             
             foreach ($recentVisitors as $visitor) {
-                // Sin cache, sin match - solo if simple
+                // Usar approval_status en lugar de status
                 $statusText = 'actualizado';
                 $statusColor = 'info';
                 
-                if ($visitor->status == 'approved') {
+                if ($visitor->approval_status == 'approved') {
                     $statusText = 'APROBADO ✅';
                     $statusColor = 'success';
-                } elseif ($visitor->status == 'rejected') {
+                } elseif ($visitor->approval_status == 'rejected') {
                     $statusText = 'RECHAZADO ❌';
                     $statusColor = 'danger';
-                } elseif ($visitor->status == 'pending') {
+                } elseif ($visitor->approval_status == 'pending') {
                     $statusText = 'marcado como PENDIENTE ⏳';
                     $statusColor = 'warning';
                 }
                 
                 $mensaje = "El visitante {$visitor->name} ha sido {$statusText}";
                 
-                if ($visitor->status == 'rejected') {
+                if ($visitor->approval_status == 'rejected') {
                     $mensaje .= "\n\n🚫 NO PERMITIR EL INGRESO";
-                } elseif ($visitor->status == 'approved') {
+                } elseif ($visitor->approval_status == 'approved') {
                     $mensaje .= "\n\n✅ AUTORIZAR INGRESO";
                 }
                 
@@ -68,7 +69,7 @@ class FilamentNotificationController extends Controller
                     'title' => 'Estado de Visitante Actualizado',
                     'body' => $mensaje,
                     'visitor_id' => $visitor->id,
-                    'status' => $visitor->status,
+                    'status' => $visitor->approval_status,
                     'color' => $statusColor,
                     'timestamp' => $visitor->updated_at->toISOString()
                 ];

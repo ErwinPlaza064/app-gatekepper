@@ -65,7 +65,7 @@ Route::get('/test-visitor-approval', function() {
                 'reject' => route('approval.reject.public', $visitor->approval_token),
             ]
         ]);
-        
+
     } catch (\Exception $e) {
         return response()->json([
             'error' => $e->getMessage()
@@ -118,7 +118,7 @@ Route::post('/complaints', [DashboardController::class, 'store'])->name('complai
 Route::prefix('approval')->group(function () {
     Route::get('/{token}/approve', [ApprovalController::class, 'approvePublic'])
          ->name('approval.approve.public');
-    
+
     Route::get('/{token}/reject', [ApprovalController::class, 'rejectPublic'])
          ->name('approval.reject.public');
 });
@@ -192,8 +192,11 @@ Route::get('/debug-user', function() {
     ]);
 })->middleware(['web', 'auth']);
 
-// Rutas de broadcasting para autenticación WebSocket
-Broadcast::routes(['middleware' => ['web', 'auth']]);
+// Rutas de broadcasting para autenticación WebSocket ya están definidas en BroadcastServiceProvider
+// Broadcast::routes(['middleware' => ['web', 'auth']]);
+
+// Incluir rutas de testing para debugging
+require __DIR__.'/test.php';
 
 require __DIR__.'/auth.php';
 

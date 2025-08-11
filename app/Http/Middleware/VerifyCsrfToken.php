@@ -16,5 +16,7 @@ class VerifyCsrfToken extends Middleware
         'api/recent-visitor-scans',
         'api/qr-codes/*/deactivate',
         'api/qr-codes/*/reactivate',
+        'broadcasting/auth',
+        'test-broadcasting-auth',
     ];
 }

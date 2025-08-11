@@ -20,11 +20,26 @@ Broadcast::channel('admin.notifications', function ($user) {
         'user_id' => $user ? $user->id : 'No autenticado',
         'user_email' => $user ? $user->email : 'No disponible',
         'user_rol' => $user ? $user->rol : 'No disponible',
-        'is_admin' => $user ? in_array($user->rol, ['administrador', 'admin']) : false
+        'is_admin' => $user ? in_array($user->rol, ['administrador', 'admin']) : false,
+        'auth_check' => \Illuminate\Support\Facades\Auth::check(),
+        'session_id' => session()->getId(),
     ]);
-    
+
+    // Verificar que el usuario existe y está autenticado
+    if (!$user || !$user->exists) {
+        \Illuminate\Support\Facades\Log::warning('Canal admin.notifications - Usuario no existe o no autenticado');
+        return false;
+    }
+
     // Aceptar tanto 'administrador' como 'admin'
-    return $user && in_array($user->rol, ['administrador', 'admin']);
+    $isAuthorized = in_array($user->rol, ['administrador', 'admin']);
+
+    \Illuminate\Support\Facades\Log::info('Canal admin.notifications - Resultado autorización', [
+        'authorized' => $isAuthorized,
+        'user_rol' => $user->rol
+    ]);
+
+    return $isAuthorized;
 });
 
 // Canal específico para cada usuario

@@ -79,7 +79,8 @@ class AdminPanelProvider extends PanelProvider
             if (!csrfToken) {
                 console.error('❌ No se encontró CSRF token, activando SSE...');
                 initializeSSEFallback();
-            } else {
+                return;
+            }
 
             // Configurar Pusher
             Pusher.logToConsole = true;
@@ -134,8 +135,6 @@ class AdminPanelProvider extends PanelProvider
                     initializeSSEFallback();
                 }
             }, 10000);
-            
-            } // Cerrar el else del csrfToken
 
         } catch (error) {
             console.error('❌ Error fatal Pusher:', error);

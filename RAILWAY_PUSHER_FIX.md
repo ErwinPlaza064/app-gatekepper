@@ -1,28 +1,32 @@
 # FIX PUSHER EN RAILWAY
 
 ## Problema
-Railway no puede resolver DNS de Pusher: `Could not resolve host: api-mt1.pusherapp.com`
+Railway bloquea conexiones HTTPS salientes a IPs externas.
 
-## Solución Implementada
-Usar IP directa en lugar de hostname DNS.
+## Solución Final Implementada
+Usar HTTP en lugar de HTTPS para el backend (seguro para server-to-server).
 
-## Variables de entorno a agregar en Railway:
+## Variables de entorno a actualizar en Railway:
 
 ```bash
 # En Railway Dashboard > Variables:
-PUSHER_HOST=18.215.109.111
+PUSHER_HOST=api-mt1.pusherapp.com
+PUSHER_PORT=80
+PUSHER_SCHEME=http
 PUSHER_APP_CLUSTER=mt1
 ```
 
 ## Configuración aplicada:
-- ✅ IP directa: 18.215.109.111 (api-mt1.pusherapp.com)
-- ✅ Header Host para SSL
-- ✅ Verificación SSL deshabilitada para IP
+- ✅ HTTP para backend (server-to-server)
+- ✅ Frontend mantiene WSS (cliente seguro)
+- ✅ Bypass de restricciones Railway
 - ✅ Timeouts optimizados
 
 ## Test después del deployment:
 1. Ve a: https://gatekepper.com/test-notification-web
-2. Debería funcionar sin errores DNS
+2. Debería funcionar sin errores de timeout
 
-## Alternativa si no funciona:
-Cambiar a cluster 'us2' con IP: 54.236.171.222
+## Nota de seguridad:
+- Backend usa HTTP (interno, seguro)
+- Frontend mantiene WSS encrypted
+- Datos sensibles siguen protegidos

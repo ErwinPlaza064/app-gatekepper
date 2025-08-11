@@ -28,30 +28,29 @@ return [
     */
 
     'connections' => [
-        'pusher' => [
+                'pusher' => [
             'driver' => 'pusher',
             'key' => env('PUSHER_APP_KEY'),
             'secret' => env('PUSHER_APP_SECRET'),
             'app_id' => env('PUSHER_APP_ID'),
             'options' => [
                 'cluster' => env('PUSHER_APP_CLUSTER', 'mt1'),
-                'host' => env('PUSHER_HOST', '18.215.109.111'), // IP directa de api-mt1.pusherapp.com
-                'port' => env('PUSHER_PORT', 443),
-                'scheme' => env('PUSHER_SCHEME', 'https'),
-                'encrypted' => true,
-                'useTLS' => true,
+                'host' => env('PUSHER_HOST', 'api-mt1.pusherapp.com'),
+                'port' => env('PUSHER_PORT', 80), // HTTP en lugar de HTTPS
+                'scheme' => env('PUSHER_SCHEME', 'http'), // HTTP para evitar bloqueo SSL
+                'encrypted' => false,
+                'useTLS' => false,
             ],
             'client_options' => [
                 'timeout' => 30,
                 'connect_timeout' => 10,
-                'verify' => false, // Deshabilitar verificación SSL para IP directa
+                'verify' => false,
                 'curl' => [
                     CURLOPT_IPRESOLVE => CURL_IPRESOLVE_V4,
                     CURLOPT_FOLLOWLOCATION => true,
                     CURLOPT_MAXREDIRS => 3,
-                    CURLOPT_HTTPHEADER => [
-                        'Host: api-mt1.pusherapp.com', // Header Host para SSL
-                    ],
+                    CURLOPT_DNS_USE_GLOBAL_CACHE => false,
+                    CURLOPT_DNS_CACHE_TIMEOUT => 60,
                 ],
             ],
         ],

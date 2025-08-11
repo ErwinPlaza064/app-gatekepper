@@ -28,13 +28,73 @@ class FilamentNotificationController extends Controller
                 return response()->json(['notifications' => [], 'message' => 'No autorizado']);
             }
 
-            // Respuesta simple para testing
+            // Obtener timestamp de última verificación
+            $lastCheck = session('last_notification_check', Carbon::now()->subMinutes(2));
+            
+            // Buscar visitantes actualizados recientemente
+            $recentVisitors = Visitor::where('updated_at', '>=', $lastCheck)
+                ->whereIn('status', ['approved', 'rejected', 'pending'])
+                ->orderBy('updated_at', 'desc')
+                ->limit(5)
+                ->get();
+
+            $notifications = [];
+            
+            foreach ($recentVisitors as $visitor) {
+                // Evitar duplicados
+                $cacheKey = "notification_sent_{$visitor->id}_{$visitor->status}";
+                if (cache()->has($cacheKey)) {
+                    continue;
+                }
+                
+                // Verificar que no es una creación muy reciente (cambio real de estado)
+                if ($visitor->created_at->diffInMinutes($visitor->updated_at) < 1) {
+                    continue;
+                }
+                
+                $statusText = match($visitor->status) {
+                    'approved' => 'APROBADO ✅',
+                    'rejected' => 'RECHAZADO ❌',
+                    'pending' => 'marcado como PENDIENTE ⏳',
+                    default => 'actualizado'
+                };
+                
+                $statusColor = match($visitor->status) {
+                    'approved' => 'success',
+                    'rejected' => 'danger',
+                    'pending' => 'warning',
+                    default => 'info'
+                };
+                
+                $mensaje = "El visitante {$visitor->name} ha sido {$statusText}";
+                
+                if ($visitor->status === 'rejected') {
+                    $mensaje .= "\n\n🚫 NO PERMITIR EL INGRESO";
+                } elseif ($visitor->status === 'approved') {
+                    $mensaje .= "\n\n✅ AUTORIZAR INGRESO";
+                }
+                
+                $notifications[] = [
+                    'title' => 'Estado de Visitante Actualizado',
+                    'body' => $mensaje,
+                    'visitor_id' => $visitor->id,
+                    'status' => $visitor->status,
+                    'color' => $statusColor,
+                    'timestamp' => $visitor->updated_at->toISOString()
+                ];
+                
+                // Marcar como procesado
+                cache()->put($cacheKey, true, 300);
+            }
+
+            // Actualizar timestamp
+            session(['last_notification_check' => Carbon::now()]);
+
             return response()->json([
-                'notifications' => [],
-                'count' => 0,
-                'status' => 'ok',
-                'user' => $user->name,
-                'timestamp' => now()->toISOString()
+                'notifications' => $notifications,
+                'count' => count($notifications),
+                'last_check' => Carbon::now()->toISOString(),
+                'status' => 'ok'
             ]);
 
         } catch (\Exception $e) {
@@ -72,49 +132,34 @@ class FilamentNotificationController extends Controller
      */
     public function testNotification()
     {
-        if (!auth()->check() || auth()->user()->rol !== 'administrador') {
-            return response()->json(['error' => 'No autorizado'], 403);
-        }
+        try {
+            if (!auth()->check() || auth()->user()->rol !== 'administrador') {
+                return response()->json(['error' => 'No autorizado'], 403);
+            }
 
-        // Crear notificaciones de prueba para todos los estados
-        $user = auth()->user();
-        
-        // Notificación aprobado
-        Notification::make()
-            ->title('Estado de Visitante Actualizado')
-            ->body('El visitante Juan Pérez ha sido APROBADO ✅')
-            ->icon('heroicon-o-check-circle')
-            ->iconColor('success')
-            ->sendToDatabase($user);
-            
-        // Notificación rechazado
-        Notification::make()
-            ->title('Estado de Visitante Actualizado')
-            ->body('El visitante María López ha sido RECHAZADO ❌')
-            ->icon('heroicon-o-x-circle')
-            ->iconColor('danger')
-            ->sendToDatabase($user);
-
-        return response()->json([
-            'notifications' => [
-                [
-                    'title' => 'Estado de Visitante Actualizado',
-                    'body' => 'El visitante Juan Pérez ha sido APROBADO ✅',
-                    'color' => 'success',
-                    'icon' => 'heroicon-o-check-circle',
-                    'timestamp' => now()->toISOString()
+            return response()->json([
+                'notifications' => [
+                    [
+                        'title' => 'Estado de Visitante Actualizado',
+                        'body' => 'El visitante Juan Pérez ha sido APROBADO ✅\n\n✅ AUTORIZAR INGRESO',
+                        'color' => 'success',
+                        'status' => 'approved',
+                        'timestamp' => now()->toISOString()
+                    ],
+                    [
+                        'title' => 'Estado de Visitante Actualizado', 
+                        'body' => 'El visitante María López ha sido RECHAZADO ❌\n\n🚫 NO PERMITIR EL INGRESO',
+                        'color' => 'danger',
+                        'status' => 'rejected',
+                        'timestamp' => now()->toISOString()
+                    ]
                 ],
-                [
-                    'title' => 'Estado de Visitante Actualizado', 
-                    'body' => 'El visitante María López ha sido RECHAZADO ❌',
-                    'color' => 'danger',
-                    'icon' => 'heroicon-o-x-circle',
-                    'timestamp' => now()->toISOString()
-                ]
-            ],
-            'count' => 2,
-            'test' => true
-        ]);
+                'count' => 2,
+                'test' => true
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
     /**

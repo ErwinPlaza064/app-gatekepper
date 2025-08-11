@@ -81,7 +81,7 @@ class AdminPanelProvider extends PanelProvider
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
             console.log('🔐 CSRF Token:', csrfToken ? 'Disponible' : 'No encontrado');
             
-            // Configurar conexión de Pusher con más detalles
+            // Configurar conexión de Pusher con headers mejorados
             const pusher = new Pusher('7fa6f3ebe8d4679dd6ac', {
                 cluster: 'us2',
                 forceTLS: true,
@@ -90,9 +90,13 @@ class AdminPanelProvider extends PanelProvider
                 auth: {
                     headers: {
                         'X-CSRF-TOKEN': csrfToken,
+                        'X-Requested-With': 'XMLHttpRequest',
                         'Accept': 'application/json',
                         'Content-Type': 'application/json',
                     },
+                    params: {
+                        // Agregar parámetros adicionales si es necesario
+                    }
                 },
                 enabledTransports: ['ws', 'wss']
             });
@@ -144,7 +148,7 @@ class AdminPanelProvider extends PanelProvider
                     console.error('❌ Error obteniendo info del usuario:', error);
                 });
                 
-                // Suscribirse al canal de administradores
+                // Suscribirse al canal de administradores (corregido el nombre del canal)
                 const adminChannel = pusher.subscribe('private-admin.notifications');
                 
                 adminChannel.bind('pusher:subscription_succeeded', () => {
@@ -155,10 +159,47 @@ class AdminPanelProvider extends PanelProvider
                     console.error('❌ Error de suscripción al canal:', error);
                     console.error('📋 Detalles del error de suscripción:', error);
                     
+                    // Información adicional de debugging
+                    console.error('🔍 Headers enviados:', {
+                        'X-CSRF-TOKEN': csrfToken,
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    });
+                    
+                    console.error('🔍 URL de autenticación:', '/broadcasting/auth');
+                    console.error('🔍 Socket ID:', pusher.connection.socket_id);
+                    
                     // Sugerencia si es error 403
                     if (error.status === 403) {
                         console.error('🚫 Error 403: El usuario no está autorizado para este canal');
                         console.error('💡 Verifique que el usuario tenga rol de "administrador"');
+                        console.error('💡 Verifique que /broadcasting/auth esté excluido del CSRF');
+                        
+                        // Intentar hacer un test request para ver qué devuelve el endpoint
+                        fetch('/broadcasting/auth', {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': csrfToken,
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                socket_id: pusher.connection.socket_id,
+                                channel_name: 'private-admin.notifications'
+                            })
+                        })
+                        .then(response => {
+                            console.log('🔍 Test response status:', response.status);
+                            return response.text();
+                        })
+                        .then(text => {
+                            console.log('🔍 Test response body:', text);
+                        })
+                        .catch(testError => {
+                            console.error('🔍 Test request failed:', testError);
+                        });
                     }
                 });
 

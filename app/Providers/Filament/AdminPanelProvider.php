@@ -81,7 +81,7 @@ class AdminPanelProvider extends PanelProvider
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
             console.log('🔐 CSRF Token:', csrfToken ? 'Disponible' : 'No encontrado');
             
-            // Configurar conexión de Pusher con headers mejorados
+            // Configurar conexión de Pusher con headers mejorados y formato correcto
             const pusher = new Pusher('7fa6f3ebe8d4679dd6ac', {
                 cluster: 'us2',
                 forceTLS: true,
@@ -90,12 +90,7 @@ class AdminPanelProvider extends PanelProvider
                 auth: {
                     headers: {
                         'X-CSRF-TOKEN': csrfToken,
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json',
-                    },
-                    params: {
-                        // Agregar parámetros adicionales si es necesario
+                        'X-Requested-With': 'XMLHttpRequest'
                     }
                 },
                 enabledTransports: ['ws', 'wss']
@@ -176,29 +171,27 @@ class AdminPanelProvider extends PanelProvider
                         console.error('💡 Verifique que el usuario tenga rol de "administrador"');
                         console.error('💡 Verifique que /broadcasting/auth esté excluido del CSRF');
                         
-                        // Intentar hacer un test request para ver qué devuelve el endpoint
+                        // Comparar con request real de Pusher
                         fetch('/broadcasting/auth', {
                             method: 'POST',
                             headers: {
                                 'X-CSRF-TOKEN': csrfToken,
-                                'X-Requested-With': 'XMLHttpRequest',
-                                'Accept': 'application/json',
-                                'Content-Type': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest'
                             },
-                            body: JSON.stringify({
+                            body: new URLSearchParams({
                                 socket_id: pusher.connection.socket_id,
                                 channel_name: 'private-admin.notifications'
                             })
                         })
                         .then(response => {
-                            console.log('🔍 Test response status:', response.status);
+                            console.log('🔍 Test con URLSearchParams status:', response.status);
                             return response.text();
                         })
                         .then(text => {
-                            console.log('🔍 Test response body:', text);
+                            console.log('🔍 Test con URLSearchParams body:', text);
                         })
                         .catch(testError => {
-                            console.error('🔍 Test request failed:', testError);
+                            console.error('🔍 Test con URLSearchParams failed:', testError);
                         });
                     }
                 });

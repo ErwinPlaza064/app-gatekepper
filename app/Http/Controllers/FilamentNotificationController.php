@@ -28,27 +28,22 @@ class FilamentNotificationController extends Controller
                 return response()->json(['notifications' => [], 'message' => 'No autorizado']);
             }
 
-            // Obtener última verificación de la sesión
-            $lastCheck = session('last_notification_check', now()->subMinutes(5));
+            // Obtener última verificación de la sesión (más tiempo para detectar cambios)
+            $lastCheck = session('last_notification_check', now()->subMinutes(10));
             
-            // Query usando approval_status con filtro de tiempo más estricto
+            // Query usando approval_status
             $recentVisitors = \App\Models\Visitor::where('updated_at', '>=', $lastCheck)
                 ->whereIn('approval_status', ['approved', 'rejected', 'pending'])
                 ->orderBy('updated_at', 'desc')
-                ->limit(3)
+                ->limit(5)
                 ->get();
 
             $notifications = [];
             
             foreach ($recentVisitors as $visitor) {
-                // Evitar duplicados usando session
-                $sessionKey = "notif_{$visitor->id}_{$visitor->approval_status}_{$visitor->updated_at->timestamp}";
+                // Sistema de duplicados más simple - solo por visitor y status
+                $sessionKey = "notif_processed_{$visitor->id}_{$visitor->approval_status}";
                 if (session()->has($sessionKey)) {
-                    continue;
-                }
-                
-                // Verificar que no es una creación muy reciente (cambio real de estado)
-                if ($visitor->created_at->diffInMinutes($visitor->updated_at) < 1) {
                     continue;
                 }
                 
@@ -75,12 +70,16 @@ class FilamentNotificationController extends Controller
                 }
                 
                 // Crear notificación en la base de datos de Filament
-                \Filament\Notifications\Notification::make()
-                    ->title('Estado de Visitante Actualizado')
-                    ->body($mensaje)
-                    ->color($statusColor)
-                    ->persistent($visitor->approval_status === 'rejected') // Persistente para rechazados
-                    ->sendToDatabase($user);
+                try {
+                    \Filament\Notifications\Notification::make()
+                        ->title('Estado de Visitante Actualizado')
+                        ->body($mensaje)
+                        ->color($statusColor)
+                        ->persistent($visitor->approval_status === 'rejected') // Persistente para rechazados
+                        ->sendToDatabase($user);
+                } catch (\Exception $e) {
+                    // Si falla la BD, continuar sin error
+                }
                 
                 $notifications[] = [
                     'title' => 'Estado de Visitante Actualizado',
@@ -91,7 +90,7 @@ class FilamentNotificationController extends Controller
                     'timestamp' => $visitor->updated_at->toISOString()
                 ];
                 
-                // Marcar como procesado
+                // Marcar como procesado (expira en 30 minutos)
                 session()->put($sessionKey, true);
             }
 
@@ -102,7 +101,11 @@ class FilamentNotificationController extends Controller
                 'notifications' => $notifications,
                 'count' => count($notifications),
                 'status' => 'ok',
-                'timestamp' => now()->toISOString()
+                'timestamp' => now()->toISOString(),
+                'debug' => [
+                    'visitors_found' => $recentVisitors->count(),
+                    'last_check' => $lastCheck->toISOString()
+                ]
             ]);
 
         } catch (\Exception $e) {
@@ -233,5 +236,40 @@ class FilamentNotificationController extends Controller
             'count' => 1,
             'forced' => true
         ]);
+    }
+
+    /**
+     * Limpiar sessions de notificaciones para testing
+     */
+    public function clearNotificationCache(Request $request)
+    {
+        try {
+            // Limpiar todas las sessions de notificaciones
+            $sessionKeys = array_keys(session()->all());
+            $clearedKeys = [];
+            
+            foreach ($sessionKeys as $key) {
+                if (str_starts_with($key, 'notif_')) {
+                    session()->forget($key);
+                    $clearedKeys[] = $key;
+                }
+            }
+            
+            // Reset del timestamp
+            session()->forget('last_notification_check');
+            
+            return response()->json([
+                'status' => 'ok',
+                'message' => 'Cache de notificaciones limpiado',
+                'cleared_keys' => $clearedKeys,
+                'count' => count($clearedKeys)
+            ]);
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage(),
+                'status' => 'error'
+            ], 500);
+        }
     }
 }

@@ -45,7 +45,9 @@ const initialToken = getCSRFToken();
 if (initialToken) {
     axios.defaults.headers.common["X-CSRF-TOKEN"] = initialToken;
 } else {
-    console.error("CSRF token not found: https://laravel.com/docs/csrf#csrf-x-csrf-token");
+    console.error(
+        "CSRF token not found: https://laravel.com/docs/csrf#csrf-x-csrf-token"
+    );
 }
 
 // Interceptor para asegurar CSRF y HTTPS
@@ -58,7 +60,10 @@ axios.interceptors.request.use(
         if (config.url) {
             if (config.url.startsWith("http://")) {
                 config.url = config.url.replace("http://", "https://");
-            } else if (!config.url.startsWith("http") && config.url.startsWith("/")) {
+            } else if (
+                !config.url.startsWith("http") &&
+                config.url.startsWith("/")
+            ) {
                 config.url = baseURL + config.url;
             }
         }
@@ -80,22 +85,30 @@ axios.interceptors.response.use(
             if (!originalRequest._retry) {
                 originalRequest._retry = true;
                 try {
-                    await axios.get(window.location.pathname, { headers: { Accept: "text/html" } });
+                    await axios.get(window.location.pathname, {
+                        headers: { Accept: "text/html" },
+                    });
                     const newToken = getCSRFToken();
                     if (newToken) {
-                        axios.defaults.headers.common["X-CSRF-TOKEN"] = newToken;
+                        axios.defaults.headers.common["X-CSRF-TOKEN"] =
+                            newToken;
                         originalRequest.headers["X-CSRF-TOKEN"] = newToken;
                         console.log("✅ CSRF token refreshed successfully");
                         return axios(originalRequest);
                     }
                 } catch (refreshError) {
-                    console.error("Failed to refresh CSRF token:", refreshError);
+                    console.error(
+                        "Failed to refresh CSRF token:",
+                        refreshError
+                    );
                 }
             }
             setTimeout(() => window.location.reload(), 1000);
         }
         if (error.response && error.response.status === 403) {
-            console.error("403 Forbidden - Check CSRF token and authentication");
+            console.error(
+                "403 Forbidden - Check CSRF token and authentication"
+            );
             const token = getCSRFToken();
             if (!token) {
                 console.error("No CSRF token found - this might be the issue");
@@ -115,9 +128,11 @@ if (typeof window !== "undefined") {
                     const newToken = getCSRFToken();
                     if (
                         newToken &&
-                        newToken !== axios.defaults.headers.common["X-CSRF-TOKEN"]
+                        newToken !==
+                            axios.defaults.headers.common["X-CSRF-TOKEN"]
                     ) {
-                        axios.defaults.headers.common["X-CSRF-TOKEN"] = newToken;
+                        axios.defaults.headers.common["X-CSRF-TOKEN"] =
+                            newToken;
                         console.log("🔄 CSRF token updated from DOM change");
                     }
                 }
@@ -132,7 +147,10 @@ window.refreshCSRFToken = function () {
     const newToken = getCSRFToken();
     if (newToken) {
         axios.defaults.headers.common["X-CSRF-TOKEN"] = newToken;
-        console.log("✅ CSRF token manually refreshed:", newToken.substring(0, 10) + "...");
+        console.log(
+            "✅ CSRF token manually refreshed:",
+            newToken.substring(0, 10) + "..."
+        );
         return true;
     }
     console.error("❌ Could not find CSRF token to refresh");

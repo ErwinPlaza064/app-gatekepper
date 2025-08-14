@@ -31,6 +31,9 @@ export default function Login({ status }) {
 
     const submit = (e) => {
         e.preventDefault();
+        if (window.refreshCSRFToken) {
+            window.refreshCSRFToken();
+        }
         post(route("login"));
     };
 

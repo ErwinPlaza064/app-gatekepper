@@ -7,29 +7,22 @@ use Illuminate\Support\Facades\URL;
 
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     */
     public function register(): void
     {
-        // Forzar HTTPS en producción desde el registro
-        if ($this->app->environment('production')) {
-            $this->app['request']->server->set('HTTPS', true);
-        }
+        //
     }
 
-    /**
-     * Bootstrap any application services.
-     */
     public function boot(): void
     {
-        // Forzar HTTPS en producción
-        if ($this->app->environment('production')) {
+        // Forzar HTTPS en producción (Railway)
+        if (app()->environment('production')) {
             URL::forceScheme('https');
-            URL::forceRootUrl(config('app.url'));
+        }
 
-            // Asegurar que la request actual también use HTTPS
-            $this->app['request']->server->set('HTTPS', 'on');
+        // Crear directorio de sesiones si no existe
+        $sessionPath = storage_path('framework/sessions');
+        if (!file_exists($sessionPath)) {
+            mkdir($sessionPath, 0755, true);
         }
     }
 }

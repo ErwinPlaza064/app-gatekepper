@@ -17,52 +17,57 @@ const ContentLoader = () => (
     </div>
 );
 
-const DashboardContent = memo(({ activeTab, auth, visits, stats }) => {
-    if (activeTab === "escritorio") {
+const DashboardContent = memo(
+    ({ activeTab, auth, visits, stats, onRefreshVisits }) => {
+        if (activeTab === "escritorio") {
+            return (
+                <div className="min-h-full space-y-2">
+                    <div className="space-y-6">
+                        <div className="flex justify-center">
+                            <div className="w-full max-w-2xl">
+                                <QuickStatsChart stats={stats} />
+                            </div>
+                        </div>
+                        <StatsCard stats={stats} />
+                    </div>
+                </div>
+            );
+        }
+
         return (
             <div className="min-h-full space-y-2">
-                <div className="space-y-6">
-                    <div className="flex justify-center">
-                        <div className="w-full max-w-2xl">
-                            <QuickStatsChart stats={stats} />
+                <Suspense fallback={<ContentLoader />}>
+                    {activeTab === "generate" && (
+                        <div className="max-w-2xl mx-auto">
+                            <QRGenerator userId={auth.user.id} />
                         </div>
-                    </div>
-                    <StatsCard stats={stats} />
-                </div>
+                    )}
+
+                    {activeTab === "qr-management" && (
+                        <div className="max-w-4xl mx-auto">
+                            <QRDashboard userId={auth.user.id} />
+                        </div>
+                    )}
+
+                    {activeTab === "visits-history" && (
+                        <div className="max-w-4xl mx-auto">
+                            <VisitsHistory
+                                visits={visits}
+                                onRefresh={onRefreshVisits}
+                            />
+                        </div>
+                    )}
+
+                    {activeTab === "generar-quejas" && (
+                        <div className="max-w-4xl mx-auto">
+                            <ComplaintsCard />
+                        </div>
+                    )}
+                </Suspense>
             </div>
         );
     }
-
-    return (
-        <div className="min-h-full space-y-2">
-            <Suspense fallback={<ContentLoader />}>
-                {activeTab === "generate" && (
-                    <div className="max-w-2xl mx-auto">
-                        <QRGenerator userId={auth.user.id} />
-                    </div>
-                )}
-
-                {activeTab === "qr-management" && (
-                    <div className="max-w-4xl mx-auto">
-                        <QRDashboard userId={auth.user.id} />
-                    </div>
-                )}
-
-                {activeTab === "visits-history" && (
-                    <div className="max-w-4xl mx-auto">
-                        <VisitsHistory visits={visits} />
-                    </div>
-                )}
-
-                {activeTab === "generar-quejas" && (
-                    <div className="max-w-4xl mx-auto">
-                        <ComplaintsCard />
-                    </div>
-                )}
-            </Suspense>
-        </div>
-    );
-});
+);
 
 DashboardContent.displayName = "DashboardContent";
 

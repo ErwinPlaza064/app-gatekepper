@@ -9,15 +9,32 @@ import {
     FaCar,
     FaTimes,
     FaFilter,
+    FaSync,
 } from "react-icons/fa";
 
-export default function VisitsHistory({ visits }) {
+export default function VisitsHistory({ visits, onRefresh }) {
     const [globalSearch, setGlobalSearch] = useState("");
     const [vehicleFilter, setVehicleFilter] = useState("all"); // all, with, without
     const [dateRange, setDateRange] = useState("all"); // all, today, week, month, custom
     const [customDateFrom, setCustomDateFrom] = useState("");
     const [customDateTo, setCustomDateTo] = useState("");
     const [showDatePicker, setShowDatePicker] = useState(false);
+    const [isRefreshing, setIsRefreshing] = useState(false);
+
+    // Función para manejar el refresh
+    const handleRefresh = async () => {
+        if (onRefresh) {
+            setIsRefreshing(true);
+            try {
+                await onRefresh();
+            } finally {
+                // Simular un pequeño delay para mostrar la animación
+                setTimeout(() => {
+                    setIsRefreshing(false);
+                }, 500);
+            }
+        }
+    };
 
     // Función para obtener el rango de fechas basado en la selección
     const getDateRange = () => {
@@ -114,7 +131,7 @@ export default function VisitsHistory({ visits }) {
                     <div className="flex items-center justify-center flex-shrink-0 w-10 h-10 bg-black rounded-full sm:w-12 sm:h-12">
                         <FaHistory className="w-5 h-5 text-white sm:w-6 sm:h-6" />
                     </div>
-                    <div>
+                    <div className="flex-1">
                         <Typography
                             as="h4"
                             variant="h4"
@@ -126,6 +143,25 @@ export default function VisitsHistory({ visits }) {
                             Registro completo de visitantes
                         </p>
                     </div>
+                    {/* Botón de refrescar */}
+                    <button
+                        onClick={handleRefresh}
+                        disabled={isRefreshing}
+                        className={`flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full transition-all duration-200 ${
+                            isRefreshing
+                                ? "bg-gray-100 dark:bg-gray-800 cursor-not-allowed"
+                                : "bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 shadow-sm hover:shadow-md border border-gray-200 dark:border-gray-600"
+                        }`}
+                        title="Refrescar datos"
+                    >
+                        <FaSync
+                            className={`w-3 h-3 sm:w-4 sm:h-4 text-gray-600 dark:text-gray-400 transition-transform duration-500 ${
+                                isRefreshing
+                                    ? "animate-spin"
+                                    : "hover:rotate-180"
+                            }`}
+                        />
+                    </button>
                 </div>
             </div>
 

@@ -8,9 +8,6 @@ use App\Models\Visitor;
 use App\Models\Complaint;
 use Illuminate\Support\Facades\Log;
 
-
-
-
 class DashboardController extends Controller
 {
     public function index(Request $request)
@@ -45,11 +42,27 @@ class DashboardController extends Controller
             });
             $chartValues = $visitsByDay->pluck('count');
 
-            // Obtener visitas recientes
+            // Obtener visitas recientes con formato compatible para VisitsHistory
             $visits = Visitor::where('user_id', $user->id)
+                ->with(['qrCode' => function($q) {
+                    $q->select('id', 'qr_id', 'qr_type');
+                }])
                 ->orderBy('entry_time', 'desc')
-                ->limit(10) // Limitar para mejorar performance
-                ->get(['name', 'id_document', 'vehicle_plate', 'entry_time', 'created_at']);
+                ->limit(50) // Aumentamos el límite para el historial
+                ->get()
+                ->map(function($visitor) {
+                    return [
+                        'id' => $visitor->id,
+                        'visitor_name' => $visitor->name,
+                        'name' => $visitor->name, // Para compatibilidad
+                        'document_id' => $visitor->id_document,
+                        'id_document' => $visitor->id_document, // Para compatibilidad
+                        'vehicle_plate' => $visitor->vehicle_plate,
+                        'created_at' => $visitor->entry_time,
+                        'entry_time' => $visitor->entry_time, // Para compatibilidad
+                        'qr_id' => $visitor->qrCode?->qr_id,
+                    ];
+                });
 
             // Obtener notificaciones del usuario
             $notifications = $user->notifications()->limit(20)->get();
@@ -76,6 +89,18 @@ class DashboardController extends Controller
                     'visitas' => $visitsCount,
                     'quejas' => $complaintsCount,
                     'qrs' => $qrCount,
+                    // Agregamos estadísticas adicionales para el componente
+                    'total_visits' => $visitsCount,
+                    'visits_today' => Visitor::where('user_id', $user->id)
+                        ->whereDate('entry_time', today())
+                        ->count(),
+                    'visits_this_week' => Visitor::where('user_id', $user->id)
+                        ->whereBetween('entry_time', [now()->startOfWeek(), now()->endOfWeek()])
+                        ->count(),
+                    'visits_this_month' => Visitor::where('user_id', $user->id)
+                        ->whereMonth('entry_time', now()->month)
+                        ->whereYear('entry_time', now()->year)
+                        ->count(),
                 ],
                 'visitsChartData' => [
                     'labels' => $chartLabels,
@@ -102,6 +127,10 @@ class DashboardController extends Controller
                     'visitas' => 0,
                     'quejas' => 0,
                     'qrs' => 0,
+                    'total_visits' => 0,
+                    'visits_today' => 0,
+                    'visits_this_week' => 0,
+                    'visits_this_month' => 0,
                 ],
                 'visitsChartData' => [
                     'labels' => [],
@@ -145,8 +174,6 @@ class DashboardController extends Controller
 
             return redirect()->back()->with('success', 'Queja enviada correctamente');
     }
-
-
 
     public function markNotificationsAsRead(Request $request)
     {

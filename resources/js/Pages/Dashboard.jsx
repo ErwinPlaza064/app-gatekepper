@@ -34,6 +34,26 @@ const Dashboard = memo(({ auth, visits, stats, visitsChartData, error }) => {
         auth?.notifications || []
     );
 
+    // Función para refrescar las visitas
+    const handleRefreshVisits = async () => {
+        try {
+            // Usar Inertia para recargar solo los datos de visitas
+            router.reload({
+                only: ["visits", "stats"], // Recarga visits y stats si ambos dependen de las visitas
+                preserveScroll: true,
+                onSuccess: () => {
+                    toast.success("Datos actualizados correctamente");
+                },
+                onError: () => {
+                    toast.error("Error al actualizar los datos");
+                },
+            });
+        } catch (error) {
+            console.error("Error al refrescar visitas:", error);
+            toast.error("Error al actualizar los datos");
+        }
+    };
+
     useEffect(() => {
         if (error) {
             toast.error(error);
@@ -143,6 +163,7 @@ const Dashboard = memo(({ auth, visits, stats, visitsChartData, error }) => {
                                 auth={auth}
                                 visits={visits}
                                 stats={stats}
+                                onRefreshVisits={handleRefreshVisits}
                             />
                         </section>
                     </main>

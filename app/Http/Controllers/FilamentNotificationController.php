@@ -30,7 +30,7 @@ class FilamentNotificationController extends Controller
 
             // Obtener última verificación de la sesión (más tiempo para detectar cambios)
             $lastCheck = session('last_notification_check', now()->subMinutes(10));
-            
+
             // Query usando approval_status - INCLUIR RECHAZADOS con withoutGlobalScope
             $recentVisitors = \App\Models\Visitor::withoutGlobalScope('hideRejected')
                 ->where('updated_at', '>=', $lastCheck)
@@ -40,17 +40,17 @@ class FilamentNotificationController extends Controller
                 ->get();
 
             $notifications = [];
-            
+
             foreach ($recentVisitors as $visitor) {
                 // Sistema de duplicados más simple - solo por visitor y status
                 $sessionKey = "notif_processed_{$visitor->id}_{$visitor->approval_status}";
                 if (session()->has($sessionKey)) {
                     continue;
                 }
-                
+
                 $statusText = 'actualizado';
                 $statusColor = 'info';
-                
+
                 if ($visitor->approval_status == 'approved') {
                     $statusText = 'APROBADO ✅';
                     $statusColor = 'success';
@@ -61,15 +61,15 @@ class FilamentNotificationController extends Controller
                     $statusText = 'marcado como PENDIENTE ⏳';
                     $statusColor = 'warning';
                 }
-                
+
                 $mensaje = "El visitante {$visitor->name} ha sido {$statusText}";
-                
+
                 if ($visitor->approval_status == 'rejected') {
                     $mensaje .= "\n\n🚫 NO PERMITIR EL INGRESO";
                 } elseif ($visitor->approval_status == 'approved') {
                     $mensaje .= "\n\n✅ AUTORIZAR INGRESO";
                 }
-                
+
                 // Crear notificación en la base de datos de Filament
                 try {
                     \Filament\Notifications\Notification::make()
@@ -81,7 +81,7 @@ class FilamentNotificationController extends Controller
                 } catch (\Exception $e) {
                     // Si falla la BD, continuar sin error
                 }
-                
+
                 $notifications[] = [
                     'title' => 'Estado de Visitante Actualizado',
                     'body' => $mensaje,
@@ -90,7 +90,7 @@ class FilamentNotificationController extends Controller
                     'color' => $statusColor,
                     'timestamp' => $visitor->updated_at->toISOString()
                 ];
-                
+
                 // Marcar como procesado (expira en 30 minutos)
                 session()->put($sessionKey, true);
             }
@@ -126,7 +126,7 @@ class FilamentNotificationController extends Controller
     public function markSent(Request $request)
     {
         $visitorId = $request->input('visitor_id');
-        
+
         if ($visitorId) {
             // Guardar en cache que esta notificación ya fue enviada
             cache()->put("notification_sent_{$visitorId}", true, 300); // 5 minutos
@@ -155,7 +155,7 @@ class FilamentNotificationController extends Controller
                         'timestamp' => now()->toISOString()
                     ],
                     [
-                        'title' => 'Estado de Visitante Actualizado', 
+                        'title' => 'Estado de Visitante Actualizado',
                         'body' => 'El visitante María López ha sido RECHAZADO ❌\n\n🚫 NO PERMITIR EL INGRESO',
                         'color' => 'danger',
                         'status' => 'rejected',
@@ -185,15 +185,15 @@ class FilamentNotificationController extends Controller
         }
 
         $statusText = match($visitor->status) {
-            'approved' => 'APROBADO ✅',
-            'rejected' => 'RECHAZADO ❌',
-            'pending' => 'marcado como PENDIENTE ⏳',
+            'approved' => 'APROBADO ',
+            'rejected' => 'RECHAZADO ',
+            'pending' => 'marcado como PENDIENTE ',
             default => 'actualizado'
         };
 
         $statusIcon = match($visitor->status) {
             'approved' => 'heroicon-o-check-circle',
-            'rejected' => 'heroicon-o-x-circle', 
+            'rejected' => 'heroicon-o-x-circle',
             'pending' => 'heroicon-o-clock',
             default => 'heroicon-o-information-circle'
         };
@@ -206,11 +206,11 @@ class FilamentNotificationController extends Controller
         };
 
         $mensaje = "El visitante {$visitor->name} ha sido {$statusText}";
-        
+
         if ($visitor->status === 'rejected') {
-            $mensaje .= "\n\n🚫 NO PERMITIR EL INGRESO";
+            $mensaje .= "\n\n NO PERMITIR EL INGRESO";
         } elseif ($visitor->status === 'approved') {
-            $mensaje .= "\n\n✅ AUTORIZAR INGRESO";
+            $mensaje .= "\n\n AUTORIZAR INGRESO";
         }
 
         // Crear notificación en base de datos
@@ -248,24 +248,24 @@ class FilamentNotificationController extends Controller
             // Limpiar todas las sessions de notificaciones
             $sessionKeys = array_keys(session()->all());
             $clearedKeys = [];
-            
+
             foreach ($sessionKeys as $key) {
                 if (str_starts_with($key, 'notif_')) {
                     session()->forget($key);
                     $clearedKeys[] = $key;
                 }
             }
-            
+
             // Reset del timestamp
             session()->forget('last_notification_check');
-            
+
             return response()->json([
                 'status' => 'ok',
                 'message' => 'Cache de notificaciones limpiado',
                 'cleared_keys' => $clearedKeys,
                 'count' => count($clearedKeys)
             ]);
-            
+
         } catch (\Exception $e) {
             return response()->json([
                 'error' => $e->getMessage(),

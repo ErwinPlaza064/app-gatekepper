@@ -46,8 +46,17 @@ class AuthenticatedSessionController extends Controller
 
         // Redireccionar según el rol del usuario
         if (in_array($user->rol, ['administrador', 'portero', 'adminresidencial'])) {
-            Log::info('[LOGIN] Redireccionando a /admin', ['id' => $user->id, 'rol' => $user->rol]);
-            return redirect()->intended('/admin');
+            Log::info('[LOGIN] Redireccionando a Filament admin', ['id' => $user->id, 'rol' => $user->rol]);
+
+            // Construir la URL del admin asegurando HTTPS en producción
+            $adminUrl = config('app.url') . '/admin';
+
+            // Asegurar que siempre use HTTPS en producción
+            if (app()->environment('production')) {
+                $adminUrl = str_replace('http://', 'https://', $adminUrl);
+            }
+
+            return redirect()->intended($adminUrl);
         }
 
         // Para usuarios regulares (residentes)

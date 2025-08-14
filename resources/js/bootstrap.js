@@ -289,3 +289,11 @@ window.refreshCSRFToken = function () {
     console.error("❌ Could not find CSRF token to refresh");
     return false;
 };
+
+// Refresco automático del token CSRF cada 10 minutos (600000 ms)
+setInterval(() => {
+    const refreshed = window.refreshCSRFToken();
+    if (refreshed) {
+        console.log("🔄 CSRF token auto-refreshed");
+    }
+}, 600000); // Puedes ajustar el intervalo si lo deseas

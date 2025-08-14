@@ -37,8 +37,7 @@ class ComplaintResource extends Resource
     }
     public static function canCreate(): bool
     {
-        $user = auth()->user();
-        return $user?->rol !== 'adminresidencial';
+        return false;
     }
 
     public static function form(Form $form): Form

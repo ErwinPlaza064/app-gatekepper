@@ -5,22 +5,64 @@ import { createRoot } from "react-dom/client";
 import { createInertiaApp } from "@inertiajs/react";
 import { resolvePageComponent } from "laravel-vite-plugin/inertia-helpers";
 import { router } from "@inertiajs/react";
+import axios from "axios";
 
 const appName = import.meta.env.VITE_APP_NAME || "GateKepper";
 
-// CONFIGURAR INERTIA PARA USAR HTTPS
-if (typeof window !== 'undefined' && window.location.protocol === 'https:') {
-    // Interceptar todas las visitas de Inertia para forzar HTTPS
-    const originalVisit = router.visit;
-    router.visit = function(url, options = {}) {
-        // Si la URL es relativa, no necesita cambios
-        // Si es absoluta y usa HTTP, cambiar a HTTPS
-        if (typeof url === 'string' && url.startsWith('http://')) {
-            url = url.replace('http://', 'https://');
+// CONFIGURACIÓN CRÍTICA: Asegurar que axios tenga el CSRF token
+const token = document.querySelector('meta[name="csrf-token"]')?.content;
+if (token) {
+    axios.defaults.headers.common["X-CSRF-TOKEN"] = token;
+    // También configurar los headers que Inertia usa internamente
+    axios.defaults.headers.common["X-XSRF-TOKEN"] = token;
+    console.log("✅ CSRF configurado para Inertia");
+}
+
+// CONFIGURAR INERTIA PARA USAR HTTPS Y CSRF
+if (typeof window !== "undefined") {
+    // Forzar HTTPS en producción
+    if (window.location.protocol === "https:") {
+        const originalVisit = router.visit;
+        router.visit = function (url, options = {}) {
+            // Si la URL es absoluta y usa HTTP, cambiar a HTTPS
+            if (typeof url === "string" && url.startsWith("http://")) {
+                url = url.replace("http://", "https://");
+            }
+
+            // Asegurar que el CSRF token esté presente en los headers
+            if (!options.headers) {
+                options.headers = {};
+            }
+
+            const currentToken = document.querySelector(
+                'meta[name="csrf-token"]'
+            )?.content;
+            if (currentToken) {
+                options.headers["X-CSRF-TOKEN"] = currentToken;
+            }
+
+            return originalVisit.call(this, url, options);
+        };
+    }
+
+    // Interceptar eventos de Inertia para asegurar CSRF
+    router.on("before", (event) => {
+        // Obtener el token más reciente antes de cada navegación
+        const currentToken = document.querySelector(
+            'meta[name="csrf-token"]'
+        )?.content;
+        if (currentToken) {
+            axios.defaults.headers.common["X-CSRF-TOKEN"] = currentToken;
         }
-        
-        return originalVisit.call(this, url, options);
-    };
+    });
+
+    // Manejar errores 419 (CSRF token mismatch)
+    router.on("error", (event) => {
+        if (event.detail.errors && event.detail.errors.status === 419) {
+            console.error("🔄 CSRF token expirado, recargando...");
+            window.location.reload();
+        }
+    });
 }
 
 createInertiaApp({
@@ -32,7 +74,6 @@ createInertiaApp({
         ),
     setup({ el, App, props }) {
         const root = createRoot(el);
-
         root.render(<App {...props} />);
     },
     progress: {

@@ -125,8 +125,8 @@ class Visitor extends Model
 
         // Enviar notificación de solicitud de aprobación al residente
         if ($this->user) {
-            // Envío de notificaciones por email con job en background
-            SendVisitorNotificationJob::dispatch($this->user, $this, 'approval')->delay(now()->addSeconds(2));
+            // TEMPORALMENTE DESHABILITADO - Envío de notificaciones por email con job en background
+            // SendVisitorNotificationJob::dispatch($this->user, $this, 'approval')->delay(now()->addSeconds(2));
 
             // WhatsApp con enlaces de aprobación
             if ($this->user->phone && $this->user->whatsapp_notifications) {

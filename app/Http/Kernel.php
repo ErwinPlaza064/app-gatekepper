@@ -70,5 +70,7 @@ class Kernel extends HttpKernel
         'admin.role' => \App\Http\Middleware\AdminRoleMiddleware::class,
         'portero.role' => \App\Http\Middleware\PorteroRoleMiddleware::class,
         'admin_residencial.role' => \App\Http\Middleware\ResidencialAdminMiddleware::class,
+        // Middleware para Broadcasting
+        'broadcast.auth' => \App\Http\Middleware\HandleBroadcastAuth::class,
     ];
 }

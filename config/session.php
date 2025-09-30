@@ -17,8 +17,8 @@ return [
     // CONFIGURACIÓN ESPECÍFICA PARA GATEKEPPER.COM
     'cookie' => env('SESSION_COOKIE', 'gatekepper_session'),
     'path' => '/',
-    'domain' => env('SESSION_DOMAIN', 'gatekepper.com'), // SIN PUNTO al inicio
+    'domain' => env('SESSION_DOMAIN', null), // NULL para permitir subdominio automático
     'secure' => env('SESSION_SECURE_COOKIE', true), // SIEMPRE true en HTTPS
     'http_only' => true,
-    'same_site' => env('SESSION_SAME_SITE', 'none'), // NONE para CORS en Railway
+    'same_site' => env('SESSION_SAME_SITE', 'lax'), // LAX es más compatible que NONE
 ];

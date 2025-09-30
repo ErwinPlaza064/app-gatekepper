@@ -15,6 +15,7 @@ class Kernel extends ConsoleKernel
     protected $commands = [
         Commands\NotifyExpiringQrCodes::class,
         Commands\ProcessExpiredApprovals::class,
+        Commands\CleanProblemSessions::class,
     ];
 
     /**
@@ -35,6 +36,11 @@ class Kernel extends ConsoleKernel
                  ->everyMinute()
                  ->withoutOverlapping()
                  ->runInBackground();
+
+        // Limpiar sesiones problemáticas diariamente
+        $schedule->command('sessions:clean-problems --force')
+                 ->dailyAt('03:00')
+                 ->withoutOverlapping();
     }
 
     /**

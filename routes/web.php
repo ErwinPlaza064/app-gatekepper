@@ -176,8 +176,22 @@ Route::get('/csrf-token', function() {
         'session_domain' => config('session.domain'),
         'session_secure' => config('session.secure'),
         'cors_origins' => config('cors.allowed_origins'),
+        'session_id' => session()->getId(),
+        'timestamp' => now()->toISOString(),
     ]);
 });
+
+// Ruta para refrescar la sesión cuando hay problemas de CSRF
+Route::post('/refresh-session', function() {
+    // Regenerar session ID
+    session()->regenerate();
+
+    return response()->json([
+        'message' => 'Session refreshed successfully',
+        'csrf_token' => csrf_token(),
+        'session_id' => session()->getId(),
+    ]);
+})->name('refresh.session');
 
 // Debug para verificar usuario autenticado
 Route::get('/debug-user', function() {
@@ -227,25 +241,25 @@ Route::get('/test-notification-web', function() {
     try {
         $admin = App\Models\User::where('rol', 'administrador')->first();
         $visitor = App\Models\Visitor::latest()->first();
-        
+
         if (!$admin || !$visitor) {
             return response()->json(['error' => 'No admin or visitor found'], 404);
         }
-        
+
         // Enviar notificación completa
         $notification = new App\Notifications\AdminVisitorStatusNotification($visitor, 'approved', $visitor->user);
         $notification->sendFilamentNotification($admin);
-        
+
         // También enviar evento directo
         broadcast(new App\Events\VisitorStatusUpdated($visitor, 'approved', $visitor->user));
-        
+
         return response()->json([
             'success' => true,
             'message' => 'Notificación enviada correctamente',
             'admin' => $admin->name,
             'visitor' => $visitor->name
         ]);
-        
+
     } catch (Exception $e) {
         return response()->json(['error' => $e->getMessage()], 500);
     }

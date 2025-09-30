@@ -6,6 +6,9 @@
         <meta name="csrf-token" content="{{ csrf_token() }}">
         <meta name="description" content="Sistema de gestión de visitantes GateKepper">
         <meta name="theme-color" content="#4F46E5">
+        <meta name="app-url" content="{{ config('app.url') }}">
+        <meta name="session-domain" content="{{ config('session.domain') }}">
+        <meta name="environment" content="{{ app()->environment() }}">
 
         <title inertia>{{ config('app.name', 'Laravel') }}</title>
 

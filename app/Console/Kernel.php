@@ -16,6 +16,7 @@ class Kernel extends ConsoleKernel
         Commands\NotifyExpiringQrCodes::class,
         Commands\ProcessExpiredApprovals::class,
         Commands\CleanProblemSessions::class,
+        Commands\ClearAllSessions::class,
     ];
 
     /**

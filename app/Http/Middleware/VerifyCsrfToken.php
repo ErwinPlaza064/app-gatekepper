@@ -22,7 +22,6 @@ class VerifyCsrfToken extends Middleware
         'api/qr-codes/*/reactivate',
         'broadcasting/auth',
         'test-broadcasting-auth',
-        'login', // Excluir temporalmente login de CSRF
     ];
 
     /**

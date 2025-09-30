@@ -10,6 +10,7 @@ use App\Notifications\NewVisitorNotification;
 use App\Notifications\VisitorApprovalRequest;
 use Illuminate\Support\Facades\Log;
 use App\Jobs\EnviarWhatsAppJob;
+use App\Jobs\SendVisitorNotificationJob;
 
 
 
@@ -124,12 +125,8 @@ class Visitor extends Model
 
         // Enviar notificación de solicitud de aprobación al residente
         if ($this->user) {
-            // Notificación al frontend (usando job para evitar bloqueos)
-            \App\Jobs\SendVisitorNotificationJob::dispatch(
-                $this->user,
-                $this,
-                'approval'
-            )->delay(now()->addSeconds(1)); // Pequeño delay
+                    // Envío de notificaciones por email con job en background
+        SendVisitorNotificationJob::dispatch($this)->delay(now()->addSeconds(2));
 
             // WhatsApp con enlaces de aprobación
             if ($this->user->phone && $this->user->whatsapp_notifications) {
@@ -301,12 +298,12 @@ class Visitor extends Model
         if ($visitor->user) {
             // Si el visitante tiene QR code, es una visita programada → notificación normal
             if ($visitor->qr_code_id) {
-                // Enviar notificación normal para visitantes con QR (usando job para evitar bloqueos)
-                \App\Jobs\SendVisitorNotificationJob::dispatch(
-                    $visitor->user,
-                    $visitor,
-                    'new_visitor'
-                )->delay(now()->addSeconds(2)); // Pequeño delay para evitar sobrecarga
+                // TEMPORALMENTE DESHABILITADO - Enviar notificación normal para visitantes con QR
+                // \App\Jobs\SendVisitorNotificationJob::dispatch(
+                //     $visitor->user,
+                //     $visitor,
+                //     'new_visitor'
+                // )->delay(now()->addSeconds(2));
 
                 // Enviar WhatsApp para visitas programadas
                 if ($visitor->user->phone && $visitor->user->whatsapp_notifications) {

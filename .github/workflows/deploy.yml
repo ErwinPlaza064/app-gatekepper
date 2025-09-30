@@ -1,0 +1,34 @@
+name: CI/CD - Azul/Verde
+
+on:
+  push:
+    branches:
+      - main
+      - deploy-azul
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v3
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+
+      - name: Instalar dependencias
+        run: npm install
+
+      - name: Ejecutar pruebas
+        run: npm test
+
+      - name: Despliegue Azul
+        if: github.ref == 'refs/heads/deploy-azul'
+        run: bash deploy-railway.sh azul
+
+      - name: Despliegue Verde
+        if: github.ref == 'refs/heads/main'
+        run: bash deploy-railway.sh verde

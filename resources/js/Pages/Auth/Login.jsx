@@ -43,9 +43,9 @@ export default function Login({ status }) {
                 console.log("Current URL:", window.location.href);
                 console.log("Response:", page);
 
-                // Forzar redirección inmediata al dashboard
+                // Forzar redirección inmediata usando replace (más directo que href)
                 console.log("Redirecting to dashboard...");
-                window.location.href = "/dashboard";
+                window.location.replace("/dashboard");
             },
             onError: (errors) => {
                 console.error("Login errors:", errors);
@@ -53,6 +53,9 @@ export default function Login({ status }) {
             onFinish: () => {
                 console.log("Login request finished");
             },
+            // Desactivar el manejo automático de redirects de Inertia
+            preserveScroll: false,
+            preserveState: false,
         });
     };
 

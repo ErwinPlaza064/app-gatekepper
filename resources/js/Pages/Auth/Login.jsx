@@ -34,34 +34,25 @@ export default function Login({ status }) {
         if (window.refreshCSRFToken) {
             window.refreshCSRFToken();
         }
-        
-        console.log('Submitting login form...');
-        
+
+        console.log("Submitting login form...");
+
         post(route("login"), {
             onSuccess: (page) => {
                 console.log("Login successful!", page);
                 console.log("Current URL:", window.location.href);
-                
-                // Verificar si ya estamos en el dashboard
-                if (window.location.pathname === '/dashboard') {
-                    console.log('Already on dashboard, no redirect needed');
-                    return;
-                }
-                
-                // Dar tiempo a Inertia para procesar la redirección
-                setTimeout(() => {
-                    if (window.location.pathname === '/login') {
-                        console.log('Still on login page, forcing redirect...');
-                        window.location.href = "/dashboard";
-                    }
-                }, 100);
+                console.log("Response:", page);
+
+                // Forzar redirección inmediata al dashboard
+                console.log("Redirecting to dashboard...");
+                window.location.href = "/dashboard";
             },
             onError: (errors) => {
                 console.error("Login errors:", errors);
             },
             onFinish: () => {
-                console.log('Login request finished');
-            }
+                console.log("Login request finished");
+            },
         });
     };
 

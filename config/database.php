@@ -58,12 +58,12 @@ return [
             'prefix_indexes' => true,
             'strict' => true,
             'engine' => null,
-            // Configuraciones específicas para Railway MySQL
+            // Configuraciones específicas para Railway MySQL 9.4+
             'options' => extension_loaded('pdo_mysql') ? array_filter([
                 PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
                 PDO::ATTR_TIMEOUT => 30, // Timeout de conexión más largo
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                PDO::MYSQL_ATTR_INIT_COMMAND => "SET sql_mode='STRICT_TRANS_TABLES,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'",
+                // Sin sql_mode personalizado para evitar conflictos con MySQL 9.4
             ]) : [],
             // Configuraciones de reconexión para Railway
             'sticky' => true,

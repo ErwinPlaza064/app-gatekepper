@@ -49,7 +49,7 @@ class DatabaseRetryMiddleware
                 ]);
 
                 // Códigos de error de conexión MySQL
-                $connectionErrors = [2002, 2006, 2013, 1045, 1044];
+                $connectionErrors = [2002, 2006, 2013, 1045, 1044, 1231]; // 1231 = Variable can't be set
 
                 if (in_array($e->getCode(), $connectionErrors) && $attempt < $maxAttempts) {
                     // Esperar progresivamente más tiempo entre intentos

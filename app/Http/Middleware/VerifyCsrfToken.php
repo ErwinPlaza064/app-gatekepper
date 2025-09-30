@@ -23,7 +23,8 @@ class VerifyCsrfToken extends Middleware
         'broadcasting/auth',
         'test-broadcasting-auth',
         'livewire/update',
-        'livewire/message/*',
+        'livewire/message/*', 
+        'livewire/*',
     ];
 
     /**

@@ -66,10 +66,11 @@ class AuthenticatedSessionController extends Controller
             'is_inertia' => $request->inertia(),
             'accepts_json' => $request->acceptsJson(),
             'header_x_inertia' => $request->header('X-Inertia'),
-            'intended_url' => session()->get('url.intended', RouteServiceProvider::HOME)
+            'dashboard_route' => route('dashboard')
         ]);
 
-        return redirect()->intended(RouteServiceProvider::HOME);
+        // Para Inertia, usar redirección directa
+        return redirect()->route('dashboard');
     }
 
     /**

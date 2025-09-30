@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'default' => env('MAIL_MAILER', 'smtp'),
+    'default' => env('MAIL_MAILER', 'log'), // Temporalmente usar log en lugar de smtp
 
     /*
     |--------------------------------------------------------------------------
@@ -41,7 +41,7 @@ return [
             'encryption' => env('MAIL_ENCRYPTION', 'tls'),
             'username' => env('MAIL_USERNAME'),
             'password' => env('MAIL_PASSWORD'),
-            'timeout' => null,
+            'timeout' => env('MAIL_TIMEOUT', 10), // 10 segundos timeout
             'local_domain' => env('MAIL_EHLO_DOMAIN'),
         ],
 

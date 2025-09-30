@@ -124,8 +124,12 @@ class Visitor extends Model
 
         // Enviar notificación de solicitud de aprobación al residente
         if ($this->user) {
-            // Notificación al frontend
-            $this->user->notify(new VisitorApprovalRequest($this));
+            // Notificación al frontend (usando job para evitar bloqueos)
+            \App\Jobs\SendVisitorNotificationJob::dispatch(
+                $this->user,
+                $this,
+                'approval'
+            )->delay(now()->addSeconds(1)); // Pequeño delay
 
             // WhatsApp con enlaces de aprobación
             if ($this->user->phone && $this->user->whatsapp_notifications) {
@@ -297,8 +301,12 @@ class Visitor extends Model
         if ($visitor->user) {
             // Si el visitante tiene QR code, es una visita programada → notificación normal
             if ($visitor->qr_code_id) {
-                // Enviar notificación normal para visitantes con QR
-                $visitor->user->notify(new NewVisitorNotification($visitor));
+                // Enviar notificación normal para visitantes con QR (usando job para evitar bloqueos)
+                \App\Jobs\SendVisitorNotificationJob::dispatch(
+                    $visitor->user,
+                    $visitor,
+                    'new_visitor'
+                )->delay(now()->addSeconds(2)); // Pequeño delay para evitar sobrecarga
 
                 // Enviar WhatsApp para visitas programadas
                 if ($visitor->user->phone && $visitor->user->whatsapp_notifications) {

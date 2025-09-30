@@ -18,7 +18,7 @@ function setupCSRF() {
         // Configuración específica para Railway + dominio personalizado
         axios.defaults.headers.common["X-CSRF-TOKEN"] = token;
         axios.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
-        axios.defaults.withCredentials = true; // CRÍTICO para Railway
+        // axios.defaults.withCredentials = true; // DESHABILITADO TEMPORALMENTE
 
         // Headers básicos para Railway (sin baseURL que puede causar conflictos)
         axios.defaults.headers.common["Accept"] = "application/json";
@@ -34,7 +34,7 @@ function setupCSRF() {
 
 // Función para refrescar CSRF token específica para Railway
 window.refreshCSRFToken = function () {
-    return fetch("https://gatekepper.com/csrf-token", {
+    return fetch("/csrf-token", {
         method: "GET",
         credentials: "include", // IMPORTANTE para Railway
         headers: {
@@ -120,9 +120,10 @@ createInertiaApp({
     },
 });
 
-// Verificar estado de sesión cada 5 minutos
+// Verificar estado de sesión cada 5 minutos (DESHABILITADO TEMPORALMENTE)
+/*
 setInterval(() => {
-    fetch("https://gatekepper.com/csrf-token", {
+    fetch("/csrf-token", {
         method: "GET",
         credentials: "include",
         headers: {
@@ -133,8 +134,10 @@ setInterval(() => {
         console.warn("⚠️ Sesión posiblemente expirada");
     });
 }, 5 * 60 * 1000);
+*/
 
-// Service Worker
+// Service Worker (DESHABILITADO TEMPORALMENTE PARA DEBUGGING)
+/*
 if ("serviceWorker" in navigator && import.meta.env.PROD) {
     window.addEventListener("load", function () {
         navigator.serviceWorker
@@ -147,3 +150,4 @@ if ("serviceWorker" in navigator && import.meta.env.PROD) {
             });
     });
 }
+*/

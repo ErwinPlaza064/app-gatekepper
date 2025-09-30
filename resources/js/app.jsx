@@ -20,12 +20,8 @@ function setupCSRF() {
         axios.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
         axios.defaults.withCredentials = true; // CRÍTICO para Railway
 
-        // Base URL para producción
-        axios.defaults.baseURL = "https://gatekepper.com";
-
-        // Headers adicionales para Railway
+        // Headers básicos para Railway (sin baseURL que puede causar conflictos)
         axios.defaults.headers.common["Accept"] = "application/json";
-        axios.defaults.headers.common["Content-Type"] = "application/json";
 
         window.axios = axios;
         window.Laravel = { csrfToken: token };
@@ -71,7 +67,8 @@ window.refreshCSRFToken = function () {
 // Inicializar CSRF
 setupCSRF();
 
-// Interceptor para manejar errores 419 específico para Railway
+// Interceptor para manejar errores 419 específico para Railway (COMENTADO TEMPORALMENTE)
+/*
 axios.interceptors.response.use(
     (response) => response,
     (error) => {
@@ -103,8 +100,9 @@ axios.interceptors.response.use(
         return Promise.reject(error);
     }
 );
+*/
 
-// CONFIGURAR INERTIA
+// CONFIGURAR INERTIA (SIMPLIFICADO PARA RAILWAY)
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
     resolve: (name) =>
@@ -120,34 +118,6 @@ createInertiaApp({
         color: "#4B5563",
         showSpinner: true,
     },
-});
-
-// Interceptar navegación de Inertia
-router.on("before", (event) => {
-    // Reset del flag de intento de refresh
-    window.csrfRefreshAttempted = false;
-
-    // Asegurar token en headers
-    const currentToken = document.querySelector(
-        'meta[name="csrf-token"]'
-    )?.content;
-    if (currentToken) {
-        axios.defaults.headers.common["X-CSRF-TOKEN"] = currentToken;
-    }
-});
-
-// Manejar errores específicos de Inertia para Railway
-router.on("error", (event) => {
-    const errors = event.detail?.errors;
-
-    if (errors?.status === 419 || (errors && errors.message?.includes("419"))) {
-        console.error("🔄 CSRF token expirado en Inertia, refrescando...");
-
-        // Intentar refrescar token
-        window.refreshCSRFToken().catch(() => {
-            window.location.reload();
-        });
-    }
 });
 
 // Verificar estado de sesión cada 5 minutos

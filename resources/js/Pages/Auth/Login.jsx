@@ -34,7 +34,21 @@ export default function Login({ status }) {
         if (window.refreshCSRFToken) {
             window.refreshCSRFToken();
         }
-        post(route("login"));
+        post(route("login"), {
+            onSuccess: (response) => {
+                console.log("Login successful, redirecting...");
+                // Forzar redirección si Inertia no la maneja automáticamente
+                if (response.props?.redirect) {
+                    window.location.href = response.props.redirect;
+                } else {
+                    // Redirección por defecto al dashboard
+                    window.location.href = "/dashboard";
+                }
+            },
+            onError: (errors) => {
+                console.error("Login errors:", errors);
+            },
+        });
     };
 
     return (

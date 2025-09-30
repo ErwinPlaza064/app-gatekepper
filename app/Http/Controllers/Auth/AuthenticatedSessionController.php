@@ -29,7 +29,7 @@ class AuthenticatedSessionController extends Controller
     /**
      * Handle an incoming authentication request.
      */
-    public function store(LoginRequest $request): RedirectResponse
+    public function store(LoginRequest $request)
     {
         $request->authenticate();
 
@@ -44,7 +44,7 @@ class AuthenticatedSessionController extends Controller
             'rol' => $user->rol,
         ]);
 
-        // Redireccionar según el rol del usuario
+        // Determinar la URL de redirección según el rol
         if (in_array($user->rol, ['administrador', 'portero', 'adminresidencial'])) {
             Log::info('[LOGIN] Redireccionando a Filament admin', ['id' => $user->id, 'rol' => $user->rol]);
 
@@ -56,11 +56,19 @@ class AuthenticatedSessionController extends Controller
                 $adminUrl = str_replace('http://', 'https://', $adminUrl);
             }
 
-            return redirect()->intended($adminUrl);
+            // Para Inertia, usar redirect externo para Filament
+            return redirect()->away($adminUrl);
         }
 
         // Para usuarios regulares (residentes)
         Log::info('[LOGIN] Redireccionando a HOME', ['id' => $user->id, 'rol' => $user->rol]);
+        Log::info('[LOGIN] Request details', [
+            'is_inertia' => $request->inertia(),
+            'accepts_json' => $request->acceptsJson(),
+            'header_x_inertia' => $request->header('X-Inertia'),
+            'intended_url' => session()->get('url.intended', RouteServiceProvider::HOME)
+        ]);
+
         return redirect()->intended(RouteServiceProvider::HOME);
     }
 

@@ -72,5 +72,7 @@ class Kernel extends HttpKernel
         'admin_residencial.role' => \App\Http\Middleware\ResidencialAdminMiddleware::class,
         // Middleware para Broadcasting
         'broadcast.auth' => \App\Http\Middleware\HandleBroadcastAuth::class,
+        // Middleware para retry de base de datos
+        'db.retry' => \App\Http\Middleware\DatabaseRetryMiddleware::class,
     ];
 }

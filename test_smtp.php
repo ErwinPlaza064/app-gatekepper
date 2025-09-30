@@ -34,6 +34,6 @@ try {
 
 } catch (Exception $e) {
     echo "❌ Error: " . $e->getMessage() . "\n";
-    echo "📋 Detalles del error:\n";
-    echo $e->getTraceAsString() . "\n";
+    // Evitar imprimir stack trace que puede causar problemas de formato
+    error_log("SMTP Test Error: " . $e->getMessage());
 }

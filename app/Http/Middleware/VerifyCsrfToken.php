@@ -18,10 +18,12 @@ class VerifyCsrfToken extends Middleware
     protected $except = [
         'api/scan-qr',
         'api/recent-visitor-scans',
-        'api/qr-codes/*/deactivate',
+        'api/qr-codes/*/deactivate',  
         'api/qr-codes/*/reactivate',
         'broadcasting/auth',
         'test-broadcasting-auth',
+        'livewire/update',
+        'livewire/message/*',
     ];
 
     /**
@@ -38,16 +40,8 @@ class VerifyCsrfToken extends Middleware
         try {
             return parent::handle($request, $next);
         } catch (TokenMismatchException $exception) {
-            // Log del error para debugging
-            Log::warning('CSRF Token Mismatch', [
-                'url' => $request->fullUrl(),
-                'method' => $request->method(),
-                'ip' => $request->ip(),
-                'user_agent' => $request->userAgent(),
-                'session_id' => $request->session()->getId(),
-                'has_token' => $request->hasHeader('X-CSRF-TOKEN') || $request->has('_token'),
-                'referer' => $request->header('referer'),
-            ]);
+            // Log simple del error
+            Log::warning("CSRF Token Mismatch: {$request->method()} {$request->path()}");
 
             // Si es una petición AJAX/API, devolver JSON
             if ($request->expectsJson() || $request->ajax()) {

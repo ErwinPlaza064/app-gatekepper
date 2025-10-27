@@ -227,25 +227,25 @@ Route::get('/test-notification-web', function() {
     try {
         $admin = App\Models\User::where('rol', 'administrador')->first();
         $visitor = App\Models\Visitor::latest()->first();
-        
+
         if (!$admin || !$visitor) {
             return response()->json(['error' => 'No admin or visitor found'], 404);
         }
-        
+
         // Enviar notificación completa
         $notification = new App\Notifications\AdminVisitorStatusNotification($visitor, 'approved', $visitor->user);
         $notification->sendFilamentNotification($admin);
-        
+
         // También enviar evento directo
         broadcast(new App\Events\VisitorStatusUpdated($visitor, 'approved', $visitor->user));
-        
+
         return response()->json([
             'success' => true,
             'message' => 'Notificación enviada correctamente',
             'admin' => $admin->name,
             'visitor' => $visitor->name
         ]);
-        
+
     } catch (Exception $e) {
         return response()->json(['error' => $e->getMessage()], 500);
     }

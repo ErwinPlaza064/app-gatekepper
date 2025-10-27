@@ -1,9 +1,9 @@
 {
     "$schema": "https://railway.app/railway.schema.json",
     "build": {
-        "buildCommand": "npm install && npm run build:production"
+        "buildCommand": "npm install && npm run build:production && php artisan config:clear && php artisan route:clear && php artisan view:clear"
     },
     "deploy": {
-        "startCommand": "php artisan serve --host=0.0.0.0 --port=$PORT"
+        "startCommand": "php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=$PORT"
     }
 }

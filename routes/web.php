@@ -36,28 +36,28 @@ Route::get('/test-whatsapp', function() {
 Route::get('/debug-approval-system', function() {
     try {
         $debug = [];
-        
+
         // 1. Verificar configuración de queue
         $debug['queue_connection'] = config('queue.default');
         $debug['queue_driver'] = config("queue.connections.{$debug['queue_connection']}.driver");
-        
+
         // 2. Verificar cantidad de jobs en cola
         $debug['jobs_pendientes'] = DB::table('jobs')->count();
         $debug['jobs_fallidos'] = DB::table('failed_jobs')->count();
-        
+
         // 3. Buscar usuario de prueba
         $user = \App\Models\User::where('phone', '4641226304')->first();
         if (!$user) {
             throw new \Exception('Usuario con teléfono 4641226304 no encontrado');
         }
-        
+
         $debug['usuario_encontrado'] = [
             'id' => $user->id,
             'name' => $user->name,
             'phone' => $user->phone,
             'whatsapp_notifications' => $user->whatsapp_notifications
         ];
-        
+
         // 4. Crear visitante de prueba
         $visitor = new \App\Models\Visitor([
             'name' => 'Debug Test Visitor',
@@ -66,33 +66,33 @@ Route::get('/debug-approval-system', function() {
             'entry_time' => now(),
             'approval_status' => 'pending'
         ]);
-        
+
         $debug['antes_de_guardar'] = [
             'jobs_count' => DB::table('jobs')->count()
         ];
-        
+
         // 5. Guardar visitante (esto debería disparar el evento created)
         $visitor->save();
-        
+
         $debug['despues_de_guardar'] = [
             'visitor_id' => $visitor->id,
             'jobs_count' => DB::table('jobs')->count(),
             'jobs_nuevos' => DB::table('jobs')->count() - $debug['antes_de_guardar']['jobs_count']
         ];
-        
+
         // 6. Probar requestApproval manualmente
         $debug['antes_request_approval'] = [
             'jobs_count' => DB::table('jobs')->count()
         ];
-        
+
         $visitor->requestApproval('Debug test manual');
-        
+
         $debug['despues_request_approval'] = [
             'jobs_count' => DB::table('jobs')->count(),
             'jobs_nuevos' => DB::table('jobs')->count() - $debug['antes_request_approval']['jobs_count'],
             'approval_token' => $visitor->approval_token
         ];
-        
+
         // 7. Ver últimos jobs
         $debug['ultimos_jobs'] = DB::table('jobs')
             ->orderBy('id', 'desc')
@@ -106,12 +106,12 @@ Route::get('/debug-approval-system', function() {
                     'job_class' => $payload['displayName'] ?? 'Unknown'
                 ];
             });
-        
+
         return response()->json([
             'success' => true,
             'debug' => $debug
         ], 200, [], JSON_PRETTY_PRINT);
-        
+
     } catch (\Exception $e) {
         return response()->json([
             'success' => false,

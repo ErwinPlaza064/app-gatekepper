@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { router } from "@inertiajs/react";
 import {
-    XMarkIcon,
-    BellIcon,
-    CheckIcon,
-    ExclamationTriangleIcon,
-    InformationCircleIcon,
-} from "@heroicons/react/24/outline";
+    FaBell,
+    FaCheck,
+    FaInfoCircle,
+    FaExclamationTriangle,
+    FaTimes,
+} from "react-icons/fa";
 
 const Notification = ({ notifications = [], onClose, show = false }) => {
     const [localNotifications, setLocalNotifications] = useState(notifications);
@@ -80,19 +80,17 @@ const Notification = ({ notifications = [], onClose, show = false }) => {
     const getNotificationIcon = (type) => {
         switch (type) {
             case "success":
-                return <CheckIcon className="w-6 h-6 text-green-500" />;
+                return <FaCheck className="w-6 h-6 text-green-500" />;
             case "warning":
                 return (
-                    <ExclamationTriangleIcon className="w-6 h-6 text-yellow-500" />
+                    <FaExclamationTriangle className="w-6 h-6 text-yellow-500" />
                 );
             case "error":
                 return (
-                    <ExclamationTriangleIcon className="w-6 h-6 text-red-500" />
+                    <FaExclamationTriangle className="w-6 h-6 text-red-500" />
                 );
             default:
-                return (
-                    <InformationCircleIcon className="w-6 h-6 text-blue-500" />
-                );
+                return <FaInfoCircle className="w-6 h-6 text-blue-500" />;
         }
     };
 
@@ -128,7 +126,7 @@ const Notification = ({ notifications = [], onClose, show = false }) => {
                 {/* Header móvil */}
                 <div className="flex items-center justify-between px-4 py-4 bg-white border-b border-gray-200">
                     <div className="flex items-center space-x-3">
-                        <BellIcon className="w-6 h-6 text-gray-600" />
+                        <FaBell className="w-6 h-6 text-gray-600" />
                         <h1 className="text-lg font-semibold text-gray-900">
                             Notificaciones
                         </h1>
@@ -142,7 +140,7 @@ const Notification = ({ notifications = [], onClose, show = false }) => {
                         onClick={onClose}
                         className="p-2 transition-colors rounded-full hover:bg-gray-100"
                     >
-                        <XMarkIcon className="w-6 h-6 text-gray-600" />
+                        <FaTimes className="w-6 h-6 text-gray-600" />
                     </button>
                 </div>
 
@@ -162,7 +160,7 @@ const Notification = ({ notifications = [], onClose, show = false }) => {
                 <div className="flex-1 overflow-y-auto">
                     {localNotifications.length === 0 ? (
                         <div className="flex flex-col items-center justify-center px-4 py-12">
-                            <BellIcon className="w-16 h-16 mb-4 text-gray-300" />
+                            <FaBell className="w-16 h-16 mb-4 text-gray-300" />
                             <p className="text-center text-gray-500">
                                 No tienes notificaciones
                             </p>
@@ -251,7 +249,7 @@ const Notification = ({ notifications = [], onClose, show = false }) => {
                     <div className="px-6 py-4 bg-white border-b border-gray-200">
                         <div className="flex items-center justify-between">
                             <div className="flex items-center space-x-3">
-                                <BellIcon className="w-6 h-6 text-gray-600" />
+                                <FaBell className="w-6 h-6 text-gray-600" />
                                 <h3 className="text-lg font-medium text-gray-900">
                                     Notificaciones
                                 </h3>
@@ -265,7 +263,7 @@ const Notification = ({ notifications = [], onClose, show = false }) => {
                                 onClick={onClose}
                                 className="text-gray-400 rounded-md hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             >
-                                <XMarkIcon className="w-6 h-6" />
+                                <FaTimes className="w-6 h-6" />
                             </button>
                         </div>
                     </div>
@@ -286,7 +284,7 @@ const Notification = ({ notifications = [], onClose, show = false }) => {
                     <div className="px-6 py-4 overflow-y-auto bg-white max-h-96">
                         {localNotifications.length === 0 ? (
                             <div className="py-8 text-center">
-                                <BellIcon className="w-12 h-12 mx-auto text-gray-300" />
+                                <FaBell className="w-12 h-12 mx-auto text-gray-300" />
                                 <p className="mt-2 text-sm text-gray-500">
                                     No tienes notificaciones
                                 </p>

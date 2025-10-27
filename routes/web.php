@@ -500,6 +500,79 @@ Route::get('/force-test-email', function() {
     }
 });
 
+Route::get('/test-smtp-direct', function() {
+    try {
+        $user = \App\Models\User::where('phone', '4641226304')->first();
+        if (!$user) {
+            throw new \Exception('Usuario no encontrado');
+        }
+
+        $debug = [];
+
+        // Verificar configuraciones actuales
+        $debug['current_config'] = [
+            'MAIL_MAILER' => env('MAIL_MAILER'),
+            'MAIL_HOST' => env('MAIL_HOST'),
+            'MAIL_PORT' => env('MAIL_PORT'),
+            'MAIL_USERNAME' => env('MAIL_USERNAME') ? '***configurado***' : 'NO_CONFIGURADO',
+            'MAIL_PASSWORD' => env('MAIL_PASSWORD') ? '***configurado***' : 'NO_CONFIGURADO',
+            'MAIL_FROM_ADDRESS' => env('MAIL_FROM_ADDRESS')
+        ];
+
+        // Forzar el uso directo de SMTP (bypasseando failover)
+        try {
+            Mail::mailer('smtp')->raw('🚀 TEST SMTP DIRECTO - ' . now()->format('Y-m-d H:i:s') . '
+
+Este email fue enviado forzando el uso directo de SMTP de Gmail.
+
+Si recibes este mensaje, significa que:
+✅ La configuración SMTP funciona
+✅ La contraseña de aplicación es correcta
+✅ El problema era el mailer "failover"
+
+Configuración utilizada:
+- Host: ' . env('MAIL_HOST') . '
+- Puerto: ' . env('MAIL_PORT') . '
+- Usuario: ' . env('MAIL_USERNAME') . '
+- Encriptación: ' . env('MAIL_ENCRYPTION') . '
+
+¡El sistema de email está funcionando!
+', function ($message) use ($user) {
+                $message->to($user->email, $user->name)
+                        ->subject('🚀 TEST SMTP DIRECTO - Gatekeeper')
+                        ->from(env('MAIL_FROM_ADDRESS'), 'Gatekeeper SMTP Test');
+            });
+
+            $debug['smtp_direct_test'] = 'SUCCESS - Email enviado vía SMTP directo';
+
+        } catch (\Exception $e) {
+            $debug['smtp_direct_test'] = 'ERROR: ' . $e->getMessage();
+        }
+
+        // Test de configuración específica de Gmail
+        $debug['gmail_check'] = [
+            'host_correct' => env('MAIL_HOST') === 'smtp.gmail.com',
+            'port_correct' => env('MAIL_PORT') == '587',
+            'encryption_correct' => env('MAIL_ENCRYPTION') === 'tls',
+            'username_format' => str_contains(env('MAIL_USERNAME', ''), '@gmail.com') ? 'OK' : 'DEBE_SER_EMAIL_COMPLETO'
+        ];
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Test SMTP directo ejecutado',
+            'debug' => $debug,
+            'recommendation' => 'Cambia MAIL_MAILER de "failover" a "smtp" en Railway',
+            'instructions' => 'Si este test funciona, el problema era el failover mailer'
+        ], 200, [], JSON_PRETTY_PRINT);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage()
+        ], 500, [], JSON_PRETTY_PRINT);
+    }
+});
+
 // Rutas de broadcasting para autenticación WebSocket ya están definidas en BroadcastServiceProvider
 // Broadcast::routes(['middleware' => ['web', 'auth']]);
 

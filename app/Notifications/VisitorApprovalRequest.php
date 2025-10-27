@@ -25,12 +25,13 @@ class VisitorApprovalRequest extends Notification
     public function via($notifiable): array
     {
         $channels = ['database'];
-        
+
+        // Temporalmente deshabilitado email para evitar timeouts
         // Agregar email si el usuario tiene email y las notificaciones por email están habilitadas
-        if ($notifiable->email && $notifiable->email_notifications ?? true) {
+        if (config('app.env') === 'local' && $notifiable->email && $notifiable->email_notifications ?? true) {
             $channels[] = 'mail';
         }
-        
+
         return $channels;
     }
 
@@ -41,7 +42,7 @@ class VisitorApprovalRequest extends Notification
     {
         $approveUrl = route('approval.approve.public', $this->visitor->approval_token);
         $rejectUrl = route('approval.reject.public', $this->visitor->approval_token);
-        
+
         return (new MailMessage)
             ->subject('🔔 Nueva Solicitud de Visita - Gatekeeper')
             ->from(config('mail.from.address'), config('mail.from.name'))
@@ -91,7 +92,7 @@ class VisitorApprovalRequest extends Notification
                     'style' => 'success'
                 ],
                 [
-                    'type' => 'reject', 
+                    'type' => 'reject',
                     'label' => 'Rechazar',
                     'url' => route('approval.reject.public', $this->visitor->approval_token),
                     'style' => 'danger'

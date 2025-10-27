@@ -26,8 +26,8 @@ Route::get('/check-auth', function () {
 Route::get('/test-whatsapp', function() {
     $whatsapp = new \App\Services\WhatsAppService();
 
-    // CAMBIA ESTE NÚMERO POR TU NÚMERO DE TELÉFONO
-    $resultado = $whatsapp->enviarMensaje('+524641226304', '🎉 ¡Prueba de WhatsApp desde Gatekeeper! 🎉');
+    // FORMATO CORRECTO SIN +52
+    $resultado = $whatsapp->enviarMensaje('4641226304', '🎉 ¡Prueba de WhatsApp desde Gatekeeper! 🎉');
 
     return response()->json($resultado);
 });

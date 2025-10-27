@@ -12,8 +12,10 @@ class BroadcastServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Broadcast::routes(['middleware' => ['web', 'auth']]);
-
-        require base_path('routes/channels.php');
+        // Solo cargar broadcasting si no estamos en modo build/cache
+        if (!app()->runningInConsole() || app()->environment('local')) {
+            Broadcast::routes(['middleware' => ['web', 'auth']]);
+            require base_path('routes/channels.php');
+        }
     }
 }

@@ -420,6 +420,86 @@ Route::get('/debug-email-system', function() {
     }
 });
 
+Route::get('/force-test-email', function() {
+    try {
+        $user = \App\Models\User::where('phone', '4641226304')->first();
+        if (!$user) {
+            throw new \Exception('Usuario no encontrado');
+        }
+
+        $debug = [];
+        $debug['usuario'] = [
+            'email' => $user->email,
+            'name' => $user->name
+        ];
+
+        // Probar diferentes métodos de envío
+
+        // 1. Test con Mail::raw (más directo)
+        try {
+            Mail::raw('🧪 TEST DIRECTO - Email desde Gatekeeper - ' . now()->format('Y-m-d H:i:s'), function ($message) use ($user) {
+                $message->to($user->email, $user->name)
+                        ->subject('🧪 TEST Email - Gatekeeper ' . now()->format('H:i'))
+                        ->from(config('mail.from.address'), 'Gatekeeper Test');
+            });
+
+            $debug['mail_raw'] = 'SUCCESS - Email raw enviado';
+        } catch (\Exception $e) {
+            $debug['mail_raw'] = 'ERROR: ' . $e->getMessage();
+        }
+
+        // 2. Test con notificación completa
+        try {
+            $visitor = new \App\Models\Visitor([
+                'name' => 'Test Email Notification',
+                'id_document' => 'EMAIL123',
+                'approval_token' => 'test-token-' . time(),
+                'approval_requested_at' => now(),
+                'vehicle_plate' => 'TEST-001',
+                'approval_notes' => 'Email de prueba'
+            ]);
+
+            $notification = new \App\Notifications\VisitorApprovalRequest($visitor);
+
+            // Verificar canales primero
+            $channels = $notification->via($user);
+            $debug['notification_channels'] = $channels;
+
+            // Solo enviar si incluye mail
+            if (in_array('mail', $channels)) {
+                $user->notify($notification);
+                $debug['notification_sent'] = 'SUCCESS - Notificación completa enviada';
+            } else {
+                $debug['notification_sent'] = 'SKIPPED - Email no está en canales: ' . implode(', ', $channels);
+            }
+
+        } catch (\Exception $e) {
+            $debug['notification_sent'] = 'ERROR: ' . $e->getMessage();
+        }
+
+        // 3. Verificar configuración actual de mail
+        $debug['mail_config_check'] = [
+            'default_mailer' => config('mail.default'),
+            'mailer_config' => config('mail.mailers.' . config('mail.default')),
+            'from_config' => config('mail.from')
+        ];
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Pruebas de email ejecutadas',
+            'debug' => $debug,
+            'instructions' => 'Revisa tu email (incluyendo spam) en los próximos minutos'
+        ], 200, [], JSON_PRETTY_PRINT);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ], 500, [], JSON_PRETTY_PRINT);
+    }
+});
+
 // Rutas de broadcasting para autenticación WebSocket ya están definidas en BroadcastServiceProvider
 // Broadcast::routes(['middleware' => ['web', 'auth']]);
 

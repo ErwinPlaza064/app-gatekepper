@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 
 Route::get('/check-auth', function () {
@@ -339,6 +340,85 @@ Route::get('/test-notification-web', function() {
         return response()->json(['error' => $e->getMessage()], 500);
     }
 })->middleware(['web', 'auth']);
+
+Route::get('/debug-email-system', function() {
+    try {
+        $debug = [];
+        
+        // 1. Verificar configuración de email
+        $debug['mail_config'] = [
+            'default_mailer' => config('mail.default'),
+            'smtp_host' => config('mail.mailers.smtp.host'),
+            'smtp_port' => config('mail.mailers.smtp.port'),
+            'smtp_encryption' => config('mail.mailers.smtp.encryption'),
+            'smtp_username' => config('mail.mailers.smtp.username') ? '***configurado***' : null,
+            'smtp_password' => config('mail.mailers.smtp.password') ? '***configurado***' : null,
+            'from_address' => config('mail.from.address'),
+            'from_name' => config('mail.from.name'),
+            'timeout' => config('mail.mailers.smtp.timeout'),
+        ];
+        
+        // 2. Buscar usuario para prueba
+        $user = \App\Models\User::where('phone', '4641226304')->first();
+        if (!$user) {
+            throw new \Exception('Usuario con teléfono 4641226304 no encontrado');
+        }
+        
+        $debug['usuario_prueba'] = [
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'email_notifications' => $user->email_notifications ?? 'no_definido'
+        ];
+        
+        // 3. Verificar canales de notificación actual
+        $visitor = new \App\Models\Visitor([
+            'name' => 'Test Email',
+            'id_document' => 'EMAIL001',
+            'approval_token' => 'test-token-123'
+        ]);
+        
+        $notification = new \App\Notifications\VisitorApprovalRequest($visitor);
+        $channels = $notification->via($user);
+        
+        $debug['notification_channels'] = $channels;
+        
+        // 4. Probar envío directo de email
+        try {
+            Mail::raw('🧪 Prueba de email desde Gatekeeper - ' . now(), function ($message) use ($user) {
+                $message->to($user->email, $user->name)
+                        ->subject('🧪 Test Email - Gatekeeper')
+                        ->from(config('mail.from.address'), config('mail.from.name'));
+            });
+            
+            $debug['test_email_sent'] = true;
+            $debug['test_email_message'] = 'Email de prueba enviado correctamente';
+            
+        } catch (\Exception $e) {
+            $debug['test_email_sent'] = false;
+            $debug['test_email_error'] = $e->getMessage();
+        }
+        
+        // 5. Información del entorno
+        $debug['environment'] = [
+            'app_env' => config('app.env'),
+            'app_debug' => config('app.debug'),
+            'mail_log_channel' => config('mail.mailers.log.channel')
+        ];
+        
+        return response()->json([
+            'success' => true,
+            'debug' => $debug
+        ], 200, [], JSON_PRETTY_PRINT);
+        
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ], 500, [], JSON_PRETTY_PRINT);
+    }
+});
 
 // Rutas de broadcasting para autenticación WebSocket ya están definidas en BroadcastServiceProvider
 // Broadcast::routes(['middleware' => ['web', 'auth']]);

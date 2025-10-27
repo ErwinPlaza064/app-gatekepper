@@ -26,9 +26,8 @@ class VisitorApprovalRequest extends Notification
     {
         $channels = ['database'];
 
-        // Temporalmente deshabilitado email para evitar timeouts
         // Agregar email si el usuario tiene email y las notificaciones por email están habilitadas
-        if (config('app.env') === 'local' && $notifiable->email && $notifiable->email_notifications ?? true) {
+        if ($notifiable->email && ($notifiable->email_notifications ?? true)) {
             $channels[] = 'mail';
         }
 

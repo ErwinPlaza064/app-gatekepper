@@ -64,6 +64,16 @@ return [
             // ],
         ],
 
+        'sendgrid' => [
+            'transport' => 'smtp',
+            'host' => 'smtp.sendgrid.net',
+            'port' => 587,
+            'encryption' => 'tls',
+            'username' => 'apikey',
+            'password' => env('SENDGRID_API_KEY'),
+            'timeout' => 30,
+        ],
+
         'postmark' => [
             'transport' => 'postmark',
             // 'client' => [

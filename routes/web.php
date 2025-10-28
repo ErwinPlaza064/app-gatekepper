@@ -573,6 +573,104 @@ Configuración utilizada:
     }
 });
 
+Route::get('/test-sendgrid', function() {
+    try {
+        $user = \App\Models\User::where('phone', '4641226304')->first();
+        if (!$user) {
+            throw new \Exception('Usuario no encontrado');
+        }
+
+        $debug = [];
+
+        // Verificar configuración de SendGrid
+        $debug['sendgrid_config'] = [
+            'api_key_configured' => env('SENDGRID_API_KEY') ? '***configurado***' : 'NO_CONFIGURADO',
+            'from_address' => env('MAIL_FROM_ADDRESS'),
+            'from_name' => env('MAIL_FROM_NAME', 'Gatekeeper'),
+            'mailer' => env('MAIL_MAILER')
+        ];
+
+        // Test con SendGrid
+        if (!env('SENDGRID_API_KEY')) {
+            $debug['sendgrid_test'] = 'SKIPPED - API Key no configurado';
+        } else {
+            try {
+                Mail::mailer('sendgrid')->raw('🚀 TEST SENDGRID - ' . now()->format('Y-m-d H:i:s') . '
+
+¡Hola desde Gatekeeper!
+
+Este email fue enviado usando SendGrid con tu dominio personalizado.
+
+✅ SendGrid configurado correctamente
+✅ Dominio: gatekepper.com
+✅ Remitente: registrador@gatekepper.com
+✅ El sistema de notificaciones por email está funcionando
+
+Configuración utilizada:
+- Servicio: SendGrid
+- Dominio: gatekepper.com
+- Remitente: ' . env('MAIL_FROM_ADDRESS') . '
+- Fecha: ' . now()->format('d/m/Y H:i:s') . '
+
+¡Las notificaciones de visitantes ahora incluirán email!
+
+Saludos,
+Equipo Gatekeeper 🏘️
+', function ($message) use ($user) {
+                    $message->to($user->email, $user->name)
+                            ->subject('🚀 SendGrid Configurado - Gatekeeper')
+                            ->from(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME', 'Gatekeeper'));
+                });
+
+                $debug['sendgrid_test'] = 'SUCCESS - Email enviado vía SendGrid';
+
+            } catch (\Exception $e) {
+                $debug['sendgrid_test'] = 'ERROR: ' . $e->getMessage();
+            }
+        }
+
+        // Verificar notificación completa
+        try {
+            $visitor = new \App\Models\Visitor([
+                'name' => 'Test SendGrid Notification',
+                'id_document' => 'SENDGRID123',
+                'approval_token' => 'sendgrid-test-' . time(),
+                'approval_requested_at' => now()
+            ]);
+
+            $notification = new \App\Notifications\VisitorApprovalRequest($visitor);
+            $channels = $notification->via($user);
+
+            $debug['notification_test'] = [
+                'channels' => $channels,
+                'will_send_email' => in_array('mail', $channels)
+            ];
+
+        } catch (\Exception $e) {
+            $debug['notification_test'] = 'ERROR: ' . $e->getMessage();
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Test SendGrid ejecutado',
+            'debug' => $debug,
+            'next_steps' => [
+                '1. Configura tu dominio en SendGrid',
+                '2. Agrega registros DNS en Ionos',
+                '3. Crea API Key en SendGrid',
+                '4. Configura variables SENDGRID_API_KEY y MAIL_FROM_ADDRESS',
+                '5. Cambia MAIL_MAILER a "sendgrid"'
+            ]
+        ], 200, [], JSON_PRETTY_PRINT);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage()
+        ], 500, [], JSON_PRETTY_PRINT);
+    }
+});
+
 // Rutas de broadcasting para autenticación WebSocket ya están definidas en BroadcastServiceProvider
 // Broadcast::routes(['middleware' => ['web', 'auth']]);
 

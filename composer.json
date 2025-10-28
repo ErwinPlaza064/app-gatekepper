@@ -24,6 +24,7 @@
         "livewire/livewire": "3.5.12",
         "openspout/openspout": "4.29.0",
         "pusher/pusher-php-server": "^7.2",
+        "sendgrid/sendgrid": "^8.1",
         "tightenco/ziggy": "^2.0",
         "twilio/sdk": "^8.7"
     },

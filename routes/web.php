@@ -671,6 +671,131 @@ Equipo Gatekeeper 🏘️
     }
 });
 
+Route::get('/test-sendgrid-api', function() {
+    try {
+        $user = \App\Models\User::where('phone', '4641226304')->first();
+        if (!$user) {
+            throw new \Exception('Usuario no encontrado');
+        }
+
+        $debug = [];
+
+        // Verificar configuración
+        $debug['config'] = [
+            'sendgrid_api_key' => env('SENDGRID_API_KEY') ? '***configurado***' : 'NO_CONFIGURADO',
+            'from_address' => env('MAIL_FROM_ADDRESS'),
+            'from_name' => env('MAIL_FROM_NAME'),
+            'user_email' => $user->email
+        ];
+
+        // Test con SendGrid API directo
+        if (!env('SENDGRID_API_KEY')) {
+            $debug['sendgrid_test'] = 'SKIPPED - API Key no configurado';
+        } else {
+            try {
+                $sendGridService = new \App\Services\SendGridService();
+
+                $content = '
+                <h2>🚀 SendGrid API Test - Gatekeeper</h2>
+                <p>¡Hola desde Gatekeeper!</p>
+                <p>Este email fue enviado usando <strong>SendGrid API directamente</strong> (no SMTP).</p>
+
+                <div style="background: #f0f9ff; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #0ea5e9;">
+                    <h3>✅ Configuración Exitosa</h3>
+                    <ul>
+                        <li>✅ SendGrid API conectado correctamente</li>
+                        <li>✅ Dominio: gatekepper.com configurado</li>
+                        <li>✅ Remitente: ' . env('MAIL_FROM_ADDRESS') . '</li>
+                        <li>✅ Sin problemas de SMTP/timeouts</li>
+                    </ul>
+                </div>
+
+                <p><strong>Fecha:</strong> ' . now()->format('d/m/Y H:i:s') . '</p>
+                <p><strong>Sistema:</strong> Laravel + SendGrid API</p>
+
+                <p>¡Las notificaciones de visitantes ahora incluirán email automáticamente!</p>
+
+                <hr>
+                <p style="color: #666; font-size: 14px;">
+                    Este email fue generado por el sistema de pruebas de Gatekeeper.<br>
+                    Remitente: registrador@gatekepper.com
+                </p>
+                ';
+
+                $result = $sendGridService->sendEmail(
+                    $user->email,
+                    '🚀 SendGrid API Configurado - Gatekeeper',
+                    $content,
+                    env('MAIL_FROM_ADDRESS'),
+                    env('MAIL_FROM_NAME', 'Gatekeeper')
+                );
+
+                $debug['sendgrid_api_test'] = $result;
+
+            } catch (\Exception $e) {
+                $debug['sendgrid_api_test'] = [
+                    'success' => false,
+                    'error' => $e->getMessage()
+                ];
+            }
+        }
+
+        // Test notificación completa de visitante
+        try {
+            $visitor = new \App\Models\Visitor([
+                'name' => 'Test SendGrid API Visitor',
+                'id_document' => 'API123',
+                'approval_token' => 'sendgrid-api-test-' . time(),
+                'approval_requested_at' => now(),
+                'vehicle_plate' => 'API-001',
+                'approval_notes' => 'Prueba de notificación con SendGrid API'
+            ]);
+
+            if (env('SENDGRID_API_KEY')) {
+                $sendGridService = new \App\Services\SendGridService();
+
+                $approveUrl = 'https://gatekepper.com/approval/test-approve';
+                $rejectUrl = 'https://gatekepper.com/approval/test-reject';
+
+                $notificationResult = $sendGridService->sendVisitorNotification(
+                    $user->email,
+                    $visitor,
+                    $approveUrl,
+                    $rejectUrl
+                );
+
+                $debug['visitor_notification_test'] = $notificationResult;
+            } else {
+                $debug['visitor_notification_test'] = 'SKIPPED - API Key no configurado';
+            }
+
+        } catch (\Exception $e) {
+            $debug['visitor_notification_test'] = [
+                'success' => false,
+                'error' => $e->getMessage()
+            ];
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'SendGrid API tests ejecutados',
+            'debug' => $debug,
+            'instructions' => [
+                'Si sendgrid_api_test = success: ¡Email enviado! Revisa tu bandeja',
+                'Si visitor_notification_test = success: ¡Notificación de visitante enviada!',
+                'Revisa también la carpeta de spam'
+            ]
+        ], 200, [], JSON_PRETTY_PRINT);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ], 500, [], JSON_PRETTY_PRINT);
+    }
+});
+
 // Rutas de broadcasting para autenticación WebSocket ya están definidas en BroadcastServiceProvider
 // Broadcast::routes(['middleware' => ['web', 'auth']]);
 

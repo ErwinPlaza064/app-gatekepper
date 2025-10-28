@@ -40,4 +40,8 @@ return [
     'product_id' => env('MAYTAPI_PRODUCT_ID'),
     'phone_id' => env('MAYTAPI_PHONE_ID'),
     ],
+
+    'sendgrid' => [
+        'api_key' => env('SENDGRID_API_KEY'),
+    ],
 ];

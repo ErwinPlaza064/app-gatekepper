@@ -16,7 +16,7 @@
         "beyondcode/laravel-websockets": "*",
         "filament/filament": "3.2",
         "guzzlehttp/guzzle": "^7.2",
-        "inertiajs/inertia-laravel": "^0.6.3",
+        "inertiajs/inertia-laravel": "^1.0",
         "laravel/framework": "^10.0",
         "laravel/sanctum": "^3.2",
         "laravel/socialite": "^5.16",

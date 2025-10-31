@@ -74,6 +74,10 @@ return [
             'timeout' => 30,
         ],
 
+        'sendgrid-api' => [
+            'transport' => 'sendgrid-api',
+        ],
+
         'postmark' => [
             'transport' => 'postmark',
             // 'client' => [

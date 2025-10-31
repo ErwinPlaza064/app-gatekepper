@@ -4,10 +4,12 @@ namespace App\Mail;
 
 use App\Services\SendGridService;
 use Illuminate\Support\Facades\Log;
+use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\RawMessage;
 use Symfony\Component\Mime\MessageConverter;
 
 class SendGridApiTransport implements TransportInterface
@@ -19,7 +21,7 @@ class SendGridApiTransport implements TransportInterface
         $this->sendGridService = new SendGridService();
     }
 
-    public function send(\Symfony\Component\Mime\RawMessage $message, ?\Symfony\Component\Mime\Address\Envelope $envelope = null): ?SentMessage
+    public function send(RawMessage $message, Envelope $envelope = null): ?SentMessage
     {
         $email = MessageConverter::toEmail($message);
 
@@ -61,7 +63,7 @@ class SendGridApiTransport implements TransportInterface
                 ]);
             }
 
-            return new SentMessage($message, $envelope ?? \Symfony\Component\Mime\Address\Envelope::create($message));
+            return new SentMessage($message, $envelope ?? Envelope::create($message));
 
         } catch (\Exception $e) {
             Log::error('SendGridApiTransport: Exception', [

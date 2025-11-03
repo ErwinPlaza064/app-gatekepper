@@ -10,12 +10,8 @@ class CreateVisitor extends CreateRecord
 
     protected function handleRecordCreation(array $data): \App\Models\Visitor
     {
-        // Agregar campos de aprobación automática
-        $data['approval_status'] = 'approved';
-        $data['approval_responded_at'] = now();
-        $data['approved_by'] = auth()->id(); // El usuario que está creando (admin/portero)
-        $data['approval_notes'] = $data['approval_notes'] ?? 'Aprobado directamente desde el panel administrativo';
-
+        // Crear visitante SIN aprobación automática
+        // El modelo Visitor se encargará de enviar la solicitud de aprobación
         $visitor = parent::handleRecordCreation($data);
         return $visitor;
     }

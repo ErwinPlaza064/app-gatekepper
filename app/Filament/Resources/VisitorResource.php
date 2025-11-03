@@ -95,16 +95,9 @@ class VisitorResource extends Resource
                     ->label('Hora de Salida')
                     ->after('entry_time'),
 
-                // Campo oculto para establecer status aprobado por defecto
-                Forms\Components\Hidden::make('approval_status')
-                    ->default('approved'),
-
-                Forms\Components\Hidden::make('approval_responded_at')
-                    ->default(now()),
-
                 Forms\Components\Textarea::make('approval_notes')
-                    ->label('Notas')
-                    ->placeholder('Notas adicionales sobre la visita')
+                    ->label('Notas Adicionales')
+                    ->placeholder('Información adicional sobre el visitante')
                     ->columnSpanFull(),
             ]);
     }

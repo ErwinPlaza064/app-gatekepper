@@ -311,36 +311,16 @@ class Visitor extends Model
 
         // Verificar que exista un usuario relacionado
         if ($visitor->user) {
-            // Si el visitante fue creado con approval_status 'approved' (desde Filament),
-            // enviar notificación directa sin solicitar aprobación
-            if ($visitor->approval_status === 'approved') {
-                // Enviar notificación via Job para visitantes ya aprobados
-                \App\Jobs\SendVisitorNotificationJob::dispatch(
-                    $visitor->id,
-                    $visitor->user->id,
-                    'new_visitor'
-                );
+            // Si el visitante tiene QR code, es una visita PRE-AUTORIZADA → notificación directa
+            if ($visitor->qr_code_id) {
+                // Marcar como aprobado automáticamente (QR significa pre-autorización)
+                $visitor->update([
+                    'approval_status' => 'approved',
+                    'approval_responded_at' => now(),
+                    'approval_notes' => 'Aprobado automáticamente por código QR pre-autorizado',
+                ]);
 
-                // Enviar WhatsApp para visitantes aprobados
-                if ($visitor->user->phone && $visitor->user->whatsapp_notifications) {
-                    EnviarWhatsAppJob::dispatch(
-                        $visitor->user->phone,
-                        'nuevo_visitante',
-                        ['visitante' => $visitor]
-                    );
-
-                    Log::info('WhatsApp programado para visitante aprobado', [
-                        'usuario' => $visitor->user->name,
-                        'telefono' => $visitor->user->phone,
-                        'visitante' => $visitor->name
-                    ]);
-                }
-
-                Log::info('Notificaciones programadas para visitante aprobado: ' . $visitor->user->name . ' sobre el visitante ' . $visitor->name);
-            }
-            // Si el visitante tiene QR code, es una visita programada → notificación normal
-            elseif ($visitor->qr_code_id) {
-                // Enviar notificación via Job para visitantes con QR
+                // Enviar notificación via Job para visitas con QR
                 \App\Jobs\SendVisitorNotificationJob::dispatch(
                     $visitor->id,
                     $visitor->user->id,
@@ -362,16 +342,24 @@ class Visitor extends Model
                     ]);
                 }
 
-                Log::info('Notificaciones programadas para visita programada: ' . $visitor->user->name . ' sobre el visitante ' . $visitor->name);
-            } else {
-                // Si NO tiene QR code y no está aprobado, es visitante espontáneo → solicitar aprobación via Job
+                Log::info('Notificaciones programadas para visita con QR aprobada automáticamente: ' . $visitor->user->name . ' sobre el visitante ' . $visitor->name);
+            } 
+            // Si YA está aprobado (raro caso), enviar notificación directa
+            elseif ($visitor->approval_status === 'approved') {
+                // Enviar notificación via Job para visitantes ya aprobados
                 \App\Jobs\SendVisitorNotificationJob::dispatch(
                     $visitor->id,
                     $visitor->user->id,
-                    'approval_request'
+                    'new_visitor'
                 );
 
-                Log::info('Solicitud de aprobación programada para visitante espontáneo: ' . $visitor->name);
+                Log::info('Notificaciones programadas para visitante pre-aprobado: ' . $visitor->user->name . ' sobre el visitante ' . $visitor->name);
+            }
+            else {
+                // Visitante ESPONTÁNEO (desde Filament o portería) → SOLICITAR APROBACIÓN
+                $visitor->requestApproval($visitor->approval_notes);
+
+                Log::info('Solicitud de aprobación iniciada para visitante: ' . $visitor->name . ' (creado desde ' . (request()->is('admin/*') ? 'Filament' : 'Portería') . ')');
             }
         } else {
             Log::warning("No se pudo notificar al residente. No se encontró un usuario para el visitante con ID {$visitor->id}.");

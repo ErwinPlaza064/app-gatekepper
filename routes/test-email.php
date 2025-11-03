@@ -185,3 +185,58 @@ Route::get('/test-queue-email', function() {
         ], 500);
     }
 });
+
+Route::get('/test-approval-flow', function() {
+    try {
+        $debug = [];
+        
+        // Buscar un usuario residente
+        $user = User::where('rol', '!=', 'administrador')
+                   ->where('email', '!=', null)
+                   ->first();
+                   
+        if (!$user) {
+            throw new Exception('No se encontró ningún residente con email');
+        }
+
+        $debug['resident'] = [
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+        ];
+
+        // Crear visitante SIN approval_status (para que pase por aprobación)
+        $visitor = Visitor::create([
+            'name' => 'Test Approval Flow ' . time(),
+            'id_document' => 'APPROVAL' . time(),
+            'user_id' => $user->id,
+            'vehicle_plate' => 'APPR-001',
+            'entry_time' => now(),
+            'approval_notes' => 'Visitante de prueba para sistema de aprobación'
+        ]);
+
+        $debug['visitor_created'] = [
+            'id' => $visitor->id,
+            'name' => $visitor->name,
+            'status' => $visitor->fresh()->approval_status, // Fresh para obtener estado actualizado
+            'approval_token' => $visitor->fresh()->approval_token,
+            'approve_url' => $visitor->approval_token ? route('approval.approve.public', $visitor->approval_token) : null,
+            'reject_url' => $visitor->approval_token ? route('approval.reject.public', $visitor->approval_token) : null,
+        ];
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Visitante creado - debe pasar por aprobación',
+            'debug' => $debug,
+            'note' => 'Revisar email para solicitud de aprobación. El visitante debe estar en estado "pending".'
+        ]);
+
+    } catch (Exception $e) {
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage(),
+            'line' => $e->getLine(),
+            'file' => basename($e->getFile())
+        ], 500);
+    }
+});

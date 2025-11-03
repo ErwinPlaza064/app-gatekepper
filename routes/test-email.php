@@ -285,3 +285,56 @@ Route::get('/preview-email-design', function() {
         ], 500);
     }
 });
+
+Route::get('/preview-mobile-email', function() {
+    try {
+        // Crear un visitante ficticio para preview
+        $visitor = new \App\Models\Visitor([
+            'name' => 'María García López',
+            'id_document' => 'CC-12345678',
+            'vehicle_plate' => 'ABC-123',
+            'approval_notes' => 'Viene a entregar documentos importantes',
+            'approval_token' => 'preview-token-123',
+            'approval_requested_at' => now(),
+        ]);
+
+        $user = new \App\Models\User([
+            'name' => 'Juan Carlos Pérez',
+            'email' => 'residente@example.com'
+        ]);
+
+        // Crear el job para generar el HTML
+        $job = new \App\Jobs\SendVisitorNotificationJob(0, 0, 'approval_request');
+
+        // Usar reflection para acceder al método privado
+        $reflection = new ReflectionClass($job);
+        $method = $reflection->getMethod('buildApprovalRequestEmailContent');
+        $method->setAccessible(true);
+
+        $html = $method->invoke($job, $visitor, $user);
+
+        // Agregar simulación de viewport móvil
+        $mobileHtml = "
+        <div style='max-width: 375px; margin: 0 auto; border: 2px solid #e5e7eb; border-radius: 8px; overflow: hidden;'>
+            <div style='background: #374151; color: white; padding: 10px; text-align: center; font-size: 14px;'>
+                📱 Vista Móvil (375px)
+            </div>
+            {$html}
+        </div>
+        <script>
+            // Simular viewport móvil
+            document.body.style.maxWidth = '375px';
+            document.body.style.margin = '0 auto';
+            document.body.style.background = '#f3f4f6';
+        </script>";
+
+        // Mostrar el HTML directamente para preview
+        return response($mobileHtml)->header('Content-Type', 'text/html');
+
+    } catch (Exception $e) {
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage()
+        ], 500);
+    }
+});

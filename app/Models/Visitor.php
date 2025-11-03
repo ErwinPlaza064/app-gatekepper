@@ -313,12 +313,11 @@ class Visitor extends Model
         if ($visitor->user) {
             // Si el visitante tiene QR code, es una visita PRE-AUTORIZADA → notificación directa
             if ($visitor->qr_code_id) {
-                // Marcar como aprobado automáticamente (QR significa pre-autorización)
-                $visitor->update([
-                    'approval_status' => 'approved',
-                    'approval_responded_at' => now(),
-                    'approval_notes' => 'Aprobado automáticamente por código QR pre-autorizado',
-                ]);
+                // Marcar como aprobado automáticamente usando el método approve()
+                $visitor->approve(
+                    null, // No hay usuario que apruebe, es automático
+                    'Aprobado automáticamente por código QR pre-autorizado'
+                );
 
                 // Enviar notificación via Job para visitas con QR
                 \App\Jobs\SendVisitorNotificationJob::dispatch(

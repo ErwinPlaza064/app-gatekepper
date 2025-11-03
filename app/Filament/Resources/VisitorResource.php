@@ -88,8 +88,8 @@ class VisitorResource extends Resource
 
                 Forms\Components\DateTimePicker::make('entry_time')
                     ->label('Hora de Entrada')
-                    ->default(now())
-                    ->required(),
+                    ->helperText('Se establecerá automáticamente cuando el visitante sea aprobado')
+                    ->hidden(), // Ocultar campo - se establece automáticamente al aprobar
 
                 Forms\Components\DateTimePicker::make('exit_time')
                     ->label('Hora de Salida')
@@ -132,21 +132,59 @@ class VisitorResource extends Resource
                     ->dateTime('d/m/Y H:i')
                     ->sortable(),
 
+                Tables\Columns\BadgeColumn::make('approval_status_badge')
+                    ->label('Estado Aprobación')
+                    ->getStateUsing(fn ($record) => $record->approval_status ?? 'pending')
+                    ->colors([
+                        'warning' => 'pending',
+                        'danger' => 'rejected',
+                        'success' => ['approved', 'auto_approved'],
+                    ])
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'pending' => 'Pendiente',
+                        'approved' => 'Aprobado',
+                        'auto_approved' => 'Auto-aprobado',
+                        'rejected' => 'Rechazado',
+                        default => 'Pendiente',
+                    }),
+
                 Tables\Columns\TextColumn::make('exit_time')
                     ->label('Salida')
                     ->dateTime('d/m/Y H:i')
                     ->placeholder('Aún dentro')
                     ->color(fn ($record) => $record->exit_time ? 'success' : 'warning'),
 
-                Tables\Columns\IconColumn::make('status')
+                Tables\Columns\BadgeColumn::make('approval_status')
                     ->label('Estado Visita')
-                    ->getStateUsing(fn ($record) => is_null($record->exit_time))
-                    ->boolean()
-                    ->trueIcon('heroicon-o-clock')
-                    ->falseIcon('heroicon-o-check-circle')
-                    ->trueColor('warning')
-                    ->falseColor('success')
-                    ->tooltip(fn ($record) => is_null($record->exit_time) ? 'Visitante adentro' : 'Visita finalizada'),
+                    ->getStateUsing(function ($record) {
+                        // Lógica correcta para mostrar el estado
+                        if ($record->approval_status === 'pending') {
+                            return 'pending';
+                        } elseif ($record->approval_status === 'rejected') {
+                            return 'rejected';
+                        } elseif (in_array($record->approval_status, ['approved', 'auto_approved'])) {
+                            if ($record->exit_time) {
+                                return 'finished';
+                            } else {
+                                return 'inside';
+                            }
+                        }
+                        return 'unknown';
+                    })
+                    ->colors([
+                        'warning' => 'pending',
+                        'danger' => 'rejected',
+                        'success' => 'inside',
+                        'secondary' => 'finished',
+                        'gray' => 'unknown',
+                    ])
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'pending' => 'Pendiente',
+                        'rejected' => 'Rechazado',
+                        'inside' => 'Adentro',
+                        'finished' => 'Finalizado',
+                        default => 'Desconocido',
+                    }),
             ])
             ->filters([
                 Filter::make('search')

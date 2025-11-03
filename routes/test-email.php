@@ -205,30 +205,37 @@ Route::get('/test-approval-flow', function() {
             'email' => $user->email,
         ];
 
-        // Crear visitante SIN approval_status (para que pase por aprobación)
+        // Crear visitante SIN entry_time y SIN approval_status (para que pase por aprobación)
         $visitor = Visitor::create([
             'name' => 'Test Approval Flow ' . time(),
             'id_document' => 'APPROVAL' . time(),
             'user_id' => $user->id,
             'vehicle_plate' => 'APPR-001',
-            'entry_time' => now(),
+            // NO establecer entry_time - se establece cuando se aprueba
             'approval_notes' => 'Visitante de prueba para sistema de aprobación'
         ]);
 
+        $visitorFresh = $visitor->fresh();
         $debug['visitor_created'] = [
             'id' => $visitor->id,
             'name' => $visitor->name,
-            'status' => $visitor->fresh()->approval_status, // Fresh para obtener estado actualizado
-            'approval_token' => $visitor->fresh()->approval_token,
-            'approve_url' => $visitor->approval_token ? route('approval.approve.public', $visitor->approval_token) : null,
-            'reject_url' => $visitor->approval_token ? route('approval.reject.public', $visitor->approval_token) : null,
+            'status' => $visitorFresh->approval_status,
+            'entry_time' => $visitorFresh->entry_time,
+            'approval_token' => $visitorFresh->approval_token,
+            'approve_url' => $visitorFresh->approval_token ? route('approval.approve.public', $visitorFresh->approval_token) : null,
+            'reject_url' => $visitorFresh->approval_token ? route('approval.reject.public', $visitorFresh->approval_token) : null,
         ];
 
         return response()->json([
             'success' => true,
-            'message' => 'Visitante creado - debe pasar por aprobación',
+            'message' => 'Visitante creado correctamente',
             'debug' => $debug,
-            'note' => 'Revisar email para solicitud de aprobación. El visitante debe estar en estado "pending".'
+            'expected' => [
+                'status' => 'pending',
+                'entry_time' => null,
+                'approval_token' => 'should_exist'
+            ],
+            'note' => 'El visitante debe estar en "pending" sin entry_time hasta ser aprobado.'
         ]);
 
     } catch (Exception $e) {
@@ -237,6 +244,44 @@ Route::get('/test-approval-flow', function() {
             'error' => $e->getMessage(),
             'line' => $e->getLine(),
             'file' => basename($e->getFile())
+        ], 500);
+    }
+});
+
+Route::get('/preview-email-design', function() {
+    try {
+        // Crear un visitante ficticio para preview
+        $visitor = new \App\Models\Visitor([
+            'name' => 'María García López',
+            'id_document' => 'CC-12345678',
+            'vehicle_plate' => 'ABC-123',
+            'approval_notes' => 'Viene a entregar documentos importantes',
+            'approval_token' => 'preview-token-123',
+            'approval_requested_at' => now(),
+        ]);
+
+        $user = new \App\Models\User([
+            'name' => 'Juan Carlos Pérez',
+            'email' => 'residente@example.com'
+        ]);
+
+        // Crear el job para generar el HTML
+        $job = new \App\Jobs\SendVisitorNotificationJob(0, 0, 'approval_request');
+
+        // Usar reflection para acceder al método privado
+        $reflection = new ReflectionClass($job);
+        $method = $reflection->getMethod('buildApprovalRequestEmailContent');
+        $method->setAccessible(true);
+
+        $html = $method->invoke($job, $visitor, $user);
+
+        // Mostrar el HTML directamente para preview
+        return response($html)->header('Content-Type', 'text/html');
+
+    } catch (Exception $e) {
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage()
         ], 500);
     }
 });

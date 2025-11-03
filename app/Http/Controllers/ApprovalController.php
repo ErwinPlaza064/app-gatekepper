@@ -424,14 +424,26 @@ class ApprovalController extends Controller
                 $request->notes ?: 'Aprobado desde la aplicación web'
             );
 
-            // Enviar confirmación
-            $this->sendApprovalConfirmation($visitor, 'approved');
+            // Enviar confirmación de forma asíncrona
+            try {
+                $this->sendApprovalConfirmation($visitor, 'approved');
+            } catch (\Exception $e) {
+                Log::warning('Error enviando confirmación WhatsApp', ['error' => $e->getMessage()]);
+            }
 
-            // Notificar al portero
-            $this->notifyPortero($visitor, 'approved', $user);
+            // Notificar al portero de forma asíncrona
+            try {
+                $this->notifyPortero($visitor, 'approved', $user);
+            } catch (\Exception $e) {
+                Log::warning('Error notificando portero', ['error' => $e->getMessage()]);
+            }
 
-            // Notificar a los administradores
-            $this->notifyAdmins($visitor, 'approved', $user);
+            // Notificar a los administradores de forma asíncrona
+            try {
+                $this->notifyAdmins($visitor, 'approved', $user);
+            } catch (\Exception $e) {
+                Log::warning('Error notificando admins', ['error' => $e->getMessage()]);
+            }
 
             Log::info('Visitante aprobado desde API', [
                 'visitor_id' => $visitor->id,
@@ -503,14 +515,26 @@ class ApprovalController extends Controller
                 $request->reason ?: 'Rechazado desde la aplicación web'
             );
 
-            // Enviar confirmación
-            $this->sendApprovalConfirmation($visitor, 'rejected');
+            // Enviar confirmación de forma asíncrona
+            try {
+                $this->sendApprovalConfirmation($visitor, 'rejected');
+            } catch (\Exception $e) {
+                Log::warning('Error enviando confirmación WhatsApp', ['error' => $e->getMessage()]);
+            }
 
-            // Notificar al portero
-            $this->notifyPortero($visitor, 'rejected', $user);
+            // Notificar al portero de forma asíncrona
+            try {
+                $this->notifyPortero($visitor, 'rejected', $user);
+            } catch (\Exception $e) {
+                Log::warning('Error notificando portero', ['error' => $e->getMessage()]);
+            }
 
-            // Notificar a los administradores
-            $this->notifyAdmins($visitor, 'rejected', $user);
+            // Notificar a los administradores de forma asíncrona
+            try {
+                $this->notifyAdmins($visitor, 'rejected', $user);
+            } catch (\Exception $e) {
+                Log::warning('Error notificando admins', ['error' => $e->getMessage()]);
+            }
 
             Log::info('Visitante rechazado desde API', [
                 'visitor_id' => $visitor->id,

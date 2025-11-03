@@ -32,14 +32,9 @@ class VisitorStatusNotification extends Notification implements ShouldQueue
      */
     public function via(object $notifiable): array
     {
-        $channels = ['database'];
-        
-        // Solo agregar email si el portero tiene email configurado y quiere recibirlos
-        if ($notifiable->email && ($notifiable->email_notifications ?? false)) {
-            $channels[] = 'mail';
-        }
-        
-        return $channels;
+        // Solo base de datos para evitar timeouts SMTP
+        // Los emails se manejan por separado via Jobs
+        return ['database'];
     }
 
     /**
@@ -49,12 +44,12 @@ class VisitorStatusNotification extends Notification implements ShouldQueue
     {
         $statusMessages = [
             'approved' => '✅ APROBADA',
-            'rejected' => '❌ RECHAZADA', 
+            'rejected' => '❌ RECHAZADA',
             'auto_approved' => '⏰ AUTO-APROBADA (Timeout)'
         ];
 
         $statusMessage = $statusMessages[$this->status] ?? 'PROCESADA';
-        
+
         $respondedByText = '';
         if ($this->respondedBy && $this->status !== 'auto_approved') {
             $respondedByText = " por {$this->respondedBy->name}";
@@ -94,7 +89,7 @@ class VisitorStatusNotification extends Notification implements ShouldQueue
         ];
 
         $statusMessage = $statusMessages[$this->status] ?? 'Procesada';
-        
+
         return [
             'type' => 'visitor_status_update',
             'title' => "Visita {$statusMessage}",

@@ -61,6 +61,7 @@ export default function VisitorApprovalNotification({
                         "X-CSRF-TOKEN": csrfToken,
                     },
                     withCredentials: true,
+                    timeout: 60000, // 60 segundos timeout
                 }
             );
 
@@ -134,6 +135,7 @@ export default function VisitorApprovalNotification({
                         "X-CSRF-TOKEN": csrfToken,
                     },
                     withCredentials: true,
+                    timeout: 60000, // 60 segundos timeout
                 }
             );
 

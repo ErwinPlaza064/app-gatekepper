@@ -23,14 +23,9 @@ class VisitorApprovalRequest extends Notification
      */
     public function via($notifiable): array
     {
-        $channels = ['database'];
-
-        // Agregar email si el usuario tiene email y las notificaciones por email están habilitadas
-        if ($notifiable->email && ($notifiable->email_notifications ?? true)) {
-            $channels[] = 'mail';
-        }
-
-        return $channels;
+        // Solo base de datos para evitar timeouts SMTP
+        // Los emails se manejan por separado via Jobs
+        return ['database'];
     }
 
     /**

@@ -23,9 +23,14 @@ class VisitorApprovalRequest extends Notification
      */
     public function via($notifiable): array
     {
-        // Solo base de datos para evitar timeouts SMTP
-        // Los emails se manejan por separado via Jobs
-        return ['database'];
+        $channels = ['database'];
+        
+        // Agregar Expo Push si el usuario tiene token registrado
+        if (!empty($notifiable->expo_push_token)) {
+            $channels[] = 'expo';
+        }
+        
+        return $channels;
     }
 
     /**
@@ -102,5 +107,25 @@ class VisitorApprovalRequest extends Notification
     public function toArray($notifiable): array
     {
         return $this->toDatabase($notifiable);
+    }
+
+    /**
+     * Get the Expo Push notification representation.
+     */
+    public function toExpo($notifiable): array
+    {
+        $expoPushService = new \App\Services\ExpoPushService();
+        return $expoPushService->sendApprovalRequestNotification(
+            $notifiable->expo_push_token,
+            $this->visitor
+        );
+    }
+
+    /**
+     * Route notifications for the Expo channel.
+     */
+    public function routeNotificationForExpo($notifiable)
+    {
+        return $notifiable->expo_push_token;
     }
 }

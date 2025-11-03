@@ -21,7 +21,14 @@ class NewVisitorNotification extends Notification
 
     public function via($notifiable)
     {
-        return ['mail', 'database'];
+        $channels = ['mail', 'database'];
+        
+        // Agregar Expo Push si el usuario tiene token registrado
+        if (!empty($notifiable->expo_push_token)) {
+            $channels[] = 'expo';
+        }
+        
+        return $channels;
     }
 
     // Método toWebPush eliminado
@@ -64,5 +71,25 @@ class NewVisitorNotification extends Notification
             'body' => 'Se ha registrado un nuevo visitante.',
             'visitor' => $this->visitor ?? null,
         ];
+    }
+
+    /**
+     * Get the Expo Push notification representation.
+     */
+    public function toExpo($notifiable): array
+    {
+        $expoPushService = new \App\Services\ExpoPushService();
+        return $expoPushService->sendNewVisitorNotification(
+            $notifiable->expo_push_token,
+            $this->visitor
+        );
+    }
+
+    /**
+     * Route notifications for the Expo channel.
+     */
+    public function routeNotificationForExpo($notifiable)
+    {
+        return $notifiable->expo_push_token;
     }
 }

@@ -5,7 +5,10 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Notification;
 use App\Mail\SendGridApiTransport;
+use App\Services\ExpoPushService;
+use App\Notifications\ExpoPushChannel;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,6 +22,11 @@ class AppServiceProvider extends ServiceProvider
         // Registrar SendGrid API Transport personalizado
         Mail::extend('sendgrid-api', function () {
             return new SendGridApiTransport();
+        });
+
+        // Registrar canal de Expo Push Notifications
+        Notification::extend('expo', function ($app) {
+            return new ExpoPushChannel($app->make(ExpoPushService::class));
         });
 
         // Forzar HTTPS en producción (Railway)

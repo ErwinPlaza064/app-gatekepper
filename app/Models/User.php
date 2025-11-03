@@ -55,6 +55,7 @@ class User extends Authenticatable implements FilamentUser
         'phone',
         'whatsapp_notifications',
         'email_notifications',
+        'expo_push_token',
         'rol',
         'remember_token',
     ];

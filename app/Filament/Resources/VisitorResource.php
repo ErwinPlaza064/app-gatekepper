@@ -86,14 +86,27 @@ class VisitorResource extends Resource
                     ->label('Placa del Vehículo')
                     ->placeholder('ABC-123'),
 
-                Forms\Components\DateTimePicker::make('entry_time')
-                    ->label('Hora de Entrada')
-                    ->helperText('Se establecerá automáticamente cuando el visitante sea aprobado')
-                    ->hidden(), // Ocultar campo - se establece automáticamente al aprobar
+                // 🕐 Sección de horarios para registros manuales
+                Forms\Components\Section::make('Horarios de Visita')
+                    ->description('Registra las horas de entrada y salida del visitante')
+                    ->schema([
+                        Forms\Components\DateTimePicker::make('entry_time')
+                            ->label('🚪 Hora de Entrada')
+                            ->default(now()) // Por defecto la hora actual
+                            ->required()
+                            ->displayFormat('d/m/Y H:i')
+                            ->seconds(false)
+                            ->helperText('Hora en que el visitante ingresa al edificio'),
 
-                Forms\Components\DateTimePicker::make('exit_time')
-                    ->label('Hora de Salida')
-                    ->after('entry_time'),
+                        Forms\Components\DateTimePicker::make('exit_time')
+                            ->label('🚶 Hora de Salida')
+                            ->displayFormat('d/m/Y H:i')
+                            ->seconds(false)
+                            ->after('entry_time')
+                            ->helperText('Opcional - Se puede registrar más tarde'),
+                    ])
+                    ->columns(2)
+                    ->collapsible(),
 
                 Forms\Components\Textarea::make('approval_notes')
                     ->label('Notas Adicionales')
@@ -121,6 +134,37 @@ class VisitorResource extends Resource
                     ->sortable()
                     ->wrap(),
 
+                // 🏷️ Columna para identificar método de registro
+                Tables\Columns\BadgeColumn::make('registration_method')
+                    ->label('Método')
+                    ->getStateUsing(function ($record) {
+                        // Verificar si tiene QR code asociado
+                        if ($record->qr_code_id) {
+                            return 'QR Scan';
+                        }
+
+                        // Verificar si las notas indican registro manual
+                        if (str_contains($record->approval_notes ?? '', 'Registro manual desde panel')) {
+                            return 'Manual';
+                        }
+
+                        // Verificar por timing: si entry_time y created_at son muy cercanos, probablemente manual
+                        if ($record->entry_time && $record->created_at->diffInMinutes($record->entry_time) < 1) {
+                            return 'Manual';
+                        }
+
+                        return 'QR Scan';
+                    })
+                    ->colors([
+                        'success' => 'QR Scan',
+                        'info' => 'Manual',
+                        'gray' => 'Pendiente',
+                    ])
+                    ->icons([
+                        'heroicon-o-qr-code' => 'QR Scan',
+                        'heroicon-o-pencil-square' => 'Manual',
+                    ]),
+
                 Tables\Columns\TextColumn::make('vehicle_plate')
                     ->label('Placa')
                     ->placeholder('Sin vehículo')
@@ -128,9 +172,12 @@ class VisitorResource extends Resource
                     ->color('gray'),
 
                 Tables\Columns\TextColumn::make('entry_time')
-                    ->label('Entrada')
+                    ->label('📅 Entrada')
                     ->dateTime('d/m/Y H:i')
-                    ->sortable(),
+                    ->sortable()
+                    ->placeholder('Sin registrar')
+                    ->color(fn ($record) => $record->entry_time ? 'success' : 'gray')
+                    ->icon(fn ($record) => $record->entry_time ? 'heroicon-o-calendar-days' : 'heroicon-o-exclamation-triangle'),
 
                 Tables\Columns\BadgeColumn::make('approval_status_badge')
                     ->label('Estado Aprobación')
@@ -149,10 +196,11 @@ class VisitorResource extends Resource
                     }),
 
                 Tables\Columns\TextColumn::make('exit_time')
-                    ->label('Salida')
+                    ->label('🚶 Salida')
                     ->dateTime('d/m/Y H:i')
                     ->placeholder('Aún dentro')
-                    ->color(fn ($record) => $record->exit_time ? 'success' : 'warning'),
+                    ->color(fn ($record) => $record->exit_time ? 'success' : 'warning')
+                    ->icon(fn ($record) => $record->exit_time ? 'heroicon-o-arrow-right-on-rectangle' : 'heroicon-o-clock'),
 
                 Tables\Columns\BadgeColumn::make('approval_status')
                     ->label('Estado Visita')

@@ -15,6 +15,10 @@ class Kernel extends ConsoleKernel
     protected $commands = [
         Commands\NotifyExpiringQrCodes::class,
         Commands\ProcessExpiredApprovals::class,
+        Commands\FixVisitorEntryTimes::class,
+        Commands\TestEmailCommand::class,
+        Commands\EmailDiagnosticCommand::class,
+        Commands\CheckEnvironmentCommand::class,
     ];
 
     /**

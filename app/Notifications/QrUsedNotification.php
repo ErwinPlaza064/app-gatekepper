@@ -44,6 +44,7 @@ class QrUsedNotification extends Notification implements ShouldQueue
 
     public function toMail($notifiable)
     {
+        // En Railway, usar directamente el EmailService para evitar errores de SMTP
         try {
             $emailService = new EmailService();
 
@@ -53,16 +54,27 @@ class QrUsedNotification extends Notification implements ShouldQueue
                 $this->usageDetails
             );
 
-            if ($result['success']) {
-                Log::info('QR Used notification enviada exitosamente', [
-                    'user_id' => $notifiable->id,
-                    'email' => $notifiable->email,
-                    'qr_id' => $this->qrCode->qr_id,
-                    'method' => $result['method'] ?? 'unknown'
-                ]);
-            }
+            Log::info('QR Used notification procesada', [
+                'user_id' => $notifiable->id,
+                'email' => $notifiable->email,
+                'qr_id' => $this->qrCode->qr_id,
+                'success' => $result['success'],
+                'method' => $result['method'] ?? 'unknown'
+            ]);
 
-            // Fallback a mensaje estándar de Laravel si el servicio personalizado falla
+            // Retornar null para indicar que el email ya fue enviado por el servicio personalizado
+            // Esto evita que Laravel intente enviar por SMTP
+            return null;
+
+        } catch (\Exception $e) {
+            Log::error('Error en QrUsedNotification, usando fallback Laravel', [
+                'user_id' => $notifiable->id,
+                'email' => $notifiable->email,
+                'qr_id' => $this->qrCode->qr_id,
+                'error' => $e->getMessage()
+            ]);
+
+            // Solo si falla el servicio personalizado, usar Laravel Mail como último recurso
             $isLastUse = $this->qrCode->current_uses >= $this->qrCode->max_uses;
 
             return (new MailMessage)
@@ -76,25 +88,8 @@ class QrUsedNotification extends Notification implements ShouldQueue
                         ->line('**Hora de acceso:** ' . now()->format('d/m/Y H:i'))
                         ->action('Ver Dashboard', url('/resident/dashboard'))
                         ->line('Gracias por usar Gatekeeper.');
-
-        } catch (\Exception $e) {
-            Log::error('Error en QrUsedNotification', [
-                'user_id' => $notifiable->id,
-                'email' => $notifiable->email,
-                'qr_id' => $this->qrCode->qr_id,
-                'error' => $e->getMessage()
-            ]);
-
-            // Fallback simple en caso de error
-            return (new MailMessage)
-                        ->subject('🔑 Código QR utilizado')
-                        ->line('Tu código QR ha sido utilizado.')
-                        ->line('Revisa tu dashboard para más detalles.')
-                        ->action('Ver Dashboard', url('/resident/dashboard'));
         }
-    }
-
-    public function toArray($notifiable)
+    }    public function toArray($notifiable)
     {
         return [
             'type' => 'qr_used',

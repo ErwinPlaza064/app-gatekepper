@@ -20,15 +20,16 @@ class EmailService
     }
 
     /**
-     * Enviar email con sistema de fallback
-     * 1. Intenta con SendGrid API
-     * 2. Si falla, intenta con SMTP
+     * Enviar email con sistema de fallback optimizado para Railway
+     * 1. Intenta con SendGrid API (principal)
+     * 2. Si falla y no está en Railway, intenta SMTP
      * 3. Si ambos fallan, loguea el error
      */
     public function sendEmail($to, $subject, $content, $fromAddress = null, $fromName = null)
     {
         $fromAddress = $fromAddress ?? config('mail.from.address');
         $fromName = $fromName ?? config('mail.from.name');
+        $isRailway = !empty(env('RAILWAY_ENVIRONMENT')) || !empty(env('RAILWAY_PROJECT_ID'));
 
         // Primer intento: SendGrid API
         try {
@@ -37,38 +38,47 @@ class EmailService
                 Log::info('Email enviado exitosamente via SendGrid API', [
                     'to' => $to,
                     'subject' => $subject,
-                    'method' => 'sendgrid_api'
+                    'method' => 'sendgrid_api',
+                    'environment' => $isRailway ? 'railway' : 'local'
                 ]);
                 return $result;
             }
         } catch (Exception $e) {
-            Log::warning('SendGrid API falló, intentando con SMTP', [
+            Log::warning('SendGrid API falló', [
                 'to' => $to,
                 'subject' => $subject,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
+                'will_try_smtp' => !$isRailway
             ]);
         }
 
-        // Segundo intento: SMTP con retry
-        try {
-            $result = $this->sendWithSMTP($to, $subject, $content, $fromAddress, $fromName);
-            if ($result['success']) {
-                Log::info('Email enviado exitosamente via SMTP fallback', [
+        // Segundo intento: SMTP solo si NO estamos en Railway
+        if (!$isRailway) {
+            try {
+                $result = $this->sendWithSMTP($to, $subject, $content, $fromAddress, $fromName);
+                if ($result['success']) {
+                    Log::info('Email enviado exitosamente via SMTP fallback', [
+                        'to' => $to,
+                        'subject' => $subject,
+                        'method' => 'smtp_fallback'
+                    ]);
+                    return $result;
+                }
+            } catch (Exception $e) {
+                Log::error('SMTP fallback también falló', [
                     'to' => $to,
                     'subject' => $subject,
-                    'method' => 'smtp_fallback'
+                    'smtp_error' => $e->getMessage()
                 ]);
-                return $result;
             }
-        } catch (Exception $e) {
-            Log::error('Todos los métodos de envío de email fallaron', [
+        } else {
+            Log::info('Saltando SMTP en Railway (puertos bloqueados)', [
                 'to' => $to,
-                'subject' => $subject,
-                'smtp_error' => $e->getMessage()
+                'subject' => $subject
             ]);
         }
 
-        // Si ambos métodos fallan, intentar con log como último recurso
+        // Si todos los métodos fallan, usar log como último recurso
         return $this->sendWithLog($to, $subject, $content, $fromAddress, $fromName);
     }
 

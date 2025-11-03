@@ -390,7 +390,7 @@ class QRScannerManager {
     };
 
     console.log('[OBJETO ENVIADO AL BACKEND]', formattedData);
-    this.showLoading('Registrando visitante...');
+    this.showProcessingState('🔄 Registrando visitante...');
 
     let response, result;
     try {
@@ -409,7 +409,15 @@ class QRScannerManager {
     }
 
     if (response.ok) {
-      this.showSuccess(result.message || 'Visitante registrado correctamente');
+      this.showProcessingState('📧 Enviando notificaciones...');
+
+      // Esperar un poco para mostrar el estado de envío de emails
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      this.showProcessingState('✅ Finalizando registro...');
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      this.showSuccess(`${result.message || 'Visitante registrado correctamente'} 📧 Notificaciones enviadas.`);
       this.loadRecentScans();
       // La cámara ya se detuvo al inicio del método
     } else {
@@ -529,6 +537,19 @@ class QRScannerManager {
   showLoading(message = 'Procesando código QR...') {
     // No mostrar loading como toast, solo limpiar mensajes visuales
     this.hideAllMessages();
+  }
+
+  showProcessingState(message = 'Procesando...') {
+    this.hideAllMessages();
+    this.messageArea.classList.remove('hidden');
+    this.loadingMessage.classList.remove('hidden');
+    this.loadingMessage.querySelector('#loading-text').innerHTML = message;
+
+    // Actualizar UI para mostrar estado de procesamiento
+    if (this.readerDiv) {
+      this.readerDiv.style.outline = '2px solid #f59e0b';
+      this.readerDiv.setAttribute('aria-busy', 'true');
+    }
   }
 
   enqueueToast(type, title, message) {

@@ -34,61 +34,60 @@ class QrUsedNotification extends Notification implements ShouldQueue
         // Siempre guardar en base de datos
         $channels = ['database'];
 
-        // Intentar enviar por email solo si tenemos una dirección válida
+        // Detectar si estamos en Railway
+        $isRailway = !empty(env('RAILWAY_ENVIRONMENT')) || !empty(env('RAILWAY_PROJECT_ID'));
+
+        // Solo intentar enviar email si no estamos en Railway o si tenemos configuración válida
         if ($notifiable->email && filter_var($notifiable->email, FILTER_VALIDATE_EMAIL)) {
-            $channels[] = 'mail';
+            if ($isRailway) {
+                // En Railway, enviar email directamente aquí para evitar problemas de SMTP
+                try {
+                    $emailService = new \App\Services\EmailService();
+                    $result = $emailService->sendQrUsedNotification(
+                        $notifiable->email,
+                        $this->qrCode,
+                        $this->usageDetails
+                    );
+
+                    Log::info('Email enviado directamente en via() para Railway', [
+                        'user_id' => $notifiable->id,
+                        'email' => $notifiable->email,
+                        'qr_id' => $this->qrCode->qr_id,
+                        'success' => $result['success'],
+                        'method' => $result['method'] ?? 'unknown'
+                    ]);
+                } catch (\Exception $e) {
+                    Log::error('Error enviando email en via() para Railway', [
+                        'error' => $e->getMessage(),
+                        'qr_id' => $this->qrCode->qr_id
+                    ]);
+                }
+                // NO agregar 'mail' al canal para evitar doble envío
+            } else {
+                // En local, usar el canal mail normal
+                $channels[] = 'mail';
+            }
         }
 
         return $channels;
-    }
-
-    public function toMail($notifiable)
+    }    public function toMail($notifiable)
     {
-        // En Railway, usar directamente el EmailService para evitar errores de SMTP
-        try {
-            $emailService = new EmailService();
+        // Este método solo se ejecuta en entornos locales (no Railway)
+        // porque en Railway el email se envía directamente en via()
 
-            $result = $emailService->sendQrUsedNotification(
-                $notifiable->email,
-                $this->qrCode,
-                $this->usageDetails
-            );
+        $isLastUse = $this->qrCode->current_uses >= $this->qrCode->max_uses;
 
-            Log::info('QR Used notification procesada', [
-                'user_id' => $notifiable->id,
-                'email' => $notifiable->email,
-                'qr_id' => $this->qrCode->qr_id,
-                'success' => $result['success'],
-                'method' => $result['method'] ?? 'unknown'
-            ]);
-
-            // Retornar null para indicar que el email ya fue enviado por el servicio personalizado
-            // Esto evita que Laravel intente enviar por SMTP
-            return null;
-
-        } catch (\Exception $e) {
-            Log::error('Error en QrUsedNotification, usando fallback Laravel', [
-                'user_id' => $notifiable->id,
-                'email' => $notifiable->email,
-                'qr_id' => $this->qrCode->qr_id,
-                'error' => $e->getMessage()
-            ]);
-
-            // Solo si falla el servicio personalizado, usar Laravel Mail como último recurso
-            $isLastUse = $this->qrCode->current_uses >= $this->qrCode->max_uses;
-
-            return (new MailMessage)
-                        ->subject('🔑 Tu código QR ha sido utilizado - Gatekeeper')
-                        ->greeting('Hola ' . $notifiable->name)
-                        ->line('Tu código QR para el visitante **' . $this->qrCode->visitor_name . '** ha sido utilizado exitosamente.')
-                        ->line('**Uso actual:** ' . $this->qrCode->current_uses . '/' . $this->qrCode->max_uses)
-                        ->when($isLastUse, function ($mail) {
-                            return $mail->line('⚠️ **Importante:** Este código QR ha alcanzado el límite máximo de usos y ya no estará disponible.');
-                        })
-                        ->line('**Hora de acceso:** ' . now()->format('d/m/Y H:i'))
-                        ->action('Ver Dashboard', url('/resident/dashboard'))
-                        ->line('Gracias por usar Gatekeeper.');
-        }
+        return (new MailMessage)
+                    ->subject('🔑 Tu código QR ha sido utilizado - Gatekeeper')
+                    ->greeting('Hola ' . $notifiable->name)
+                    ->line('Tu código QR para el visitante **' . $this->qrCode->visitor_name . '** ha sido utilizado exitosamente.')
+                    ->line('**Uso actual:** ' . $this->qrCode->current_uses . '/' . $this->qrCode->max_uses)
+                    ->when($isLastUse, function ($mail) {
+                        return $mail->line('⚠️ **Importante:** Este código QR ha alcanzado el límite máximo de usos y ya no estará disponible.');
+                    })
+                    ->line('**Hora de acceso:** ' . now()->format('d/m/Y H:i'))
+                    ->action('Ver Dashboard', url('/resident/dashboard'))
+                    ->line('Gracias por usar Gatekeeper.');
     }    public function toArray($notifiable)
     {
         return [

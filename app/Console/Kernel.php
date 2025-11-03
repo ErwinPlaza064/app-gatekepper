@@ -19,6 +19,7 @@ class Kernel extends ConsoleKernel
         Commands\TestEmailCommand::class,
         Commands\EmailDiagnosticCommand::class,
         Commands\CheckEnvironmentCommand::class,
+        Commands\ToggleApprovalModeCommand::class,
     ];
 
     /**

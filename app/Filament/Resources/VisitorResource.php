@@ -86,27 +86,25 @@ class VisitorResource extends Resource
                     ->label('Placa del Vehículo')
                     ->placeholder('ABC-123'),
 
-                // 🕐 Sección de horarios para registros manuales
-                Forms\Components\Section::make('Horarios de Visita')
-                    ->description('Registra las horas de entrada y salida del visitante')
+                // ℹ️ Información sobre el proceso de aprobación
+                Forms\Components\Section::make('📋 Proceso de Aprobación')
+                    ->description('El visitante será registrado como pendiente y se enviará una notificación al residente para su aprobación.')
                     ->schema([
-                        Forms\Components\DateTimePicker::make('entry_time')
-                            ->label('🚪 Hora de Entrada')
-                            ->default(now()) // Por defecto la hora actual
-                            ->required()
-                            ->displayFormat('d/m/Y H:i')
-                            ->seconds(false)
-                            ->helperText('Hora en que el visitante ingresa al edificio'),
+                        Forms\Components\Placeholder::make('approval_info')
+                            ->label('')
+                            ->content('
+                                📝 **Pasos del proceso:**
 
-                        Forms\Components\DateTimePicker::make('exit_time')
-                            ->label('🚶 Hora de Salida')
-                            ->displayFormat('d/m/Y H:i')
-                            ->seconds(false)
-                            ->after('entry_time')
-                            ->helperText('Opcional - Se puede registrar más tarde'),
+                                1. El visitante se registra como **pendiente**
+                                2. Se envía **notificación por email** al residente
+                                3. El residente **aprueba o rechaza** la visita
+                                4. Si es aprobado, se establece automáticamente la **hora de entrada**
+                                5. El portero puede marcar la **hora de salida** cuando corresponda
+                            ')
+                            ->columnSpanFull(),
                     ])
-                    ->columns(2)
-                    ->collapsible(),
+                    ->collapsible()
+                    ->collapsed(),
 
                 Forms\Components\Textarea::make('approval_notes')
                     ->label('Notas Adicionales')
@@ -265,6 +263,22 @@ class VisitorResource extends Resource
                     ->query(fn (Builder $query): Builder => $query->whereNotNull('exit_time'))
                     ->toggle(),
 
+                // 🆕 Filtros por estado de aprobación
+                Filter::make('pending_approval')
+                    ->label('⏳ Pendientes de aprobación')
+                    ->query(fn (Builder $query): Builder => $query->where('approval_status', 'pending'))
+                    ->toggle(),
+
+                Filter::make('approved_visits')
+                    ->label('✅ Aprobados')
+                    ->query(fn (Builder $query): Builder => $query->where('approval_status', 'approved'))
+                    ->toggle(),
+
+                Filter::make('rejected_visits')
+                    ->label('❌ Rechazados')
+                    ->query(fn (Builder $query): Builder => $query->where('approval_status', 'rejected'))
+                    ->toggle(),
+
                 Filter::make('with_vehicle')
                     ->label('Con vehículo')
                     ->query(fn (Builder $query): Builder => $query->whereNotNull('vehicle_plate')->where('vehicle_plate', '!=', ''))
@@ -315,11 +329,64 @@ class VisitorResource extends Resource
                 Tables\Actions\EditAction::make()
                     ->label('Editar'),
 
+                // 🟢 Acción para aprobar visitante (solo administradores)
+                Tables\Actions\Action::make('approve_visitor')
+                    ->label('Aprobar')
+                    ->icon('heroicon-o-check-circle')
+                    ->color('success')
+                    ->visible(fn ($record) => $record->approval_status === 'pending' && auth()->user()?->rol === 'administrador')
+                    ->requiresConfirmation()
+                    ->modalHeading('Aprobar visitante')
+                    ->modalDescription(fn ($record) => "¿Confirmas la aprobación de {$record->name} para visitar a {$record->user->name}?")
+                    ->action(function ($record) {
+                        $record->update([
+                            'approval_status' => 'approved',
+                            'approval_responded_at' => now(),
+                            'entry_time' => now(), // Establecer hora de entrada al aprobar
+                            'approval_notes' => ($record->approval_notes ?? '') . ' [Aprobado manualmente por administrador: ' . auth()->user()->name . ']'
+                        ]);
+
+                        \Filament\Notifications\Notification::make()
+                            ->title('✅ Visitante aprobado')
+                            ->body("Se aprobó la visita de {$record->name} y se estableció la hora de entrada.")
+                            ->success()
+                            ->send();
+                    }),
+
+                // 🔴 Acción para rechazar visitante (solo administradores)
+                Tables\Actions\Action::make('reject_visitor')
+                    ->label('Rechazar')
+                    ->icon('heroicon-o-x-circle')
+                    ->color('danger')
+                    ->visible(fn ($record) => $record->approval_status === 'pending' && auth()->user()?->rol === 'administrador')
+                    ->requiresConfirmation()
+                    ->modalHeading('Rechazar visitante')
+                    ->modalDescription(fn ($record) => "¿Confirmas el rechazo de {$record->name}?")
+                    ->form([
+                        Forms\Components\Textarea::make('rejection_reason')
+                            ->label('Motivo del rechazo')
+                            ->placeholder('Explica brevemente el motivo...')
+                            ->required()
+                    ])
+                    ->action(function ($record, array $data) {
+                        $record->update([
+                            'approval_status' => 'rejected',
+                            'approval_responded_at' => now(),
+                            'approval_notes' => ($record->approval_notes ?? '') . ' [Rechazado por administrador: ' . auth()->user()->name . ' - Motivo: ' . $data['rejection_reason'] . ']'
+                        ]);
+
+                        \Filament\Notifications\Notification::make()
+                            ->title('❌ Visitante rechazado')
+                            ->body("Se rechazó la visita de {$record->name}.")
+                            ->warning()
+                            ->send();
+                    }),
+
                 Tables\Actions\Action::make('mark_exit')
                     ->label('Marcar Salida')
                     ->icon('heroicon-o-arrow-right-on-rectangle')
-                    ->color('success')
-                    ->visible(fn ($record) => is_null($record->exit_time))
+                    ->color('warning')
+                    ->visible(fn ($record) => $record->approval_status === 'approved' && is_null($record->exit_time) && !is_null($record->entry_time))
                     ->requiresConfirmation()
                     ->modalHeading('Marcar salida del visitante')
                     ->modalDescription(fn ($record) => "¿Confirmas que {$record->name} está saliendo?")

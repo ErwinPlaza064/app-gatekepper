@@ -295,8 +295,31 @@ class Visitor extends Model
     static::created(function ($visitor) {
         // Verificar que exista un usuario relacionado
         if ($visitor->user) {
+            // Si el visitante fue creado con approval_status 'approved' (desde Filament),
+            // enviar notificación directa sin solicitar aprobación
+            if ($visitor->approval_status === 'approved') {
+                // Enviar notificación normal para visitantes ya aprobados
+                $visitor->user->notify(new NewVisitorNotification($visitor));
+
+                // Enviar WhatsApp para visitantes aprobados
+                if ($visitor->user->phone && $visitor->user->whatsapp_notifications) {
+                    EnviarWhatsAppJob::dispatch(
+                        $visitor->user->phone,
+                        'nuevo_visitante',
+                        ['visitante' => $visitor]
+                    );
+
+                    Log::info('WhatsApp programado para visitante aprobado', [
+                        'usuario' => $visitor->user->name,
+                        'telefono' => $visitor->user->phone,
+                        'visitante' => $visitor->name
+                    ]);
+                }
+
+                Log::info('Notificaciones enviadas para visitante aprobado: ' . $visitor->user->name . ' sobre el visitante ' . $visitor->name);
+            }
             // Si el visitante tiene QR code, es una visita programada → notificación normal
-            if ($visitor->qr_code_id) {
+            elseif ($visitor->qr_code_id) {
                 // Enviar notificación normal para visitantes con QR
                 $visitor->user->notify(new NewVisitorNotification($visitor));
 
@@ -317,7 +340,7 @@ class Visitor extends Model
 
                 Log::info('Notificaciones enviadas para visita programada: ' . $visitor->user->name . ' sobre el visitante ' . $visitor->name);
             } else {
-                // Si NO tiene QR code, es visitante espontáneo → solicitar aprobación
+                // Si NO tiene QR code y no está aprobado, es visitante espontáneo → solicitar aprobación
                 $visitor->requestApproval();
 
                 Log::info('Solicitud de aprobación iniciada para visitante espontáneo: ' . $visitor->name);

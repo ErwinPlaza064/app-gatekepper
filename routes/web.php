@@ -802,5 +802,8 @@ Route::get('/test-sendgrid-api', function() {
 // Incluir rutas de testing para debugging
 require __DIR__.'/test.php';
 
+// Incluir rutas de test para emails
+require __DIR__.'/test-email.php';
+
 require __DIR__.'/auth.php';
 

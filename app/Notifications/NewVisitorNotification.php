@@ -39,10 +39,22 @@ class NewVisitorNotification extends Notification
     public function toMail($notifiable)
     {
         return (new MailMessage)
-            ->subject('Nuevo visitante registrado')
-            ->greeting("Hola {$notifiable->name},")
-            ->line("{$this->visitor->name} está llendo para tu dirección.")
-            ->line('Gracias por usar nuestra aplicación!');
+            ->subject('🏠 Nuevo visitante registrado - Gatekeeper')
+            ->from(config('mail.from.address'), config('mail.from.name'))
+            ->greeting("¡Hola {$notifiable->name}!")
+            ->line("Se ha registrado un nuevo visitante para tu domicilio:")
+            ->line("👤 **Visitante:** {$this->visitor->name}")
+            ->line("🆔 **Documento:** {$this->visitor->id_document}")
+            ->line("🕐 **Hora de entrada:** " . $this->visitor->entry_time->format('H:i d/m/Y'))
+            ->when($this->visitor->vehicle_plate, function ($mail) {
+                return $mail->line("🚗 **Vehículo:** {$this->visitor->vehicle_plate}");
+            })
+            ->when($this->visitor->approval_notes, function ($mail) {
+                return $mail->line("📝 **Notas:** {$this->visitor->approval_notes}");
+            })
+            ->line('El visitante ya ha sido aprobado y puede ingresar.')
+            ->action('Ver Dashboard', route('dashboard'))
+            ->salutation('Sistema de Seguridad Gatekeeper 🏘️');
     }
 
     public function toBroadcast($notifiable)

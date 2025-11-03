@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'default' => env('MAIL_MAILER', 'failover'),
+    'default' => env('MAIL_MAILER', 'sendgrid'),
 
     /*
     |--------------------------------------------------------------------------
@@ -71,7 +71,16 @@ return [
             'encryption' => 'tls',
             'username' => 'apikey',
             'password' => env('SENDGRID_API_KEY'),
-            'timeout' => 30,
+            'timeout' => 60, // Aumentar timeout para producción
+            'local_domain' => env('MAIL_EHLO_DOMAIN', 'gatekepper.com'),
+            'verify_peer' => false,
+            'stream_context_options' => [
+                'ssl' => [
+                    'verify_peer' => false,
+                    'verify_peer_name' => false,
+                    'allow_self_signed' => true,
+                ],
+            ],
         ],
 
         'sendgrid-api' => [
@@ -102,6 +111,7 @@ return [
         'failover' => [
             'transport' => 'failover',
             'mailers' => [
+                'sendgrid',
                 'smtp',
                 'log',
             ],

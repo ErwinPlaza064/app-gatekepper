@@ -4,7 +4,6 @@ namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
-use Illuminate\Notifications\Messages\DatabaseMessage;
 use Illuminate\Notifications\Messages\MailMessage;
 use App\Models\Visitor;
 
@@ -43,26 +42,26 @@ class VisitorApprovalRequest extends Notification
         $rejectUrl = route('approval.reject.public', $this->visitor->approval_token);
 
         return (new MailMessage)
-            ->subject('🔔 Nueva Solicitud de Visita - Gatekeeper')
+            ->subject('Nueva Solicitud de Visita - Gatekeeper')
             ->from(config('mail.from.address'), config('mail.from.name'))
             ->greeting("Hola {$notifiable->name}!")
             ->line("Tienes una nueva solicitud de visita que requiere tu aprobación:")
-            ->line("👤 **Visitante:** {$this->visitor->name}")
-            ->line("🆔 **Documento:** {$this->visitor->id_document}")
-            ->line("🕐 **Hora de solicitud:** " . ($this->visitor->approval_requested_at ? $this->visitor->approval_requested_at->format('H:i d/m/Y') : now()->format('H:i d/m/Y')))
+            ->line("**Visitante:** {$this->visitor->name}")
+            ->line("**Documento:** {$this->visitor->id_document}")
+            ->line("**Hora de solicitud:** " . ($this->visitor->approval_requested_at ? $this->visitor->approval_requested_at->format('H:i d/m/Y') : now()->format('H:i d/m/Y')))
             ->when($this->visitor->vehicle_plate, function ($mail) {
-                return $mail->line("🚗 **Vehículo:** {$this->visitor->vehicle_plate}");
+                return $mail->line("**Vehículo:** {$this->visitor->vehicle_plate}");
             })
             ->when($this->visitor->approval_notes, function ($mail) {
-                return $mail->line("📝 **Notas:** {$this->visitor->approval_notes}");
+                return $mail->line("**Notas:** {$this->visitor->approval_notes}");
             })
             ->line("⏰ **Tiempo para responder:** 7 minutos")
             ->line("Si no respondes a tiempo, el acceso será automáticamente aprobado por seguridad.")
             ->line("**Opciones de respuesta:**")
-            ->action('✅ APROBAR VISITANTE', $approveUrl)
-            ->action('❌ RECHAZAR VISITANTE', $rejectUrl)
+            ->action('APROBAR VISITANTE', $approveUrl)
+            ->action('RECHAZAR VISITANTE', $rejectUrl)
             ->line('También puedes responder desde tu dashboard en la aplicación web.')
-            ->salutation('Saludos del equipo de Gatekeeper 🏘️');
+            ->salutation('Saludos del equipo de Gatekeeper');
     }
 
     /**

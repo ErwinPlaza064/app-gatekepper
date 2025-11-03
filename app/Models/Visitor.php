@@ -124,14 +124,24 @@ class Visitor extends Model
 
         // Enviar notificación de solicitud de aprobación al residente
         if ($this->user) {
-            // Enviar notificación via Job para evitar timeout
+            // IMPORTANTE: Enviar notificación de base de datos para el dashboard
+            $this->user->notify(new VisitorApprovalRequest($this));
+
+            Log::info('Database notification sent for visitor approval request', [
+                'visitor_id' => $this->id,
+                'user_id' => $this->user->id,
+                'visitor_name' => $this->name,
+                'resident_name' => $this->user->name
+            ]);
+
+            // Enviar notificación por email via Job para evitar timeout
             \App\Jobs\SendVisitorNotificationJob::dispatch(
                 $this->id,
                 $this->user->id,
                 'approval_request'
             );
 
-            Log::info('Approval request notification scheduled via job', [
+            Log::info('Email notification scheduled via job', [
                 'visitor_id' => $this->id,
                 'user_id' => $this->user->id
             ]);
@@ -158,11 +168,16 @@ class Visitor extends Model
                 ]);
             }
 
-            Log::info('Solicitud de aprobación enviada', [
+            Log::info('Solicitud de aprobación enviada por todos los canales', [
                 'visitor_id' => $this->id,
                 'visitor_name' => $this->name,
                 'resident' => $this->user->name,
                 'token' => $this->approval_token,
+                'channels' => [
+                    'database' => true,
+                    'email' => true,
+                    'whatsapp' => $this->user->phone && $this->user->whatsapp_notifications
+                ]
             ]);
         }
 

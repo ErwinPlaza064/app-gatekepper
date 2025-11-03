@@ -5,7 +5,7 @@ use Illuminate\Http\Request;
 use App\Models\Visitor;
 use App\Models\QrCode;
 use App\Notifications\NewVisitorNotification;
-use App\Notifications\QrUsedNotification;
+use App\Services\NotificationService;
 
 class VisitorController extends Controller
 {
@@ -33,7 +33,7 @@ class VisitorController extends Controller
 
                 // Incrementar uso
                 $qrCode->incrementUsage();
-                $qrCode->user->notify(new QrUsedNotification($qrCode));
+                NotificationService::sendQrUsedNotification($qrCode->user, $qrCode);
             } else {
                 // Si no existe el QR, crear registro
                 $qrData = $validated['qr_data'] ?? [];
@@ -50,7 +50,7 @@ class VisitorController extends Controller
                     'is_active' => ($qrData['qr_type'] ?? 'single_use') !== 'single_use',
                     'metadata' => $qrData
                 ]);
-                $qrCode->user->notify(new QrUsedNotification($qrCode));
+                NotificationService::sendQrUsedNotification($qrCode->user, $qrCode);
             }
         }
 

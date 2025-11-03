@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'default' => env('MAIL_MAILER', 'failover'),
+    'default' => env('MAIL_MAILER', 'railway_safe'),
 
     /*
     |--------------------------------------------------------------------------
@@ -134,6 +134,11 @@ return [
             'username' => null,
             'password' => null,
             'timeout' => 5,
+        ],
+
+        'railway_safe' => [
+            'transport' => 'log',
+            'channel' => env('MAIL_LOG_CHANNEL'),
         ],
     ],
 

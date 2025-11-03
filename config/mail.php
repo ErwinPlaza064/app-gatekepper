@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'default' => env('MAIL_MAILER', 'sendgrid'),
+    'default' => env('MAIL_MAILER', 'failover'),
 
     /*
     |--------------------------------------------------------------------------
@@ -36,20 +36,24 @@ return [
     'mailers' => [
         'smtp' => [
             'transport' => 'smtp',
-            'host' => env('MAIL_HOST', 'smtp.mailgun.org'),
+            'host' => env('MAIL_HOST', 'smtp.gmail.com'),
             'port' => env('MAIL_PORT', 587),
             'encryption' => env('MAIL_ENCRYPTION', 'tls'),
             'username' => env('MAIL_USERNAME'),
             'password' => env('MAIL_PASSWORD'),
-            'timeout' => env('MAIL_TIMEOUT', 10), // Timeout de 10 segundos
+            'timeout' => env('MAIL_TIMEOUT', 20), // Timeout más largo para SMTP fallback
             'local_domain' => env('MAIL_EHLO_DOMAIN'),
-            'verify_peer' => false, // Para problemas SSL
+            'verify_peer' => false,
             'stream_context_options' => [
                 'ssl' => [
                     'verify_peer' => false,
                     'verify_peer_name' => false,
                     'allow_self_signed' => true,
+                    'crypto_method' => STREAM_CRYPTO_METHOD_TLS_CLIENT,
                 ],
+                'socket' => [
+                    'timeout' => 20,
+                ]
             ],
         ],
 
@@ -71,7 +75,7 @@ return [
             'encryption' => 'tls',
             'username' => 'apikey',
             'password' => env('SENDGRID_API_KEY'),
-            'timeout' => 60, // Aumentar timeout para producción
+            'timeout' => 15, // Timeout más corto para fallar rápido
             'local_domain' => env('MAIL_EHLO_DOMAIN', 'gatekepper.com'),
             'verify_peer' => false,
             'stream_context_options' => [
@@ -79,7 +83,12 @@ return [
                     'verify_peer' => false,
                     'verify_peer_name' => false,
                     'allow_self_signed' => true,
+                    'crypto_method' => STREAM_CRYPTO_METHOD_TLS_CLIENT,
                 ],
+                'socket' => [
+                    'timeout' => 15,
+                    'SO_KEEPALIVE' => false,
+                ]
             ],
         ],
 
@@ -115,6 +124,16 @@ return [
                 'smtp',
                 'log',
             ],
+        ],
+
+        'custom' => [
+            'transport' => 'smtp',
+            'host' => 'localhost',
+            'port' => 587,
+            'encryption' => null,
+            'username' => null,
+            'password' => null,
+            'timeout' => 5,
         ],
     ],
 

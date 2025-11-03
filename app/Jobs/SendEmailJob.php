@@ -8,7 +8,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
-use App\Services\SendGridService;
+use App\Services\EmailService;
 
 class SendEmailJob implements ShouldQueue
 {
@@ -38,9 +38,9 @@ class SendEmailJob implements ShouldQueue
     public function handle(): void
     {
         try {
-            $sendGridService = new SendGridService();
+            $emailService = new EmailService();
 
-            $result = $sendGridService->sendEmail(
+            $result = $emailService->sendEmail(
                 $this->to,
                 $this->subject,
                 $this->content,
@@ -52,7 +52,8 @@ class SendEmailJob implements ShouldQueue
                 Log::info('Email enviado exitosamente via queue', [
                     'to' => $this->to,
                     'subject' => $this->subject,
-                    'sendgrid_response' => $result
+                    'method' => $result['method'] ?? 'unknown',
+                    'email_service_response' => $result
                 ]);
             } else {
                 Log::error('Error enviando email via queue', [
@@ -62,7 +63,7 @@ class SendEmailJob implements ShouldQueue
                 ]);
 
                 // Reintentar el job si falla
-                $this->fail(new \Exception('SendGrid failed: ' . ($result['error'] ?? 'Unknown error')));
+                $this->fail(new \Exception('Email service failed: ' . ($result['error'] ?? 'Unknown error')));
             }
 
         } catch (\Exception $e) {

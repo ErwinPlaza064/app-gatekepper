@@ -143,13 +143,14 @@ Route::get('/test-create-visitor-flow', function() {
             'id' => $visitor->id,
             'name' => $visitor->name,
             'status' => $visitor->approval_status,
-            'notifications_triggered' => 'Should be automatic via model events'
+            'notifications_triggered' => 'Jobs scheduled asynchronously - check queue logs'
         ];
 
         return response()->json([
             'success' => true,
-            'message' => 'Visitante creado exitosamente - revisar email',
-            'debug' => $debug
+            'message' => 'Visitante creado exitosamente - notifications via jobs!',
+            'debug' => $debug,
+            'note' => 'Los emails se procesan en background via queue jobs. Revisar logs para confirmación.'
         ]);
 
     } catch (Exception $e) {
@@ -158,6 +159,29 @@ Route::get('/test-create-visitor-flow', function() {
             'error' => $e->getMessage(),
             'line' => $e->getLine(),
             'file' => basename($e->getFile())
+        ], 500);
+    }
+});
+
+Route::get('/test-queue-email', function() {
+    try {
+        // Test directo del job de email
+        \App\Jobs\SendEmailJob::dispatch(
+            'erwinplaza064@gmail.com',
+            '🧪 Test Queue Email - Gatekeeper',
+            '<h1>Hola!</h1><p>Este es un email de prueba enviado via queue job.</p><p>Timestamp: ' . now() . '</p>'
+        );
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Email job dispatched successfully',
+            'note' => 'Email será procesado por el queue worker'
+        ]);
+
+    } catch (Exception $e) {
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage()
         ], 500);
     }
 });

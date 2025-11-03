@@ -12,7 +12,7 @@ class SendGridService
 
     public function __construct()
     {
-        $this->apiKey = config('services.sendgrid.api_key');
+        $this->apiKey = env('SENDGRID_API_KEY');
     }
 
     /**

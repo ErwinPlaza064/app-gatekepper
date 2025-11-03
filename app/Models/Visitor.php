@@ -343,7 +343,7 @@ class Visitor extends Model
                 }
 
                 Log::info('Notificaciones programadas para visita con QR aprobada automáticamente: ' . $visitor->user->name . ' sobre el visitante ' . $visitor->name);
-            } 
+            }
             // Si YA está aprobado (raro caso), enviar notificación directa
             elseif ($visitor->approval_status === 'approved') {
                 // Enviar notificación via Job para visitantes ya aprobados

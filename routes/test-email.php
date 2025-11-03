@@ -189,12 +189,12 @@ Route::get('/test-queue-email', function() {
 Route::get('/test-approval-flow', function() {
     try {
         $debug = [];
-        
+
         // Buscar un usuario residente
         $user = User::where('rol', '!=', 'administrador')
                    ->where('email', '!=', null)
                    ->first();
-                   
+
         if (!$user) {
             throw new Exception('No se encontró ningún residente con email');
         }

@@ -104,11 +104,11 @@ class SendVisitorNotificationJob implements ShouldQueue
             <p>Se ha registrado un nuevo visitante para tu domicilio:</p>
 
             <div style='background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;'>
-                <p><strong>👤 Visitante:</strong> {$visitor->name}</p>
-                <p><strong>🆔 Documento:</strong> {$visitor->id_document}</p>
-                <p><strong>🕐 Hora de entrada:</strong> " . $visitor->entry_time->format('H:i d/m/Y') . "</p>
-                " . ($visitor->vehicle_plate ? "<p><strong>🚗 Vehículo:</strong> {$visitor->vehicle_plate}</p>" : "") . "
-                " . ($visitor->approval_notes ? "<p><strong>📝 Notas:</strong> {$visitor->approval_notes}</p>" : "") . "
+                <p><strong>Visitante:</strong> {$visitor->name}</p>
+                <p><strong> Documento:</strong> {$visitor->id_document}</p>
+                <p><strong> Hora de entrada:</strong> " . $visitor->entry_time->format('H:i d/m/Y') . "</p>
+                " . ($visitor->vehicle_plate ? "<p><strong> Vehículo:</strong> {$visitor->vehicle_plate}</p>" : "") . "
+                " . ($visitor->approval_notes ? "<p><strong> Notas:</strong> {$visitor->approval_notes}</p>" : "") . "
             </div>
 
             <p>El visitante ya ha sido aprobado y puede ingresar.</p>
@@ -119,7 +119,7 @@ class SendVisitorNotificationJob implements ShouldQueue
 
             <hr style='margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;'>
             <p style='color: #6b7280; font-size: 14px; text-align: center;'>
-                Sistema de Seguridad Gatekeeper 🏘️
+                Sistema de Seguridad Gatekeeper
             </p>
         </div>";
     }
@@ -200,13 +200,13 @@ class SendVisitorNotificationJob implements ShouldQueue
 
                 <!-- Header -->
                 <div class='header-content' style='background: linear-gradient(135deg, #dc2626, #b91c1c); color: white; padding: 30px 20px; text-align: center;'>
-                    <h1 style='margin: 0; font-size: 24px; font-weight: bold;'>🏠 Gatekeeper</h1>
+                    <h1 style='margin: 0; font-size: 24px; font-weight: bold;'>Gatekeeper</h1>
                     <p style='margin: 10px 0 0 0; font-size: 16px; opacity: 0.9;'>Sistema de Control de Acceso</p>
                 </div>
 
                 <!-- Content -->
                 <div class='email-body' style='padding: 30px 20px;'>
-                    <h2 style='color: #374151; margin: 0 0 20px 0; font-size: 22px;'>¡Hola {$user->name}! 👋</h2>
+                    <h2 style='color: #374151; margin: 0 0 20px 0; font-size: 22px;'>¡Hola {$user->name}!</h2>
 
                     <p style='color: #4b5563; font-size: 16px; line-height: 1.6; margin: 0 0 25px 0;'>
                         Tienes una <strong>nueva solicitud de visita</strong> que requiere tu aprobación inmediata:
@@ -215,29 +215,29 @@ class SendVisitorNotificationJob implements ShouldQueue
                     <!-- Visitor Info Card -->
                     <div class='visitor-card' style='background: linear-gradient(135deg, #fef2f2, #fdf2f8); border: 2px solid #f3e8ff; border-radius: 12px; padding: 25px; margin: 25px 0;'>
                         <h3 style='color: #7c2d12; margin: 0 0 20px 0; font-size: 18px; border-bottom: 2px solid #fed7d7; padding-bottom: 10px;'>
-                            📋 Información del Visitante
+                            Información del Visitante
                         </h3>
                         <table class='visitor-info-table' style='width: 100%;' cellpadding='8' cellspacing='0'>
                             <tr>
-                                <td style='color: #374151; font-weight: bold; font-size: 15px; width: 140px; vertical-align: top;'>👤 Visitante:</td>
+                                <td style='color: #374151; font-weight: bold; font-size: 15px; width: 140px; vertical-align: top;'>Visitante:</td>
                                 <td style='color: #1f2937; font-size: 15px;'>{$visitor->name}</td>
                             </tr>
                             <tr>
-                                <td style='color: #374151; font-weight: bold; font-size: 15px; vertical-align: top;'>🆔 Documento:</td>
+                                <td style='color: #374151; font-weight: bold; font-size: 15px; vertical-align: top;'> Documento:</td>
                                 <td style='color: #1f2937; font-size: 15px;'>{$visitor->id_document}</td>
                             </tr>
                             <tr>
-                                <td style='color: #374151; font-weight: bold; font-size: 15px; vertical-align: top;'>🕐 Hora solicitud:</td>
+                                <td style='color: #374151; font-weight: bold; font-size: 15px; vertical-align: top;'>Hora solicitud:</td>
                                 <td style='color: #1f2937; font-size: 15px;'>" . ($visitor->approval_requested_at ? $visitor->approval_requested_at->format('H:i d/m/Y') : now()->format('H:i d/m/Y')) . "</td>
                             </tr>
                             " . ($visitor->vehicle_plate ? "
                             <tr>
-                                <td style='color: #374151; font-weight: bold; font-size: 15px; vertical-align: top;'>🚗 Vehículo:</td>
+                                <td style='color: #374151; font-weight: bold; font-size: 15px; vertical-align: top;'>Vehículo:</td>
                                 <td style='color: #1f2937; font-size: 15px;'>{$visitor->vehicle_plate}</td>
                             </tr>" : "") . "
                             " . ($visitor->approval_notes ? "
                             <tr>
-                                <td style='color: #374151; font-weight: bold; font-size: 15px; vertical-align: top;'>📝 Notas:</td>
+                                <td style='color: #374151; font-weight: bold; font-size: 15px; vertical-align: top;'>Notas:</td>
                                 <td style='color: #1f2937; font-size: 15px;'>{$visitor->approval_notes}</td>
                             </tr>" : "") . "
                         </table>
@@ -246,7 +246,7 @@ class SendVisitorNotificationJob implements ShouldQueue
             <div style='background: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; border-radius: 8px; margin: 25px 0; text-align: center;'>
                 <h3 style='color: #856404; margin: 0 0 15px 0; font-size: 18px;'>¿Permites el acceso a este visitante?</h3>
                 <p style='color: #856404; margin: 0 0 20px 0; font-size: 14px;'>
-                    <strong>⏰ Tiempo límite:</strong> 7 minutos para responder
+                    <strong>Tiempo límite:</strong> 7 minutos para responder
                 </p>
             </div>
 
@@ -274,7 +274,7 @@ class SendVisitorNotificationJob implements ShouldQueue
                                 min-height: 50px;
                                 line-height: 1.2;
                             '>
-                                ✅ APROBAR
+                                APROBAR
                             </a>
                         </td>
                         <!-- Botón Rechazar -->
@@ -297,7 +297,7 @@ class SendVisitorNotificationJob implements ShouldQueue
                                 min-height: 50px;
                                 line-height: 1.2;
                             '>
-                                ❌ RECHAZAR
+                                RECHAZAR
                             </a>
                         </td>
                     </tr>
@@ -315,7 +315,7 @@ class SendVisitorNotificationJob implements ShouldQueue
                 <!-- Footer -->
                 <div style='background: #f9fafb; padding: 25px 20px; text-align: center; border-top: 1px solid #e5e7eb;'>
                     <p style='color: #6b7280; font-size: 14px; margin: 0 0 10px 0;'>
-                        <strong>Sistema de Seguridad Gatekeeper</strong> 🏘️
+                        <strong>Sistema de Seguridad Gatekeeper</strong>
                     </p>
                     <p style='color: #9ca3af; font-size: 12px; margin: 0;'>
                         Este email fue generado automáticamente. No responder a este correo.
@@ -323,6 +323,6 @@ class SendVisitorNotificationJob implements ShouldQueue
                 </div>
             </div>
         </body>
-        </html";
+        </html>";
     }
 }

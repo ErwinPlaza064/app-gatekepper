@@ -22,12 +22,12 @@ class NewVisitorNotification extends Notification
     public function via($notifiable)
     {
         $channels = ['mail', 'database'];
-        
+
         // Agregar Expo Push si el usuario tiene token registrado
         if (!empty($notifiable->expo_push_token)) {
             $channels[] = 'expo';
         }
-        
+
         return $channels;
     }
 
@@ -52,14 +52,29 @@ class NewVisitorNotification extends Notification
             ->line("Se ha registrado un nuevo visitante para tu domicilio:")
             ->line("👤 **Visitante:** {$this->visitor->name}")
             ->line("🆔 **Documento:** {$this->visitor->id_document}")
-            ->line("🕐 **Hora de entrada:** " . $this->visitor->entry_time->format('H:i d/m/Y'))
+            // Mostrar hora de entrada solo si existe, si no mostrar la hora de la solicitud
+            ->when($this->visitor->entry_time, function ($mail) {
+                return $mail->line("🕐 **Hora de entrada:** " . $this->visitor->entry_time->format('H:i d/m/Y'));
+            }, function ($mail) {
+                $requestedAt = $this->visitor->approval_requested_at?->format('H:i d/m/Y') ?? now()->format('H:i d/m/Y');
+                return $mail->line("⏳ **Solicitud enviada:** {$requestedAt}");
+            })
             ->when($this->visitor->vehicle_plate, function ($mail) {
                 return $mail->line("🚗 **Vehículo:** {$this->visitor->vehicle_plate}");
             })
             ->when($this->visitor->approval_notes, function ($mail) {
                 return $mail->line("📝 **Notas:** {$this->visitor->approval_notes}");
             })
-            ->line('El visitante ya ha sido aprobado y puede ingresar.')
+            // Mensaje contextual según el estado de aprobación
+            ->when($this->visitor->approval_status === 'approved', function ($mail) {
+                return $mail->line('El visitante ya ha sido aprobado y puede ingresar.');
+            }, function ($mail) {
+                if ($this->visitor->approval_status === 'rejected') {
+                    return $mail->line('El visitante ha sido rechazado.');
+                }
+
+                return $mail->line('Por favor, revisa la solicitud y aprueba o rechaza la visita desde el panel o el enlace proporcionado.');
+            })
             ->action('Ver Dashboard', route('dashboard'))
             ->salutation('Sistema de Seguridad Gatekeeper 🏘️');
     }

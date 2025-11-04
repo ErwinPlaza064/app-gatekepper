@@ -10,6 +10,88 @@ use Carbon\Carbon;
 
 class NotificationController extends Controller
 {
+    /**
+     * Obtener todas las notificaciones del usuario autenticado
+     */
+    public function index(Request $request)
+    {
+        try {
+            $user = $request->user();
+            
+            if (!$user) {
+                return response()->json(['message' => 'No autenticado'], 401);
+            }
+
+            // Obtener todas las notificaciones del usuario, ordenadas por fecha más reciente
+            $notifications = $user->notifications()
+                ->orderBy('created_at', 'desc')
+                ->get()
+                ->map(function ($notification) {
+                    $data = $notification->data;
+                    
+                    // Determinar el tipo de notificación
+                    $type = $notification->type;
+                    $isRead = $notification->read_at !== null;
+                    
+                    // Extraer información según el tipo de notificación
+                    $formatted = [
+                        'id' => $notification->id,
+                        'type' => $type,
+                        'read' => $isRead,
+                        'created_at' => $notification->created_at->format('Y-m-d H:i:s'),
+                        'created_at_formatted' => $notification->created_at->format('d/m, H:i'),
+                        'created_at_short' => $notification->created_at->format('d/m/y, H:i'),
+                    ];
+
+                    // Si es una notificación de visitante
+                    if (str_contains($type, 'Visitor')) {
+                        $visitor = $data['visitor'] ?? null;
+                        
+                        if ($visitor) {
+                            $formatted['title'] = 'Nueva solicitud de visita';
+                            $formatted['visitor_name'] = $visitor['name'] ?? 'Visitante';
+                            $formatted['document_type'] = $visitor['document_type'] ?? 'N/A';
+                            $formatted['vehicle'] = $visitor['vehicle'] ?? null;
+                            $formatted['status'] = $visitor['status'] ?? 'pending';
+                            $formatted['expired'] = $visitor['expired'] ?? false;
+                            $formatted['expires_at'] = $visitor['expires_at'] ?? null;
+                        }
+                    } 
+                    // Si es una notificación de aprobación
+                    else if (str_contains($type, 'Approval')) {
+                        $visitor = $data['visitor'] ?? null;
+                        
+                        if ($visitor) {
+                            $formatted['title'] = 'Solicitud de aprobación';
+                            $formatted['visitor_name'] = $visitor['name'] ?? 'Visitante';
+                            $formatted['document_type'] = $visitor['document_type'] ?? 'N/A';
+                            $formatted['vehicle'] = $visitor['vehicle'] ?? null;
+                            $formatted['status'] = $visitor['status'] ?? 'pending';
+                        }
+                    }
+                    // Si es una notificación de visita
+                    else if (str_contains($type, 'NewVisitor') || str_contains($type, 'Visitor')) {
+                        $visitor = $data['visitor'] ?? $data;
+                        $formatted['title'] = 'Nueva visita';
+                        $formatted['message'] = ($visitor['name'] ?? 'Un visitante') . ' va a tu domicilio.';
+                        $formatted['visitor_name'] = $visitor['name'] ?? null;
+                    }
+                    // Notificación genérica
+                    else {
+                        $formatted['title'] = $data['title'] ?? 'Notificación';
+                        $formatted['message'] = $data['message'] ?? $data['body'] ?? '';
+                    }
+
+                    return $formatted;
+                });
+
+            return response()->json($notifications);
+        } catch (\Exception $e) {
+            \Log::error('Error fetching notifications for user ' . $request->user()->id . ': ' . $e->getMessage());
+            return response()->json(['message' => 'Error al cargar las notificaciones', 'error' => $e->getMessage()], 500);
+        }
+    }
+
     public function markAsRead(Request $request)
     {
         $request->user()->unreadNotifications->markAsRead();

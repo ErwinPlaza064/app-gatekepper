@@ -15,6 +15,8 @@ return [
 
     'allowed_methods' => ['*'],
 
+    // Para apps móviles, no necesitamos restricciones de origen estrictas
+    // Las apps móviles no están sujetas a las mismas restricciones CORS que los navegadores
     'allowed_origins' => [
         'https://gatekepper.com',
         'https://www.gatekepper.com',
@@ -27,7 +29,7 @@ return [
     'allowed_origins_patterns' => [
         'https://*.gatekepper.com',
     ],
-
+    
     'allowed_headers' => [
         'Accept',
         'Authorization',
@@ -44,5 +46,8 @@ return [
     ],
 
     'max_age' => 86400, // 24 horas
+    
+    // supports_credentials: true para la app web (cookies)
+    // Las apps móviles usan tokens (Sanctum), no cookies, así que CORS no es un problema
     'supports_credentials' => true,
 ];

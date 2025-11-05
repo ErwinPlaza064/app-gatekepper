@@ -13,10 +13,7 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Notification as LaravelNotification;
-use App\Notifications\NewVisitorNotification;
 use Illuminate\Support\Facades\Log;
-use Carbon\Carbon;
 
 class VisitorResource extends Resource
 {
@@ -35,7 +32,6 @@ class VisitorResource extends Resource
         return 'Visitantes';
     }
 
-    // Búsqueda global mejorada
     public static function getGlobalSearchEloquentQuery(): Builder
     {
         return parent::getGlobalSearchEloquentQuery()
@@ -86,21 +82,12 @@ class VisitorResource extends Resource
                     ->label('Placa del Vehículo')
                     ->placeholder('ABC-123'),
 
-                // ℹ️ Información sobre el proceso de aprobación
-                Forms\Components\Section::make('📋 Proceso de Aprobación')
+                Forms\Components\Section::make('Proceso de Aprobación')
                     ->description('El visitante será registrado como pendiente y se enviará una notificación al residente para su aprobación.')
                     ->schema([
                         Forms\Components\Placeholder::make('approval_info')
                             ->label('')
-                            ->content('
-                                📝 **Pasos del proceso:**
-
-                                1. El visitante se registra como **pendiente**
-                                2. Se envía **notificación por email** al residente
-                                3. El residente **aprueba o rechaza** la visita
-                                4. Si es aprobado, se establece automáticamente la **hora de entrada**
-                                5. El portero puede marcar la **hora de salida** cuando corresponda
-                            ')
+                            ->content('1. El visitante se registra como: pendiente. 2: Se envía notificación por email al residente. 3: El residente aprueba o rechaza la visita. 4: Si es aprobado, se establece automáticamente la hora de entrada. 5: El portero puede marcar la hora de salida cuando corresponda.')
                             ->columnSpanFull(),
                     ])
                     ->collapsible()
@@ -132,21 +119,17 @@ class VisitorResource extends Resource
                     ->sortable()
                     ->wrap(),
 
-                // 🏷️ Columna para identificar método de registro
                 Tables\Columns\BadgeColumn::make('registration_method')
                     ->label('Método')
                     ->getStateUsing(function ($record) {
-                        // Verificar si tiene QR code asociado
                         if ($record->qr_code_id) {
                             return 'QR Scan';
                         }
 
-                        // Verificar si las notas indican registro manual
                         if (str_contains($record->approval_notes ?? '', 'Registro manual desde panel')) {
                             return 'Manual';
                         }
 
-                        // Verificar por timing: si entry_time y created_at son muy cercanos, probablemente manual
                         if ($record->entry_time && $record->created_at->diffInMinutes($record->entry_time) < 1) {
                             return 'Manual';
                         }
@@ -170,7 +153,7 @@ class VisitorResource extends Resource
                     ->color('gray'),
 
                 Tables\Columns\TextColumn::make('entry_time')
-                    ->label('📅 Entrada')
+                    ->label('Entrada')
                     ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->placeholder('Sin registrar')
@@ -203,7 +186,6 @@ class VisitorResource extends Resource
                 Tables\Columns\BadgeColumn::make('approval_status')
                     ->label('Estado Visita')
                     ->getStateUsing(function ($record) {
-                        // Lógica correcta para mostrar el estado
                         if ($record->approval_status === 'pending') {
                             return 'pending';
                         } elseif ($record->approval_status === 'rejected') {
@@ -263,19 +245,18 @@ class VisitorResource extends Resource
                     ->query(fn (Builder $query): Builder => $query->whereNotNull('exit_time'))
                     ->toggle(),
 
-                // 🆕 Filtros por estado de aprobación
                 Filter::make('pending_approval')
-                    ->label('⏳ Pendientes de aprobación')
+                    ->label('Pendientes de aprobación')
                     ->query(fn (Builder $query): Builder => $query->where('approval_status', 'pending'))
                     ->toggle(),
 
                 Filter::make('approved_visits')
-                    ->label('✅ Aprobados')
+                    ->label('Aprobados')
                     ->query(fn (Builder $query): Builder => $query->where('approval_status', 'approved'))
                     ->toggle(),
 
                 Filter::make('rejected_visits')
-                    ->label('❌ Rechazados')
+                    ->label('Rechazados')
                     ->query(fn (Builder $query): Builder => $query->where('approval_status', 'rejected'))
                     ->toggle(),
 
@@ -329,8 +310,6 @@ class VisitorResource extends Resource
                 Tables\Actions\EditAction::make()
                     ->label('Editar'),
 
-                // Las aprobaciones/rechazos son responsabilidad exclusiva del residente
-                // Los administradores pueden ver el estado pero no modificarlo
 
                 Tables\Actions\Action::make('mark_exit')
                     ->label('Marcar Salida')
@@ -353,7 +332,7 @@ class VisitorResource extends Resource
             ->defaultSort('entry_time', 'desc')
             ->striped()
             ->paginated([10, 25, 50, 100])
-            ->deselectAllRecordsWhenFiltered(false); // Previene errores JavaScript
+            ->deselectAllRecordsWhenFiltered(false);
     }
 
     public static function getRelations(): array

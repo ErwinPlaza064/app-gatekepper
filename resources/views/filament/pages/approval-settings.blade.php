@@ -1,10 +1,10 @@
 <x-filament-panels::page>
     <div class="space-y-6">
         <!-- Header -->
-        <div class="bg-white rounded-lg shadow p-6">
+        <div class="p-6 bg-black rounded-lg shadow">
             <div class="flex items-center space-x-3">
                 <div class="flex-shrink-0">
-                    <x-heroicon-o-cog-6-tooth class="h-8 w-8 text-primary-600" />
+                    <x-heroicon-o-cog-6-tooth class="w-8 h-8 text-primary-600" />
                 </div>
                 <div>
                     <h2 class="text-xl font-semibold text-gray-900">Sistema de Aprobación de Visitantes</h2>
@@ -26,17 +26,17 @@
         </form>
 
         <!-- Información adicional -->
-        <div class="bg-blue-50 rounded-lg p-6">
+        <div class="p-6 rounded-lg bg-blue-50">
             <div class="flex">
                 <div class="flex-shrink-0">
-                    <x-heroicon-o-information-circle class="h-5 w-5 text-blue-400" />
+                    <x-heroicon-o-information-circle class="w-5 h-5 text-blue-400" />
                 </div>
                 <div class="ml-3">
                     <h3 class="text-sm font-medium text-blue-800">
                         ¿Cómo funciona el sistema?
                     </h3>
                     <div class="mt-2 text-sm text-blue-700">
-                        <ul class="list-disc pl-5 space-y-1">
+                        <ul class="pl-5 space-y-1 list-disc">
                             <li>Cuando llega un visitante espontáneo, el portero lo registra sin código QR</li>
                             <li>El sistema envía automáticamente una notificación al residente por WhatsApp y el panel web</li>
                             <li>El residente tiene un tiempo límite <strong>global</strong> para aprobar o rechazar la visita</li>
@@ -49,11 +49,11 @@
         </div>
 
         <!-- Estado del sistema -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="bg-green-50 rounded-lg p-4">
+        <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
+            <div class="p-4 rounded-lg bg-green-50">
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
-                        <x-heroicon-o-check-circle class="h-6 w-6 text-green-600" />
+                        <x-heroicon-o-check-circle class="w-6 h-6 text-green-600" />
                     </div>
                     <div class="ml-3">
                         <p class="text-sm font-medium text-green-800">Sistema Activo</p>
@@ -62,10 +62,10 @@
                 </div>
             </div>
 
-            <div class="bg-yellow-50 rounded-lg p-4">
+            <div class="p-4 rounded-lg bg-yellow-50">
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
-                        <x-heroicon-o-clock class="h-6 w-6 text-yellow-600" />
+                        <x-heroicon-o-clock class="w-6 h-6 text-yellow-600" />
                     </div>
                     <div class="ml-3">
                         <p class="text-sm font-medium text-yellow-800">Timeout Actual</p>
@@ -74,10 +74,10 @@
                 </div>
             </div>
 
-            <div class="bg-blue-50 rounded-lg p-4">
+            <div class="p-4 rounded-lg bg-blue-50">
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
-                        <x-heroicon-o-bell class="h-6 w-6 text-blue-600" />
+                        <x-heroicon-o-bell class="w-6 h-6 text-blue-600" />
                     </div>
                     <div class="ml-3">
                         <p class="text-sm font-medium text-blue-800">Recordatorios</p>

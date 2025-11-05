@@ -129,11 +129,15 @@ export default function Notification({ notifications, setNotifications }) {
             <div
                 key={n.id}
                 className={`group relative ${
-                    isMobile ? "px-4 py-4" : "px-4 py-3"
+                    isMobile
+                        ? "px-4 py-4 bg-white dark:bg-gray-800"
+                        : "px-4 py-3"
                 } text-sm cursor-pointer transition-all duration-200 rounded-lg border ${
                     n.read_at
                         ? "bg-gray-50 dark:bg-gray-800/50 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 border-gray-200 dark:border-gray-700"
                         : "bg-blue-50 dark:bg-blue-900/20 text-gray-900 dark:text-gray-100 hover:bg-blue-100 dark:hover:bg-blue-900/30 border-blue-200 dark:border-blue-800"
+                } ${
+                    isMobile ? "!bg-white dark:!bg-gray-800" : ""
                 } hover:shadow-sm`}
             >
                 <div className="flex items-start gap-3">
@@ -255,9 +259,9 @@ export default function Notification({ notifications, setNotifications }) {
                         </div>
 
                         {/* Contenido móvil - Ocupa todo el espacio restante */}
-                        <div className="flex-1 overflow-y-auto h-[calc(100vh-80px)]">
+                        <div className="flex-1 overflow-y-auto h-[calc(100vh-80px)] bg-white dark:bg-gray-900">
                             {notifications.length === 0 ? (
-                                <div className="flex flex-col items-center justify-center h-full px-6 py-12 text-center">
+                                <div className="flex flex-col items-center justify-center h-full px-6 py-12 text-center bg-white dark:bg-gray-900">
                                     <div className="flex items-center justify-center w-16 h-16 mb-4 bg-gray-100 rounded-full dark:bg-gray-800">
                                         <FaBell className="w-6 h-6 text-gray-400" />
                                     </div>
@@ -270,7 +274,7 @@ export default function Notification({ notifications, setNotifications }) {
                                     </p>
                                 </div>
                             ) : (
-                                <div className="p-4 space-y-3">
+                                <div className="p-4 space-y-3 bg-white dark:bg-gray-900">
                                     {notifications.map((n) =>
                                         renderNotificationItem(n, true)
                                     )}

@@ -6,13 +6,6 @@ import InputLabel from "@/Components/UI/InputLabel";
 import PrimaryButton from "@/Components/UI/PrimaryButton";
 import TextInput from "@/Components/UI/TextInput";
 import { Head, Link, useForm } from "@inertiajs/react";
-import {
-    HiMail,
-    HiLockClosed,
-    HiEye,
-    HiEyeOff,
-    HiCheckCircle,
-} from "react-icons/hi";
 
 export default function Login({ status }) {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -41,10 +34,8 @@ export default function Login({ status }) {
         <GuestLayout>
             <Head title="Inicia Sesión" />
 
-            {/* Container principal con gradiente de fondo */}
-            <div className="flex items-center justify-center min-h-screen px-4 py-1 lg:py-6 bg-gradient-to-br from-blue-50 via-white to-purple-50 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-center min-h-screen px-4 py-1 lg:py-1 bg-gradient-to-br from-blue-50 via-white to-purple-50 sm:px-6 lg:px-8">
                 <div className="w-full max-w-sm space-y-6 sm:max-w-md sm:space-y-8">
-                    {/* Header con logo y título */}
                     <div className="text-center">
                         <div className="flex items-center justify-center w-20 h-20 mx-auto mb-6 bg-black rounded-full shadow-lg">
                             <img
@@ -61,10 +52,9 @@ export default function Login({ status }) {
                         </p>
                     </div>
 
-                    {/* Card principal */}
                     <div className="p-8 border shadow-xl bg-white/80 backdrop-blur-lg rounded-2xl border-white/20">
                         {status && (
-                            <div className="p-4 mb-6 border border-green-200 rounded-lg bg-green-50">
+                            <div className="p-3 mb-6 border border-green-200 rounded-lg bg-green-50">
                                 <div className="flex">
                                     <div className="flex-shrink-0">
                                         <svg
@@ -92,7 +82,6 @@ export default function Login({ status }) {
                             onSubmit={submit}
                             className="space-y-4 sm:space-y-6"
                         >
-                            {/* Campo Email */}
                             <div className="space-y-2">
                                 <InputLabel
                                     htmlFor="email"
@@ -135,7 +124,6 @@ export default function Login({ status }) {
                                 />
                             </div>
 
-                            {/* Campo Contraseña */}
                             <div className="space-y-2">
                                 <InputLabel
                                     htmlFor="password"
@@ -222,7 +210,6 @@ export default function Login({ status }) {
                                 />
                             </div>
 
-                            {/* Recordar y enlace */}
                             <div className="flex items-center justify-between">
                                 <label className="flex items-center">
                                     <Checkbox
@@ -248,10 +235,9 @@ export default function Login({ status }) {
                                 </Link>
                             </div>
 
-                            {/* Botón de envío */}
-                            <div className="pt-4">
+                            <div className="flex justify-center pt-4">
                                 <PrimaryButton
-                                    className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                                    className="w-full flex items-center justify-center  py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                                     disabled={processing}
                                 >
                                     {processing ? (
@@ -284,13 +270,6 @@ export default function Login({ status }) {
                                 </PrimaryButton>
                             </div>
                         </form>
-                    </div>
-
-                    {/* Footer */}
-                    <div className="text-center">
-                        <p className="text-xs text-gray-500">
-                            © 2025 Gatekepper. Todos los derechos reservados.
-                        </p>
                     </div>
                 </div>
             </div>

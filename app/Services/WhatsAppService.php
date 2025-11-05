@@ -82,10 +82,14 @@ class WhatsAppService
      */
     public function nuevoVisitante($numero, $visitante)
     {
+        $entryTime = $visitante->entry_time 
+            ? $visitante->entry_time->format('H:i d/m/Y') 
+            : now()->format('H:i d/m/Y');
+        
         $mensaje = "🏠 *Nuevo Visitante para tu domicilio* 🏠\n\n" .
                   "👤 Visitante: {$visitante->name}\n" .
                   "🆔 Documento: {$visitante->id_document}\n" .
-                  "🕐 Hora de entrada: " . $visitante->entry_time->format('H:i d/m/Y') . "\n";
+                  "🕐 Hora de entrada: " . $entryTime . "\n";
 
         if ($visitante->vehicle_plate) {
             $mensaje .= "🚗 Vehículo: {$visitante->vehicle_plate}\n";
@@ -175,10 +179,14 @@ class WhatsAppService
      */
     public function solicitudAprobacion($numero, $visitante, $approveUrl, $rejectUrl)
     {
+        $entryTime = $visitante->entry_time 
+            ? $visitante->entry_time->format('H:i d/m/Y') 
+            : now()->format('H:i d/m/Y');
+        
         $mensaje = "🔔 *Solicitud de Visita* 🔔\n\n" .
                   "👤 Visitante: {$visitante->name}\n" .
                   "🆔 Documento: {$visitante->id_document}\n" .
-                  "🕐 Solicita acceso a las: " . $visitante->entry_time->format('H:i d/m/Y') . "\n";
+                  "🕐 Solicita acceso a las: " . $entryTime . "\n";
 
         if ($visitante->vehicle_plate) {
             $mensaje .= "🚗 Vehículo: {$visitante->vehicle_plate}\n";
@@ -221,6 +229,51 @@ class WhatsAppService
         } else {
             $mensaje .= "\n❌ Acceso denegado\n" .
                        "🔄 Se ha notificado al personal de seguridad\n";
+        }
+
+        $mensaje .= "\n🏘️ Sistema: Gatekeeper";
+
+        return $this->enviarMensaje($numero, $mensaje);
+    }
+
+    /**
+     * Notificación para el portero/vigilante sobre decisión de visita
+     */
+    public function notificacionPortero($numero, $visitante, $status, $respondedBy = null)
+    {
+        $emoji = in_array($status, ['approved', 'auto_approved']) ? '✅' : '❌';
+        $statusText = match($status) {
+            'approved' => 'APROBADA',
+            'auto_approved' => 'AUTO-APROBADA',
+            'rejected' => 'RECHAZADA',
+            default => 'ACTUALIZADA'
+        };
+
+        $mensaje = "{$emoji} *Visita {$statusText}* {$emoji}\n\n" .
+                  "👤 Visitante: {$visitante->name}\n" .
+                  "🆔 Documento: {$visitante->id_document}\n";
+        
+        if ($visitante->vehicle_plate) {
+            $mensaje .= "🚗 Vehículo: {$visitante->vehicle_plate}\n";
+        }
+
+        $mensaje .= "🏠 Residente: {$visitante->user->name}\n" .
+                   "📍 Dirección: {$visitante->user->address}\n";
+
+        if ($respondedBy) {
+            $mensaje .= "👤 Respondido por: {$respondedBy}\n";
+        }
+
+        $mensaje .= "🕐 Hora: " . now()->format('H:i d/m/Y') . "\n";
+
+        if (in_array($status, ['approved', 'auto_approved'])) {
+            $mensaje .= "\n✅ *PERMITIR ACCESO*\n";
+            if ($status === 'auto_approved') {
+                $mensaje .= "⏰ Aprobación automática (sin respuesta en 7 min)\n";
+            }
+        } else {
+            $mensaje .= "\n❌ *DENEGAR ACCESO*\n" .
+                       "No permitir el ingreso de esta persona\n";
         }
 
         $mensaje .= "\n🏘️ Sistema: Gatekeeper";

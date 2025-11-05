@@ -29,7 +29,8 @@ class ContactController extends Controller
         ];
 
         // Enviar email al administrador
-        Mail::to(env('ADMIN_EMAIL'))->send(new ContactMail($mailData));
+        $adminEmail = env('ADMIN_EMAIL', 'plazaerwin41@gmail.com');
+        Mail::to($adminEmail)->send(new ContactMail($mailData));
 
         // Enviar email de confirmación al usuario
         Mail::to($request->email)->send(new ContactMail($mailData, true));

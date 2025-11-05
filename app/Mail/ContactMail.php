@@ -10,18 +10,28 @@ class ContactMail extends Mailable
     use Queueable, SerializesModels;
 
     public $data;
+    public $isConfirmation;
 
-    public function __construct($data)
+    public function __construct($data, $isConfirmation = false)
     {
         $this->data = $data;
+        $this->isConfirmation = $isConfirmation;
     }
 
     public function build()
     {
-        return $this->from($this->data['email'], $this->data['fullname'])
-                    ->to('plazaerwin41@gmail.com')
-                    ->subject('Nuevo mensaje de contacto')
+        $subject = $this->data['subject'] ?? 'Nuevo mensaje de contacto';
+
+        if ($this->isConfirmation) {
+            $subject = 'Confirmación: ' . $subject;
+        }
+
+        return $this->from('noreply@gatekeeper.com', 'Sistema de Contacto')
+                    ->subject($subject)
                     ->view('email')
-                    ->with('data', $this->data);
+                    ->with([
+                        'data' => $this->data,
+                        'isConfirmation' => $this->isConfirmation
+                    ]);
     }
 }

@@ -129,8 +129,39 @@ function ContactForm({ auth }) {
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        // Validar el último paso antes de enviar
-        if (!validateStep()) {
+        // Solo permitir envío desde el paso final (Resumen)
+        if (currentStep !== steps.length - 1) {
+            addToast("Por favor, revisa el resumen antes de enviar", "warning");
+            return;
+        }
+
+        // Validación final de todos los campos
+        const finalErrors = {};
+
+        if (!data.fullname.trim() || data.fullname.trim().length < 3) {
+            finalErrors.fullname =
+                "El nombre es obligatorio y debe tener al menos 3 caracteres";
+        }
+        if (
+            !data.email.trim() ||
+            !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)
+        ) {
+            finalErrors.email = "El email es obligatorio y debe ser válido";
+        }
+        if (!data.subject.trim() || data.subject.trim().length < 5) {
+            finalErrors.subject =
+                "El asunto es obligatorio y debe tener al menos 5 caracteres";
+        }
+        if (!data.message.trim() || data.message.trim().length < 10) {
+            finalErrors.message =
+                "El mensaje es obligatorio y debe tener al menos 10 caracteres";
+        }
+        if (!data.location) {
+            finalErrors.location = "Debes seleccionar una ubicación en el mapa";
+        }
+
+        if (Object.keys(finalErrors).length > 0) {
+            setValidationErrors(finalErrors);
             addToast(
                 "Por favor, completa todos los campos correctamente",
                 "error"
@@ -185,7 +216,7 @@ function ContactForm({ auth }) {
                                 htmlFor="fullname"
                                 className="block text-xs font-semibold tracking-wide text-gray-700 uppercase sm:text-sm"
                             >
-                                ¿Cuál es tu nombre completo? *
+                                ¿Cuál es tu nombre? *
                             </label>
                             <div className="relative">
                                 <input
@@ -595,7 +626,7 @@ function ContactForm({ auth }) {
                         Contáctanos
                     </h1>
                     <p className="max-w-2xl mx-auto text-base text-gray-600 sm:text-xl">
-                        Completa el formulario en 4 sencillos pasos
+                        Completa el formulario en 5 sencillos pasos
                     </p>
                 </div>
             </div>

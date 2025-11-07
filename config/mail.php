@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'default' => env('MAIL_MAILER', 'railway_safe'),
+    'default' => env('MAIL_MAILER', 'sendgrid-api'),
 
     /*
     |--------------------------------------------------------------------------

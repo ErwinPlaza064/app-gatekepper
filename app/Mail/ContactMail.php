@@ -26,7 +26,7 @@ class ContactMail extends Mailable
             $subject = 'Confirmación: ' . $subject;
         }
 
-        return $this->from('noreply@gatekeeper.com', 'Sistema de Contacto')
+        return $this->from(config('mail.from.address'), config('mail.from.name'))
                     ->subject($subject)
                     ->view('email')
                     ->with([

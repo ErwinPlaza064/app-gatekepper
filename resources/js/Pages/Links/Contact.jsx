@@ -128,10 +128,20 @@ function ContactForm({ auth }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        e.stopPropagation();
+
+        // Debug: verificar en qué paso estamos
+        console.log(
+            "handleSubmit called - currentStep:",
+            currentStep,
+            "steps.length:",
+            steps.length
+        );
 
         // Solo permitir envío desde el paso final (Resumen)
         if (currentStep !== steps.length - 1) {
             addToast("Por favor, revisa el resumen antes de enviar", "warning");
+            console.log("Prevenir envío - no estamos en el paso final");
             return;
         }
 

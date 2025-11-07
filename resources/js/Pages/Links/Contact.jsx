@@ -108,7 +108,10 @@ function ContactForm({ auth }) {
     };
 
     const handleNext = () => {
+        console.log('handleNext - currentStep:', currentStep);
+        
         if (validateStep()) {
+            console.log('Validation passed - moving to next step');
             nextStep();
         } else {
             addToast(
@@ -445,6 +448,33 @@ function ContactForm({ auth }) {
                             <p className="text-sm text-gray-600 sm:text-base">
                                 Revisa la información antes de enviar
                             </p>
+                        </div>
+
+                        {/* Advertencia de envío */}
+                        <div className="p-4 border-2 border-green-500 rounded-lg bg-green-50">
+                            <div className="flex items-start">
+                                <svg
+                                    className="w-6 h-6 mr-3 text-green-600 flex-shrink-0"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                                    />
+                                </svg>
+                                <div className="flex-1">
+                                    <p className="font-semibold text-green-800">
+                                        ✓ Todo listo para enviar
+                                    </p>
+                                    <p className="mt-1 text-sm text-green-700">
+                                        Revisa que toda la información sea correcta. Al hacer clic en "Enviar Mensaje" se enviará tu consulta.
+                                    </p>
+                                </div>
+                            </div>
                         </div>
 
                         <div className="space-y-3 sm:space-y-4">

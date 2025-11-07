@@ -34,14 +34,14 @@ class MailConfigServiceProvider extends ServiceProvider
                      !empty(env('RAILWAY_SERVICE_NAME'));
 
         if ($isRailway) {
-            // En Railway, usar mailer que NO intente SMTP
-            Config::set('mail.default', 'railway_safe');
+            // En Railway, usar SendGrid API personalizado (ya funciona para notificaciones)
+            Config::set('mail.default', 'sendgrid-api');
 
-            // También deshabilitar completamente los mailers problemáticos
-            Config::set('mail.mailers.failover.mailers', ['log']);
+            // Configurar failover para SendGrid API como primaria
+            Config::set('mail.mailers.failover.mailers', ['sendgrid-api', 'log']);
 
             logger()->info('Mail configuration set for Railway environment', [
-                'default_mailer' => 'railway_safe',
+                'default_mailer' => 'sendgrid-api',
                 'environment' => 'railway'
             ]);
         } else {
